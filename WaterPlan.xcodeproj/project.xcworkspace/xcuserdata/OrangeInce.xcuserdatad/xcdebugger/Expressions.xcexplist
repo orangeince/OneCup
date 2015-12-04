@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<VariablesViewState
+   version = "1.0">
+   <ContextStates>
+      <ContextState
+         contextName = "ReminderNewViewController.keyboardWillShow(NSNotification) -&gt; ():ReminderNewViewController.swift">
+         <PersistentStrings>
+            <PersistentString
+               value = "self.keyBoardShowed">
+            </PersistentString>
+            <PersistentString
+               value = "self.view.window!.bounds.height">
+            </PersistentString>
+         </PersistentStrings>
+      </ContextState>
+      <ContextState
+         contextName = "ReminderTableViewController.saveReminderSetting() -&gt; ():ReminderTableViewController.swift">
+         <PersistentStrings>
+            <PersistentString
+               value = "settings.reminderArray">
+            </PersistentString>
+         </PersistentStrings>
+      </ContextState>
+      <ContextState
+         contextName = "ReminderNewViewController.pickerView(UIPickerView, didSelectRow : Int, inComponent : Int) -&gt; ():ReminderNewViewController.swift">
+      </ContextState>
+      <ContextState
+         contextName = "ReminderNewViewController.viewDidLoad() -&gt; ():ReminderNewViewController.swift">
+      </ContextState>
+      <ContextState
+         contextName = "ReminderNewViewController.keyboardWillHide(NSNotification) -&gt; ():ReminderNewViewController.swift">
+         <PersistentStrings>
+            <PersistentString
+               value = "self.view.window!.bounds">
+            </PersistentString>
+         </PersistentStrings>
+      </ContextState>
+      <ContextState
+         contextName = "ReminderNewViewController.saveTap(UIButton) -&gt; ():ReminderNewViewController.swift">
+      </ContextState>
+   </ContextStates>
+</VariablesViewState>
