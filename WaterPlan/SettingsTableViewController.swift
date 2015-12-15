@@ -14,6 +14,7 @@ class SettingsTableViewController: UITableViewController {
     @IBOutlet weak var shortcutCupCountLabel: UILabel!
     var settings = NSMutableDictionary()
     var needSave = false
+    var roundCorner = true
     var dailyGoal = 2000 {
         didSet {
             self.dailyGoalLabel.text = String(self.dailyGoal) + " ml"
@@ -142,24 +143,33 @@ class SettingsTableViewController: UITableViewController {
             return 1
         }
     }
+    
     override func tableView(tableView: UITableView, willDisplayCell cell: UITableViewCell, forRowAtIndexPath indexPath: NSIndexPath) {
         //cell.frame = CGRectMake(5.0, cell.frame.origin.y, cell.frame.width - 10.0, cell.frame.height)
-        cell.bounds = cell.bounds.insetBy(dx: 5.0, dy: 0.0)
+        
+        if !roundCorner {
+            return
+        }
+        
         cell.layer.masksToBounds = true
         
         let cornerSize: CGFloat = 5.0
         
+        let margin = CGFloat(6.0)
+        let originX = cell.bounds.origin.x + margin
+        let width = cell.bounds.width - margin * 2.0
+        let cellBounds = CGRectMake(originX, cell.bounds.origin.y, width, CGRectGetHeight(cell.bounds))
         let maskPath: UIBezierPath
         if indexPath.row == 0 && indexPath.row == tableView.numberOfRowsInSection(indexPath.section) - 1 {
             
-            maskPath = UIBezierPath(roundedRect: cell.bounds, byRoundingCorners: [.TopLeft, .TopRight, .BottomLeft, .BottomRight], cornerRadii: CGSizeMake(cornerSize, cornerSize))
+            maskPath = UIBezierPath(roundedRect: cellBounds, byRoundingCorners: [.TopLeft, .TopRight, .BottomLeft, .BottomRight], cornerRadii: CGSizeMake(cornerSize, cornerSize))
         } else if indexPath.row == 0 {
             
-            maskPath = UIBezierPath(roundedRect: cell.bounds, byRoundingCorners: [.TopLeft, .TopRight], cornerRadii: CGSizeMake(cornerSize, cornerSize))
+            maskPath = UIBezierPath(roundedRect: cellBounds, byRoundingCorners: [.TopLeft, .TopRight], cornerRadii: CGSizeMake(cornerSize, cornerSize))
         } else  if indexPath.row == tableView.numberOfRowsInSection(indexPath.section) - 1 {
-            maskPath = UIBezierPath(roundedRect: cell.bounds, byRoundingCorners: [.BottomLeft, .BottomRight], cornerRadii: CGSizeMake(cornerSize, cornerSize))
+            maskPath = UIBezierPath(roundedRect: cellBounds, byRoundingCorners: [.BottomLeft, .BottomRight], cornerRadii: CGSizeMake(cornerSize, cornerSize))
         } else {
-            maskPath = UIBezierPath(rect: cell.bounds)
+            maskPath = UIBezierPath(rect: cellBounds)
         }
         //cell.layer.cornerRadius = 5.0
         //cell.frame = cell.frame.insetBy(dx: 10, dy: 0)

@@ -15,8 +15,11 @@ class DrinkingViewController: UIViewController, UITableViewDataSource, UITableVi
     @IBOutlet weak var waterView: UIView!
     @IBOutlet weak var waterViewTopConstraint: NSLayoutConstraint!
     @IBOutlet weak var drinkedStack: UIStackView!
-    @IBOutlet weak var drinkingCup: UIButton!
+    @IBOutlet weak var drinkingCup: OICupButton!
     @IBOutlet weak var settingBtn: UIButton!
+    @IBOutlet weak var statisticBtn: UIButton!
+    @IBOutlet weak var volumeStackView: UIStackView!
+    @IBOutlet weak var goalBackgroudView: UIView!
     
     var records = [DrinkingRecord]()
     var drinkedTotalVolume = 0
@@ -26,13 +29,19 @@ class DrinkingViewController: UIViewController, UITableViewDataSource, UITableVi
     var volumesView: UIView?
     var transitioningDelegateForWVVC = TransitioningDelegateForWaterVolume()
     var transitioningDelegateForSettings: TransitioningDelegateForSettings?
+    var transitioningDelegateForStatistic: TransitioningDelegateForStatistic?
 
     override func viewDidLoad() {
         super.viewDidLoad()
         
         self.view.layer.cornerRadius = 8
         self.view.layer.masksToBounds = true
+        
+        self.goalBackgroudView.layer.cornerRadius = 10.0
+        self.goalBackgroudView.layer.masksToBounds = true
 
+        drinkedTotalLabel.text = "0"
+        self.view.layoutIfNeeded()
         drinkedTableView.delegate = self
         drinkedTableView.dataSource = self
         
@@ -42,6 +51,9 @@ class DrinkingViewController: UIViewController, UITableViewDataSource, UITableVi
         
         settingBtn.layer.cornerRadius = settingBtn.frame.width / 2.0
         settingBtn.layer.masksToBounds = true
+        
+        statisticBtn.layer.cornerRadius = settingBtn.frame.width / 2.0
+        statisticBtn.layer.masksToBounds = true
         
         DrinkingWater(drinkedTotalVolume)
     }
@@ -57,6 +69,29 @@ class DrinkingViewController: UIViewController, UITableViewDataSource, UITableVi
             //self.view.layoutIfNeeded()
         })
         digitalWheelLabel!.number = drinkedTotalVolume
+    }
+    func saveDrinkedVolume() {
+        waterViewTopConstraint.constant = 0
+        self.view.layoutIfNeeded()
+        
+        var offsetY = self.view.bounds.height - self.drinkingCup.frame.origin.y 
+        self.drinkingCup.transform = CGAffineTransformTranslate(self.drinkingCup.transform, 0, offsetY)
+        //self.drinkingCup.transform = CGAffineTransformRotate(self.drinkingCup.transform, CGFloat(M_PI))
+        
+        offsetY = self.volumeStackView.frame.origin.y + self.volumeStackView.frame.height
+        self.volumeStackView.transform = CGAffineTransformTranslate(self.volumeStackView.transform, 0, -offsetY)
+        
+        self.drinkedTableView.alpha = 0.0
+        self.settingBtn.alpha = 0.0
+        self.statisticBtn.alpha = 0.0
+    }
+    func restoreDrinkedVolume() {
+        DrinkingWater(0)
+        self.drinkingCup.transform = CGAffineTransformIdentity
+        self.volumeStackView.transform = CGAffineTransformIdentity
+        self.drinkedTableView.alpha = 1.0
+        self.settingBtn.alpha = 1.0
+        self.statisticBtn.alpha = 1.0
     }
 
     override func didReceiveMemoryWarning() {
@@ -75,7 +110,7 @@ class DrinkingViewController: UIViewController, UITableViewDataSource, UITableVi
         let cell = drinkedTableView.dequeueReusableCellWithIdentifier("drinkedCell", forIndexPath: indexPath) as! drinkedCell
         let record = records[indexPath.row]
         cell.timeLabel.text = record.drinkingTime
-        cell.volumeLabel.text = String(record.drinkingVolume) + " ml"
+        cell.volumeLabel.text = String(record.drinkingVolume) + ""
         return cell
     }
     func tableView(tableView: UITableView, canEditRowAtIndexPath indexPath: NSIndexPath) -> Bool {
@@ -107,38 +142,27 @@ class DrinkingViewController: UIViewController, UITableViewDataSource, UITableVi
         let record = DrinkingRecord(drinkingTime: drinkingTime, drinkingVolume: drinkedVolume)
         records = [record] + records
         let indexPath = NSIndexPath(forRow: 0, inSection: 0)
-        drinkedTableView.insertRowsAtIndexPaths([indexPath], withRowAnimation: .Top)
+        drinkedTableView.insertRowsAtIndexPaths([indexPath], withRowAnimation: .Left)
         DrinkingWater(drinkedVolume)
-    }
-    @IBAction func settingBtnTap(sender: UIButton) {
-        
-            UIGraphicsBeginImageContext(self.view.bounds.size)
-        self.view.drawViewHierarchyInRect(self.view.bounds, afterScreenUpdates: true)
-        //let window = UIApplication.sharedApplication().keyWindow!
-        //UIGraphicsBeginImageContextWithOptions(self.view.bounds, <#T##opaque: Bool##Bool#>, <#T##scale: CGFloat##CGFloat#>)
-        //window.layer.renderInContext(UIGraphicsGetCurrentContext()!)
-        //window
-    
-            //let tmpView = UIImageView(frame: self.view.bounds)
-            let image = UIGraphicsGetImageFromCurrentImageContext()
-        drinkingCup.setImage(image, forState: .Normal)
-            UIGraphicsEndImageContext()
     }
     
     //MARK: segue and unsegue
     override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject?) {
         if let toVC = segue.destinationViewController as? UINavigationController {
-            //toVC.view.backgroundColor = UIColor.yellowColor()
-            //toVC.viewControllers[0].view.backgroundColor = UIColor.yellowColor()
-            //let presented = toVC.viewControllers[0]
             toVC.view.layer.cornerRadius = 8
             toVC.view.layer.masksToBounds = true
             
-            //toVC.transitioningDelegate =
             if self.transitioningDelegateForSettings == nil {
                 self.transitioningDelegateForSettings = TransitioningDelegateForSettings()
             }
             toVC.transitioningDelegate = self.transitioningDelegateForSettings
+        }
+        
+        if let toVC = segue.destinationViewController as? StatisticViewController {
+            if self.transitioningDelegateForStatistic == nil {
+                self.transitioningDelegateForStatistic = TransitioningDelegateForStatistic()
+            }
+            toVC.transitioningDelegate = self.transitioningDelegateForStatistic
         }
     }
     @IBAction func unwindToSegue(unwindSegue: UIStoryboardSegue) {

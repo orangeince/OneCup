@@ -7,6 +7,10 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		2A1747F81C1ED0D100007B31 /* OICupButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2A1747F71C1ED0D100007B31 /* OICupButton.swift */; };
+		2A2B85D61C16E52D0065EA8E /* RecordsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2A2B85D51C16E52D0065EA8E /* RecordsViewController.swift */; };
+		2A2B85D81C16E6A30065EA8E /* ModelController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2A2B85D71C16E6A30065EA8E /* ModelController.swift */; };
+		2A2B85DF1C1739E30065EA8E /* OIViewAnimator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2A2B85DE1C1739E30065EA8E /* OIViewAnimator.swift */; };
 		2A2BEBD11C098AF400D74C27 /* TransitioningDelegates.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2A2BEBD01C098AF400D74C27 /* TransitioningDelegates.swift */; };
 		2A2BEBD31C0990F300D74C27 /* CustomComponents.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2A2BEBD21C0990F300D74C27 /* CustomComponents.swift */; };
 		2A2BEBD91C0C2E2900D74C27 /* SettingsTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2A2BEBD81C0C2E2900D74C27 /* SettingsTableViewController.swift */; };
@@ -14,8 +18,10 @@
 		2A2BEBDF1C0D6FAF00D74C27 /* ShortcutCupTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2A2BEBDE1C0D6FAF00D74C27 /* ShortcutCupTableViewController.swift */; };
 		2A2BEBE11C0D928200D74C27 /* Settings.plist in Resources */ = {isa = PBXBuildFile; fileRef = 2A2BEBE01C0D928200D74C27 /* Settings.plist */; };
 		2A2BEBE31C0E8F5A00D74C27 /* ReminderNewViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2A2BEBE21C0E8F5A00D74C27 /* ReminderNewViewController.swift */; };
-		2A5A94811BD3D7A800A99B86 /* Plan.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2A5A94801BD3D7A800A99B86 /* Plan.swift */; };
 		2A6497ED1BF8BBB10077989E /* WaterVolumeViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2A6497EC1BF8BBB10077989E /* WaterVolumeViewController.swift */; };
+		2A6CF9B81C127E26006D5801 /* StatisticViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2A6CF9B71C127E26006D5801 /* StatisticViewController.swift */; };
+		2A6CF9C01C15DF81006D5801 /* OIClockView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2A6CF9BF1C15DF81006D5801 /* OIClockView.swift */; };
+		2A6CF9C21C167392006D5801 /* OIBarChartView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2A6CF9C11C167392006D5801 /* OIBarChartView.swift */; };
 		2A8574C11BD37467008B55EC /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2A8574C01BD37467008B55EC /* AppDelegate.swift */; };
 		2A8574C31BD37467008B55EC /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2A8574C21BD37467008B55EC /* ViewController.swift */; };
 		2A8574C61BD37467008B55EC /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 2A8574C41BD37467008B55EC /* Main.storyboard */; };
@@ -41,6 +47,10 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		2A1747F71C1ED0D100007B31 /* OICupButton.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = OICupButton.swift; sourceTree = "<group>"; };
+		2A2B85D51C16E52D0065EA8E /* RecordsViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RecordsViewController.swift; sourceTree = "<group>"; };
+		2A2B85D71C16E6A30065EA8E /* ModelController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ModelController.swift; sourceTree = "<group>"; };
+		2A2B85DE1C1739E30065EA8E /* OIViewAnimator.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = OIViewAnimator.swift; sourceTree = "<group>"; };
 		2A2BEBD01C098AF400D74C27 /* TransitioningDelegates.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TransitioningDelegates.swift; sourceTree = "<group>"; };
 		2A2BEBD21C0990F300D74C27 /* CustomComponents.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CustomComponents.swift; sourceTree = "<group>"; };
 		2A2BEBD81C0C2E2900D74C27 /* SettingsTableViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SettingsTableViewController.swift; sourceTree = "<group>"; };
@@ -48,8 +58,10 @@
 		2A2BEBDE1C0D6FAF00D74C27 /* ShortcutCupTableViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ShortcutCupTableViewController.swift; sourceTree = "<group>"; };
 		2A2BEBE01C0D928200D74C27 /* Settings.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Settings.plist; sourceTree = "<group>"; };
 		2A2BEBE21C0E8F5A00D74C27 /* ReminderNewViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ReminderNewViewController.swift; sourceTree = "<group>"; };
-		2A5A94801BD3D7A800A99B86 /* Plan.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Plan.swift; sourceTree = "<group>"; };
 		2A6497EC1BF8BBB10077989E /* WaterVolumeViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = WaterVolumeViewController.swift; sourceTree = "<group>"; };
+		2A6CF9B71C127E26006D5801 /* StatisticViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = StatisticViewController.swift; sourceTree = "<group>"; };
+		2A6CF9BF1C15DF81006D5801 /* OIClockView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = OIClockView.swift; sourceTree = "<group>"; };
+		2A6CF9C11C167392006D5801 /* OIBarChartView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = OIBarChartView.swift; sourceTree = "<group>"; };
 		2A8574BD1BD37467008B55EC /* WaterPlan.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = WaterPlan.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		2A8574C01BD37467008B55EC /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		2A8574C21BD37467008B55EC /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
@@ -89,6 +101,8 @@
 		2A8574B41BD37466008B55EC = {
 			isa = PBXGroup;
 			children = (
+				2A2B85D51C16E52D0065EA8E /* RecordsViewController.swift */,
+				2A2B85D71C16E6A30065EA8E /* ModelController.swift */,
 				2ABB6BF71BDA2222003F7C9F /* ReminderTableViewController.swift */,
 				2ABB6BF31BDA1F57003F7C9F /* ReminderTableViewCell.swift */,
 				2A8574BF1BD37467008B55EC /* WaterPlan */,
@@ -111,8 +125,12 @@
 			children = (
 				2A8574C01BD37467008B55EC /* AppDelegate.swift */,
 				2A8574C21BD37467008B55EC /* ViewController.swift */,
-				2A5A94801BD3D7A800A99B86 /* Plan.swift */,
 				2A8574C41BD37467008B55EC /* Main.storyboard */,
+				2A6CF9C11C167392006D5801 /* OIBarChartView.swift */,
+				2A1747F71C1ED0D100007B31 /* OICupButton.swift */,
+				2A2B85DE1C1739E30065EA8E /* OIViewAnimator.swift */,
+				2A6CF9BF1C15DF81006D5801 /* OIClockView.swift */,
+				2A6CF9B71C127E26006D5801 /* StatisticViewController.swift */,
 				2A2BEBE21C0E8F5A00D74C27 /* ReminderNewViewController.swift */,
 				2A2BEBDA1C0C7ECB00D74C27 /* DailyGoalTableViewController.swift */,
 				2A2BEBD81C0C2E2900D74C27 /* SettingsTableViewController.swift */,
@@ -247,7 +265,10 @@
 				2AEDAAC01BE728EC005FF247 /* DrinkingViewController.swift in Sources */,
 				2A2BEBD91C0C2E2900D74C27 /* SettingsTableViewController.swift in Sources */,
 				2A2BEBDF1C0D6FAF00D74C27 /* ShortcutCupTableViewController.swift in Sources */,
+				2A6CF9C21C167392006D5801 /* OIBarChartView.swift in Sources */,
+				2A1747F81C1ED0D100007B31 /* OICupButton.swift in Sources */,
 				2A8574C31BD37467008B55EC /* ViewController.swift in Sources */,
+				2A2B85DF1C1739E30065EA8E /* OIViewAnimator.swift in Sources */,
 				2AEDAABE1BE72565005FF247 /* drinkedCell.swift in Sources */,
 				2A8574C11BD37467008B55EC /* AppDelegate.swift in Sources */,
 				2A2BEBD31C0990F300D74C27 /* CustomComponents.swift in Sources */,
@@ -255,11 +276,14 @@
 				2ABB6BF41BDA1F57003F7C9F /* ReminderTableViewCell.swift in Sources */,
 				2A2BEBE31C0E8F5A00D74C27 /* ReminderNewViewController.swift in Sources */,
 				2A6497ED1BF8BBB10077989E /* WaterVolumeViewController.swift in Sources */,
+				2A2B85D81C16E6A30065EA8E /* ModelController.swift in Sources */,
 				2AEDAA901BDCF06D005FF247 /* DrinkingRecord.swift in Sources */,
 				2ABB6BF81BDA2222003F7C9F /* ReminderTableViewController.swift in Sources */,
-				2A5A94811BD3D7A800A99B86 /* Plan.swift in Sources */,
+				2A6CF9B81C127E26006D5801 /* StatisticViewController.swift in Sources */,
 				2AE1BC691BDA116B00B62DB8 /* Reminder.swift in Sources */,
 				2A2BEBD11C098AF400D74C27 /* TransitioningDelegates.swift in Sources */,
+				2A6CF9C01C15DF81006D5801 /* OIClockView.swift in Sources */,
+				2A2B85D61C16E52D0065EA8E /* RecordsViewController.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

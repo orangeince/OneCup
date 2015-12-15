@@ -8,23 +8,32 @@
 
 import UIKit
 
-class WaterVolumeViewController: UIViewController {
+class WaterVolumeViewController: UIViewController, UIPickerViewDelegate, UIPickerViewDataSource {
 
     var selectedVolume = 0
-    var cupBtn: UIButton!
+    let maxVolume = 1200
+    var cupBtn: OICupButton!
     var volumeBtns = [VolumeBtn]()
+    
+    var waterView = UIView()
+    var volumePicker = UIPickerView()
+    var cupBlurView = UIVisualEffectView()
+    var submitBtn = UIButton()
+    var imageMask = UIImageView(image: UIImage(named: "emptyCup"))
     
     override func viewDidLoad() {
         super.viewDidLoad()
 
-        cupBtn = UIButton()
-        cupBtn.setImage(UIImage(named: "emptyCup"), forState: .Normal)
+        cupBtn = OICupButton()
+        
+        cupBtn.tintColor = UIColor.whiteColor()
+        cupBtn.backgroundColor = UIColor.whiteColor()
         
         let blurView = UIVisualEffectView()
         blurView.frame = self.view.bounds
         
         for index in 0...3 {
-            let btn = VolumeBtn(frame: CGRectMake(0, 0, 50, 50), volume: (index + 1) * 100)
+            let btn = VolumeBtn(frame: CGRectMake(0, 0, 50, 50), volume: (index + 1) * 200)
             //btn.setBackgroundImage(UIImage(named: "cat"), forState: .Normal)
             btn.backgroundColor = UIColor.whiteColor()
             volumeBtns.append(btn)
@@ -34,7 +43,19 @@ class WaterVolumeViewController: UIViewController {
             btn.addTarget(self, action: "tapVolumeBtn:", forControlEvents: .TouchUpInside)
         }
         
-        blurView.contentView.addSubview(self.cupBtn)
+        blurView.contentView.addSubview(cupBtn)
+        
+        volumePicker.delegate = self
+        volumePicker.dataSource = self
+        
+        submitBtn.layer.cornerRadius = 8
+        submitBtn.layer.masksToBounds = true
+        submitBtn.layer.borderWidth = 1.0
+        submitBtn.setTitle("确定", forState: .Normal)
+        submitBtn.setTitleColor(UIColor.blackColor(), forState: .Normal)
+        submitBtn.setTitleColor(UIColor.lightGrayColor(), forState: .Highlighted)
+        //submitBtn.setImage(UIImage(named: "cat"), forState: .Normal)
+        
         
         self.view = blurView
         self.view.layer.cornerRadius = 8
@@ -74,5 +95,79 @@ class WaterVolumeViewController: UIViewController {
             let volume = sender.volume
             presented.dismissWaterVolumeViewController(volume)
         }
+    }
+    func numberOfComponentsInPickerView(pickerView: UIPickerView) -> Int {
+        return 3
+    }
+    func pickerView(pickerView: UIPickerView, numberOfRowsInComponent component: Int) -> Int {
+        if component == 0 {
+            return 11
+        } else if component == 1 {
+            return 10
+        }
+        return 1
+    }
+    /*
+    func pickerView(pickerView: UIPickerView, titleForRow row: Int, forComponent component: Int) -> String? {
+        if component == 1 {
+            return String(row) + "0"
+        } else if component == 0 {
+            return String(row)
+        }
+        return "ml"
+    }
+    */
+    func pickerView(pickerView: UIPickerView, viewForRow row: Int, forComponent component: Int, reusingView view: UIView?) -> UIView {
+        let view = UIView()
+        let size = pickerView.rowSizeForComponent(component)
+        view.frame = CGRectMake(0, 0, size.width, size.height)
+        let label = UILabel()
+        label.frame = view.bounds
+        if component == 0 {
+            label.text = String(row)
+            label.textAlignment = .Right
+        } else if component == 1 {
+            label.text = String(row) + "0"
+            label.textAlignment = .Center
+        } else {
+            label.text = "ml"
+            label.font = UIFont.systemFontOfSize(8.0)
+            label.textAlignment = .Left
+        }
+        view.addSubview(label)
+        return view
+    }
+    /*
+    func pickerView(pickerView: UIPickerView, attributedTitleForRow row: Int, forComponent component: Int) -> NSAttributedString? {
+        let string: String
+        if component == 0 {
+            string = String(row)
+        } else if component == 1 {
+            string = String(row) + "0"
+        } else {
+            string = "ml"
+        }
+        //let nsfont = ns
+        let font = UIFont.systemFontOfSize(6.0)
+        //return NSAttributedString(string: string, attributes: [NSForegroundColorAttributeName: UIColor.blackColor(), NSFontAttributeName: font])
+        return NSAttributedString(string: string, attributes: [NSFontAttributeName: font])
+    } */
+    func pickerView(pickerView: UIPickerView, widthForComponent component: Int) -> CGFloat {
+        if component == 2 {
+            return 12.0
+        }
+        return 32.0
+    }
+    func pickerView(pickerView: UIPickerView, didSelectRow row: Int, inComponent component: Int) {
+        selectedVolume = pickerView.selectedRowInComponent(0) * 100 + pickerView.selectedRowInComponent(1) * 10
+        let bounds = cupBtn.bounds
+        let waterRatio = CGFloat(selectedVolume) / CGFloat(maxVolume)
+        let height = bounds.height * waterRatio
+        UIView.animateWithDuration(0.8) { () -> Void in
+            self.waterView.frame = CGRectMake(0, bounds.height - height, bounds.width, height)
+        }
+    }
+    func pickerView(pickerView: UIPickerView, rowHeightForComponent component: Int) -> CGFloat {
+        return 32.0
     }
 }

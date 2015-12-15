@@ -3,15 +3,32 @@
    version = "1.0">
    <ContextStates>
       <ContextState
+         contextName = "ReminderNewViewController.keyboardWillHide(NSNotification) -&gt; ():ReminderNewViewController.swift">
+         <PersistentStrings>
+            <PersistentString
+               value = "self.view.window!.bounds">
+            </PersistentString>
+         </PersistentStrings>
+      </ContextState>
+      <ContextState
          contextName = "ReminderNewViewController.keyboardWillShow(NSNotification) -&gt; ():ReminderNewViewController.swift">
          <PersistentStrings>
             <PersistentString
-               value = "self.keyBoardShowed">
-            </PersistentString>
-            <PersistentString
                value = "self.view.window!.bounds.height">
             </PersistentString>
+            <PersistentString
+               value = "self.keyBoardShowed">
+            </PersistentString>
          </PersistentStrings>
+      </ContextState>
+      <ContextState
+         contextName = "ReminderNewViewController.pickerView(UIPickerView, didSelectRow : Int, inComponent : Int) -&gt; ():ReminderNewViewController.swift">
+      </ContextState>
+      <ContextState
+         contextName = "ReminderNewViewController.saveTap(UIButton) -&gt; ():ReminderNewViewController.swift">
+      </ContextState>
+      <ContextState
+         contextName = "OIBarChartView.drawRect(CGRect) -&gt; ():OIBarChartView.swift">
       </ContextState>
       <ContextState
          contextName = "ReminderTableViewController.saveReminderSetting() -&gt; ():ReminderTableViewController.swift">
@@ -22,21 +39,18 @@
          </PersistentStrings>
       </ContextState>
       <ContextState
-         contextName = "ReminderNewViewController.pickerView(UIPickerView, didSelectRow : Int, inComponent : Int) -&gt; ():ReminderNewViewController.swift">
-      </ContextState>
-      <ContextState
          contextName = "ReminderNewViewController.viewDidLoad() -&gt; ():ReminderNewViewController.swift">
       </ContextState>
       <ContextState
-         contextName = "ReminderNewViewController.keyboardWillHide(NSNotification) -&gt; ():ReminderNewViewController.swift">
+         contextName = "OIBarChartView.getHeihtForBar(Int, barHeight : CGFloat) -&gt; CGFloat:OIBarChartView.swift">
          <PersistentStrings>
             <PersistentString
-               value = "self.view.window!.bounds">
+               value = "_limitVolume">
+            </PersistentString>
+            <PersistentString
+               value = "_maxVolume">
             </PersistentString>
          </PersistentStrings>
-      </ContextState>
-      <ContextState
-         contextName = "ReminderNewViewController.saveTap(UIButton) -&gt; ():ReminderNewViewController.swift">
       </ContextState>
    </ContextStates>
 </VariablesViewState>

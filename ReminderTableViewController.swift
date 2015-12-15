@@ -11,13 +11,16 @@ import UIKit
 class ReminderTableViewController: UITableViewController {
     //MARK: Properties
     //var reminders = [Reminder]()
-    var reminders = [(String, String, String, Int, Int, Int, Bool)]()
+    
+    var reminders = [(String, String, String, Int, Int, Int, Bool)]() //alertTime,alertTitle,repeatDate,repeatDateMask, hour, minute, enable
     var settingsDataSource: SettingsTableViewController?
     var reminderEnable = false
     var reminderEnableSwitch: UISwitch?
     var transitionDelegateForNew: TransitioningDelegateForReminderNew?
     var tableHasBeenLoaded = false
     var needSave = false
+    var roundCorner = true
+    var tmpMaskLayer: CALayer?
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -50,7 +53,6 @@ class ReminderTableViewController: UITableViewController {
             self.reminderEnable = settings.reminderEnable
         }
         resetReminderSetting()
-        
     }
     override func viewWillAppear(animated: Bool) {
         super.viewWillAppear(animated)
@@ -171,8 +173,8 @@ class ReminderTableViewController: UITableViewController {
             if !enable {
                 let tmpCell = self.tableView.dequeueReusableCellWithIdentifier("ReminderColorCell")!
                 cell.backgroundColor =  tmpCell.backgroundColor!
-                cell.timeLabel.textColor = UIColor.darkGrayColor()
-                cell.alertTitleLabel.textColor = UIColor.darkGrayColor()
+                cell.timeLabel.textColor = UIColor.lightGrayColor()
+                cell.alertTitleLabel.textColor = UIColor.lightGrayColor()
             }
             
             if repeatDateMask > 0 {
@@ -192,33 +194,55 @@ class ReminderTableViewController: UITableViewController {
         }
     }
     override func tableView(tableView: UITableView, willDisplayCell cell: UITableViewCell, forRowAtIndexPath indexPath: NSIndexPath) {
-        cell.bounds = cell.bounds.insetBy(dx: 5.0, dy: 0.0)
-        cell.layer.masksToBounds = true
-        
+        if !roundCorner {
+            return
+        }
+        //cell.layer.masksToBounds = true
         let cornerSize: CGFloat = 5.0
         
+        let margin = CGFloat(5.0)
+        let originX = cell.bounds.origin.x + margin
+        let width = cell.bounds.width - margin * 2.0
+        let cellBounds = CGRectMake(originX, cell.bounds.origin.y, width, CGRectGetHeight(cell.bounds))
         let maskPath: UIBezierPath
         if indexPath.row == 0 && indexPath.row == tableView.numberOfRowsInSection(indexPath.section) - 1 {
             
-            maskPath = UIBezierPath(roundedRect: cell.bounds, byRoundingCorners: [.TopLeft, .TopRight, .BottomLeft, .BottomRight], cornerRadii: CGSizeMake(cornerSize, cornerSize))
+            maskPath = UIBezierPath(roundedRect: cellBounds, byRoundingCorners: [.TopLeft, .TopRight, .BottomLeft, .BottomRight], cornerRadii: CGSizeMake(cornerSize, cornerSize))
         } else if indexPath.row == 0 {
             
-            maskPath = UIBezierPath(roundedRect: cell.bounds, byRoundingCorners: [.TopLeft, .TopRight], cornerRadii: CGSizeMake(cornerSize, cornerSize))
+            maskPath = UIBezierPath(roundedRect: cellBounds, byRoundingCorners: [.TopLeft, .TopRight], cornerRadii: CGSizeMake(cornerSize, cornerSize))
         } else  if indexPath.row == tableView.numberOfRowsInSection(indexPath.section) - 1 {
-            maskPath = UIBezierPath(roundedRect: cell.bounds, byRoundingCorners: [.BottomLeft, .BottomRight], cornerRadii: CGSizeMake(cornerSize, cornerSize))
+            maskPath = UIBezierPath(roundedRect: cellBounds, byRoundingCorners: [.BottomLeft, .BottomRight], cornerRadii: CGSizeMake(cornerSize, cornerSize))
         } else {
-            maskPath = UIBezierPath(rect: cell.bounds)
+            maskPath = UIBezierPath(rect: cellBounds)
         }
         let shape = CAShapeLayer()
-        shape.frame = cell.bounds
+        shape.frame = cell.contentView.bounds
         shape.path = maskPath.CGPath
         cell.layer.mask = shape
+        if let accessoryView = cell.accessoryView {
+            print(accessoryView.subviews.count)
+        }
+        if let editingAccessoryView = cell.editingAccessoryView {
+            print(editingAccessoryView.subviews.count)
+        }
+        //cell.contentView.layer.cornerRadius = 10.0
+        //cell.contentView.layer.masksToBounds = true
+        //cell.contentView.layer.mask = shape
     }
     /*
     override func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
-        <#code#>
     }
 */
+    override func tableView(tableView: UITableView, willBeginEditingRowAtIndexPath indexPath: NSIndexPath) {
+        let cell = self.tableView.cellForRowAtIndexPath(indexPath)!
+        self.tmpMaskLayer = cell.layer.mask
+        cell.layer.mask = nil
+    }
+    override func tableView(tableView: UITableView, didEndEditingRowAtIndexPath indexPath: NSIndexPath) {
+        let cell = self.tableView.cellForRowAtIndexPath(indexPath)!
+        cell.layer.mask = self.tmpMaskLayer
+    }
     override func tableView(tableView: UITableView, canEditRowAtIndexPath indexPath: NSIndexPath) -> Bool {
         if indexPath.section == 1 {
             return true
@@ -239,13 +263,12 @@ class ReminderTableViewController: UITableViewController {
             let deleteAction = UITableViewRowAction(style: .Normal, title: "delete") { (action: UITableViewRowAction, indexPath: NSIndexPath) -> Void in
                 //self.tableView.deleteRowsAtIndexPaths([indexPath], withRowAnimation: .Automatic)
             }
-            deleteAction.backgroundColor = UIColor.grayColor()
-            deleteAction.backgroundEffect = UIBlurEffect(style: .Dark)
+            deleteAction.backgroundColor = UIColor(white: 0.5, alpha: 0.0)
             let editAction = UITableViewRowAction(style: .Default, title: "edit", handler: { (action: UITableViewRowAction, indexPath: NSIndexPath) -> Void in
                 //
             })
             editAction.backgroundColor = UIColor.purpleColor()
-            return [deleteAction,editAction]
+            return [deleteAction]
         }
         return nil
     }
@@ -278,6 +301,20 @@ class ReminderTableViewController: UITableViewController {
     }
     */
 
+    @IBAction func swipeReminderCell(sender: UIPanGestureRecognizer) {
+        switch sender.state {
+        case .Began:
+            sender.setTranslation(CGPointMake(0, 0), inView: self.view)
+        case .Changed:
+            let translation = sender.translationInView(self.view)
+            let percentage = translation.x / CGRectGetWidth(self.view.bounds)
+            print(percentage)
+        case .Ended:
+            break
+        default:
+            break
+        }
+    }
     /*
     // Override to support conditional rearranging of the table view.
     override func tableView(tableView: UITableView, canMoveRowAtIndexPath indexPath: NSIndexPath) -> Bool {
@@ -311,6 +348,12 @@ class ReminderTableViewController: UITableViewController {
         //segue.
     }
     func reminderEnableSwitchChange(sender: UISwitch) {
+        let curNoification = UIApplication.sharedApplication().currentUserNotificationSettings()!
+        if curNoification.types == .None {
+            print("not allow the notification")
+            sender.on = false
+            return
+        }
         if let settings = self.settingsDataSource {
             settings.reminderEnable = sender.on
         }
@@ -347,13 +390,13 @@ class ReminderTableViewController: UITableViewController {
                 if sender.on {
                     let tmpCell = self.tableView.dequeueReusableCellWithIdentifier("ReminderAddCell")!
                     cell.backgroundColor =  tmpCell.backgroundColor!
-                    cell.timeLabel.textColor = UIColor.whiteColor()
-                    cell.alertTitleLabel.textColor = UIColor.whiteColor()
+                    cell.timeLabel.textColor = UIColor.blackColor()
+                    cell.alertTitleLabel.textColor = UIColor.blackColor()
                 } else {
                     let tmpCell = self.tableView.dequeueReusableCellWithIdentifier("ReminderColorCell")!
                     cell.backgroundColor =  tmpCell.backgroundColor!
-                    cell.timeLabel.textColor = UIColor.darkGrayColor()
-                    cell.alertTitleLabel.textColor = UIColor.darkGrayColor()
+                    cell.timeLabel.textColor = UIColor.lightGrayColor()
+                    cell.alertTitleLabel.textColor = UIColor.lightGrayColor()
                 }
                 var reminder = cell.reminder
                 reminder.6 = sender.on
@@ -362,5 +405,15 @@ class ReminderTableViewController: UITableViewController {
                 saveReminderSetting()
             }
         }
+    }
+    func addReminderSchedule(reminder: (String, String, String, Int, Int, Int, Bool)) {
+        /*let (_, alertTitle, _, repeatDateMask, theHour, theMinute, enable) = reminder
+        guard enable else {
+             return
+        }
+        let caledarComponents = NSCalendar.currentCalendar().components([], fromDate: NSDate())
+        let caledar = NSCalendar.autoupdatingCurrentCalendar()
+*/
+        
     }
 }
