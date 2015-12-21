@@ -28,11 +28,11 @@ class OIClockView: UIView, OIViewAnimatorDelegate  {
     private var _drawScaleLine = false
     
     var fillClock = true
-    var fillColor = UIColor.lightGrayColor()
-    var dataFillColor = UIColor.blackColor()
-    var strokeColor = UIColor.whiteColor()
-    var scaleColor = UIColor.whiteColor()
-    var dataPointRedius = CGFloat(6.0)
+    var fillColor = UIColor.whiteColor()
+    var dataFillColor: UIColor!
+    var strokeColor = UIColor.blackColor()
+    var scaleColor = UIColor.blackColor()
+    var dataPointRedius = CGFloat(3.0)
     
     var drawRatio = CGFloat(1.0)
     
@@ -57,7 +57,9 @@ class OIClockView: UIView, OIViewAnimatorDelegate  {
         let orginX = CGRectGetWidth(rect) / 2.0
         let orginY = CGRectGetHeight(rect) / 2.0
         
-        
+        if self.dataFillColor == nil {
+            self.dataFillColor = self.tintColor
+        }
         
         fillColor.setFill()
         strokeColor.setStroke()
@@ -160,7 +162,7 @@ class OIClockView: UIView, OIViewAnimatorDelegate  {
             CGContextRotateCTM(context, phaseAngle)
             CGContextMoveToPoint(context, 0, 0)
             CGContextAddLineToPoint(context, 0, _radius)
-            CGContextSetLineWidth(context, 1)
+            CGContextSetLineWidth(context, 0.5)
             //UIColor.redColor().setStroke()
             //CGContextSetStrokeColor(context, UIColor.redColor().CGColor)
             CGContextStrokePath(context)

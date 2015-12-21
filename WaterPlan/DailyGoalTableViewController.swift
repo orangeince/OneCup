@@ -20,9 +20,14 @@ class DailyGoalTableViewController: UITableViewController {
 
         // Uncomment the following line to display an Edit button in the navigation bar for this view controller.
         // self.navigationItem.rightBarButtonItem = self.editButtonItem()
+        
         if let settings = self.settingsDataSource {
             goalTextFiled.text = String(settings.dailyGoal)
         }
+    }
+    override func viewDidAppear(animated: Bool) {
+        super.viewDidAppear(animated)
+        goalTextFiled.becomeFirstResponder()
     }
 
     override func didReceiveMemoryWarning() {

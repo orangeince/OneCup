@@ -3,32 +3,21 @@
    version = "1.0">
    <ContextStates>
       <ContextState
-         contextName = "ReminderNewViewController.keyboardWillHide(NSNotification) -&gt; ():ReminderNewViewController.swift">
-         <PersistentStrings>
-            <PersistentString
-               value = "self.view.window!.bounds">
-            </PersistentString>
-         </PersistentStrings>
+         contextName = "OIBarChartView.drawRect(CGRect) -&gt; ():OIBarChartView.swift">
       </ContextState>
       <ContextState
          contextName = "ReminderNewViewController.keyboardWillShow(NSNotification) -&gt; ():ReminderNewViewController.swift">
          <PersistentStrings>
             <PersistentString
-               value = "self.view.window!.bounds.height">
+               value = "self.keyBoardShowed">
             </PersistentString>
             <PersistentString
-               value = "self.keyBoardShowed">
+               value = "self.view.window!.bounds.height">
             </PersistentString>
          </PersistentStrings>
       </ContextState>
       <ContextState
          contextName = "ReminderNewViewController.pickerView(UIPickerView, didSelectRow : Int, inComponent : Int) -&gt; ():ReminderNewViewController.swift">
-      </ContextState>
-      <ContextState
-         contextName = "ReminderNewViewController.saveTap(UIButton) -&gt; ():ReminderNewViewController.swift">
-      </ContextState>
-      <ContextState
-         contextName = "OIBarChartView.drawRect(CGRect) -&gt; ():OIBarChartView.swift">
       </ContextState>
       <ContextState
          contextName = "ReminderTableViewController.saveReminderSetting() -&gt; ():ReminderTableViewController.swift">
@@ -39,7 +28,37 @@
          </PersistentStrings>
       </ContextState>
       <ContextState
-         contextName = "ReminderNewViewController.viewDidLoad() -&gt; ():ReminderNewViewController.swift">
+         contextName = "DrinkingViewController.viewDidLoad() -&gt; ():DrinkingViewController.swift">
+         <PersistentStrings>
+            <PersistentString
+               value = "recordDaily!.weekDay">
+            </PersistentString>
+         </PersistentStrings>
+      </ContextState>
+      <ContextState
+         contextName = "DrinkingViewController.refreshRecords() -&gt; ():DrinkingViewController.swift">
+      </ContextState>
+      <ContextState
+         contextName = "DrinkingViewController.dismissWaterVolumeViewController(Int) -&gt; ():DrinkingViewController.swift">
+      </ContextState>
+      <ContextState
+         contextName = "ReminderNewViewController.saveTap(UIButton) -&gt; ():ReminderNewViewController.swift">
+      </ContextState>
+      <ContextState
+         contextName = "DrinkingViewController.initializeFetchedResultsController() -&gt; ():DrinkingViewController.swift">
+         <PersistentStrings>
+            <PersistentString
+               value = "calendarComponents.hour">
+            </PersistentString>
+         </PersistentStrings>
+      </ContextState>
+      <ContextState
+         contextName = "DrinkingViewController.DrinkingWater(Int) -&gt; ():DrinkingViewController.swift">
+         <PersistentStrings>
+            <PersistentString
+               value = "self.drinkedTotalVolume">
+            </PersistentString>
+         </PersistentStrings>
       </ContextState>
       <ContextState
          contextName = "OIBarChartView.getHeihtForBar(Int, barHeight : CGFloat) -&gt; CGFloat:OIBarChartView.swift">
@@ -49,6 +68,20 @@
             </PersistentString>
             <PersistentString
                value = "_maxVolume">
+            </PersistentString>
+         </PersistentStrings>
+      </ContextState>
+      <ContextState
+         contextName = "ReminderNewViewController.viewDidLoad() -&gt; ():ReminderNewViewController.swift">
+      </ContextState>
+      <ContextState
+         contextName = "DrinkingViewController.tableView(UITableView, numberOfRowsInSection : Int) -&gt; Int:DrinkingViewController.swift">
+      </ContextState>
+      <ContextState
+         contextName = "ReminderNewViewController.keyboardWillHide(NSNotification) -&gt; ():ReminderNewViewController.swift">
+         <PersistentStrings>
+            <PersistentString
+               value = "self.view.window!.bounds">
             </PersistentString>
          </PersistentStrings>
       </ContextState>

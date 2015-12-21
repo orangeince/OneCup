@@ -10,15 +10,14 @@ import UIKit
 
 class TransitioningDelegateForWaterVolume: NSObject, UIViewControllerTransitioningDelegate {
     func animationControllerForPresentedController(presented: UIViewController, presentingController presenting: UIViewController, sourceController source: UIViewController) -> UIViewControllerAnimatedTransitioning? {
-        return AnimationTransitioningForDrinkingAndWaterVolume1(presenting: true)
+        return AnimationTransitioningForDrinkingAndWaterVolume(presenting: true)
     }
     func animationControllerForDismissedController(dismissed: UIViewController) -> UIViewControllerAnimatedTransitioning? {
-        return AnimationTransitioningForDrinkingAndWaterVolume1(presenting: false)
-        //return nil
+        return AnimationTransitioningForDrinkingAndWaterVolume(presenting: false)
     }
 }
 
-class AnimationTransitioningForDrinkingAndWaterVolume1: NSObject, UIViewControllerAnimatedTransitioning {
+class AnimationTransitioningForDrinkingAndWaterVolume: NSObject, UIViewControllerAnimatedTransitioning {
     var presenting = true
     
     init(presenting: Bool) {
@@ -47,7 +46,8 @@ class AnimationTransitioningForDrinkingAndWaterVolume1: NSObject, UIViewControll
             let submitBtn = toVC.submitBtn
             let cupWaterView = toVC.waterView
             let imageMask = toVC.imageMask
-            let waterColor = fromVC.waterView.backgroundColor
+            let pickedVolume = fromVC.pickedVolume
+            let waterColor = fromVC.waterView.backgroundColor!.colorWithAlphaComponent(0.8)
             //cup.backgroundColor = fromVC.view.backgroundColor
             
             fromVC.drinkingCup.alpha = 0.0
@@ -66,7 +66,7 @@ class AnimationTransitioningForDrinkingAndWaterVolume1: NSObject, UIViewControll
             containerView.addSubview(toView)
             
             let duration = self.transitionDuration(transitionContext)
-            let durationFrist = duration / 3.0
+            let durationFrist = duration / 4.0
             
             UIView.animateWithDuration(
                 durationFrist,
@@ -103,6 +103,8 @@ class AnimationTransitioningForDrinkingAndWaterVolume1: NSObject, UIViewControll
                     cupBlurView.contentView.addSubview(submitBtn)
                     cupBlurView.contentView.addSubview(imageMask)
                     
+                    toVC.initPickedVolume(pickedVolume)
+                    
                     UIView.animateWithDuration(
                         duration - durationFrist,
                         delay: 0.0,
@@ -113,6 +115,7 @@ class AnimationTransitioningForDrinkingAndWaterVolume1: NSObject, UIViewControll
                             () -> Void in
                             
                             imageMask.frame = imageMask.frame.offsetBy(dx: 0, dy: imageMask.frame.height)
+                            //imageMask.alpha = 0.0
                             let firstBtn = volumeBtns[0]
                             firstBtn.alpha = 1.0
                             firstBtn.center = CGPoint(x: cup.center.x, y: cup.frame.origin.y - firstBtn.frame.height/2.0 - 30.0)
@@ -151,7 +154,7 @@ class AnimationTransitioningForDrinkingAndWaterVolume1: NSObject, UIViewControll
             let cupFinalFrame = toVC.drinkingCup.frame.offsetBy(dx: 0, dy: 0)
             
             let duration = self.transitionDuration(transitionContext)
-            let durationFrist = duration / 3.0 * 2.0
+            let durationFrist = duration / 4.0 * 3.0
             UIView.animateWithDuration(
                 durationFrist,
                 delay: 0,
@@ -184,10 +187,11 @@ class AnimationTransitioningForDrinkingAndWaterVolume1: NSObject, UIViewControll
         }
     }
     func transitionDuration(transitionContext: UIViewControllerContextTransitioning?) -> NSTimeInterval {
-        return 0.6
+        return 0.8
     }
 }
-class AnimationTransitioningForDrinkingAndWaterVolume: NSObject, UIViewControllerAnimatedTransitioning {
+/* 初版 没有自定义容量选择
+class AnimationTransitioningForDrinkingAndWaterVolume1: NSObject, UIViewControllerAnimatedTransitioning {
     var presenting = true
     
     init(presenting: Bool) {
@@ -304,6 +308,7 @@ class AnimationTransitioningForDrinkingAndWaterVolume: NSObject, UIViewControlle
         return 0.6
     }
 }
+*/
 
 class TransitioningDelegateForSettings: NSObject, UIViewControllerTransitioningDelegate {
     func animationControllerForPresentedController(presented: UIViewController, presentingController presenting: UIViewController, sourceController source: UIViewController) -> UIViewControllerAnimatedTransitioning? {
@@ -331,6 +336,8 @@ class AnimationTransitioningForDrinkingAndSettings: NSObject, UIViewControllerAn
         
         var transform = CATransform3DIdentity
         transform.m34 = -1.0 / 500.0
+        containerView.layer.cornerRadius = 8.0
+        containerView.layer.masksToBounds = true
         containerView.layer.sublayerTransform = transform
         
         if presenting {

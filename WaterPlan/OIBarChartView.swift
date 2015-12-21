@@ -16,7 +16,7 @@ class OIBarChartView: UIView, OIViewAnimatorDelegate {
     private var _lazyData = [(Int, Int)]()
     
     private var _animator: OIViewAnimator!
-    private var _barLabels = [String]()
+    private var _barLabels = ["周一", "周二", "周三", "周四", "周五", "周六", "周日"]
     private var _margin = CGFloat(10)
     private var _descriptionHeight = CGFloat(16)
     private var _descriptionMargin = CGFloat(5)
@@ -29,11 +29,11 @@ class OIBarChartView: UIView, OIViewAnimatorDelegate {
     
     private var _dataReducedPercent = CGFloat(0.0)
     
-    var fillColor = UIColor.lightGrayColor()
-    var strokeColor = UIColor.whiteColor()
+    var fillColor: UIColor?
+    var strokeColor = UIColor.blackColor()
     
     var barColor = UIColor.blueColor()
-    var barLabelColor = UIColor.whiteColor()
+    var barLabelColor = UIColor.blackColor()
     var barLabelFont = UIFont.systemFontOfSize(10.0)
     var barDescription = "每日喝水量"
     var barDataValueFont = UIFont.systemFontOfSize(8.0)
@@ -50,6 +50,8 @@ class OIBarChartView: UIView, OIViewAnimatorDelegate {
     internal func initialize() {
         _animator = OIViewAnimator()
         _animator.delegate = self
+        self.layer.cornerRadius = 8.0
+        self.layer.masksToBounds = true
     }
     
     func dataReduceWithRatio(ratio: CGFloat) {
@@ -67,7 +69,10 @@ class OIBarChartView: UIView, OIViewAnimatorDelegate {
         }
         let context = UIGraphicsGetCurrentContext()
         
-        fillColor.setFill()
+        if fillColor == nil {
+            fillColor = self.tintColor
+        }
+        fillColor!.setFill()
         strokeColor.setStroke()
         
         let barAreaHeight: CGFloat = CGRectGetHeight(rect) -  _descriptionHeight - _margin - _barLabelHeight
@@ -156,7 +161,7 @@ class OIBarChartView: UIView, OIViewAnimatorDelegate {
             let height = getHeihtForBar(volume, barHeight: barHegiht) * drawRatio
             let width = barWidth - _margin - _margin
             let barRect = CGRectMake(CGFloat(index) * barWidth + _margin, -height, width, height)
-            fillColor.setFill()
+            fillColor!.setFill()
             CGContextFillRect(context, barRect)
             
             let fontHeight = barDataValueFont.lineHeight

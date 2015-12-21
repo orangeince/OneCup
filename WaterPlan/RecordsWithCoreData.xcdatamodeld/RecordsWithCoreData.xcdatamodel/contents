@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<model userDefinedModelVersionIdentifier="" type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="9525" systemVersion="15C50" minimumToolsVersion="Xcode 7.0">
+    <entity name="RecordDaily" representedClassName=".RecordDaily" syncable="YES">
+        <attribute name="date" optional="YES" attributeType="Date" syncable="YES"/>
+        <attribute name="totalVolume" attributeType="Integer 32" defaultValueString="0" syncable="YES"/>
+        <attribute name="weekDay" optional="YES" attributeType="Integer 16" defaultValueString="0" syncable="YES"/>
+        <relationship name="details" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="RecordDetail" inverseName="theDay" inverseEntity="RecordDetail" syncable="YES"/>
+    </entity>
+    <entity name="RecordDetail" representedClassName=".RecordDetail" syncable="YES">
+        <attribute name="date" optional="YES" attributeType="Date" syncable="YES"/>
+        <attribute name="theHour" optional="YES" attributeType="Integer 16" defaultValueString="0" syncable="YES"/>
+        <attribute name="theMinute" optional="YES" attributeType="Integer 16" defaultValueString="0" syncable="YES"/>
+        <attribute name="time" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="volume" optional="YES" attributeType="Integer 32" defaultValueString="0" syncable="YES"/>
+        <relationship name="theDay" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="RecordDaily" inverseName="details" inverseEntity="RecordDaily" syncable="YES"/>
+    </entity>
+    <elements>
+        <element name="RecordDaily" positionX="-63" positionY="-18" width="128" height="103"/>
+        <element name="RecordDetail" positionX="-54" positionY="9" width="128" height="135"/>
+    </elements>
+</model>

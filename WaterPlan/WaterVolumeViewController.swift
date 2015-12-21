@@ -10,7 +10,7 @@ import UIKit
 
 class WaterVolumeViewController: UIViewController, UIPickerViewDelegate, UIPickerViewDataSource {
 
-    var selectedVolume = 0
+    var pickedVolume = 0
     let maxVolume = 1200
     var cupBtn: OICupButton!
     var volumeBtns = [VolumeBtn]()
@@ -54,6 +54,7 @@ class WaterVolumeViewController: UIViewController, UIPickerViewDelegate, UIPicke
         submitBtn.setTitle("确定", forState: .Normal)
         submitBtn.setTitleColor(UIColor.blackColor(), forState: .Normal)
         submitBtn.setTitleColor(UIColor.lightGrayColor(), forState: .Highlighted)
+        submitBtn.addTarget(self, action: "tapSubmitBtn:", forControlEvents: .TouchUpInside)
         //submitBtn.setImage(UIImage(named: "cat"), forState: .Normal)
         
         
@@ -107,16 +108,6 @@ class WaterVolumeViewController: UIViewController, UIPickerViewDelegate, UIPicke
         }
         return 1
     }
-    /*
-    func pickerView(pickerView: UIPickerView, titleForRow row: Int, forComponent component: Int) -> String? {
-        if component == 1 {
-            return String(row) + "0"
-        } else if component == 0 {
-            return String(row)
-        }
-        return "ml"
-    }
-    */
     func pickerView(pickerView: UIPickerView, viewForRow row: Int, forComponent component: Int, reusingView view: UIView?) -> UIView {
         let view = UIView()
         let size = pickerView.rowSizeForComponent(component)
@@ -137,21 +128,7 @@ class WaterVolumeViewController: UIViewController, UIPickerViewDelegate, UIPicke
         view.addSubview(label)
         return view
     }
-    /*
-    func pickerView(pickerView: UIPickerView, attributedTitleForRow row: Int, forComponent component: Int) -> NSAttributedString? {
-        let string: String
-        if component == 0 {
-            string = String(row)
-        } else if component == 1 {
-            string = String(row) + "0"
-        } else {
-            string = "ml"
-        }
-        //let nsfont = ns
-        let font = UIFont.systemFontOfSize(6.0)
-        //return NSAttributedString(string: string, attributes: [NSForegroundColorAttributeName: UIColor.blackColor(), NSFontAttributeName: font])
-        return NSAttributedString(string: string, attributes: [NSFontAttributeName: font])
-    } */
+    
     func pickerView(pickerView: UIPickerView, widthForComponent component: Int) -> CGFloat {
         if component == 2 {
             return 12.0
@@ -159,15 +136,35 @@ class WaterVolumeViewController: UIViewController, UIPickerViewDelegate, UIPicke
         return 32.0
     }
     func pickerView(pickerView: UIPickerView, didSelectRow row: Int, inComponent component: Int) {
-        selectedVolume = pickerView.selectedRowInComponent(0) * 100 + pickerView.selectedRowInComponent(1) * 10
+        pickedVolume = pickerView.selectedRowInComponent(0) * 100 + pickerView.selectedRowInComponent(1) * 10
+        pickVolume(true)
+    }
+    func pickVolume(animate: Bool) {
         let bounds = cupBtn.bounds
-        let waterRatio = CGFloat(selectedVolume) / CGFloat(maxVolume)
+        let waterRatio = CGFloat(pickedVolume) / CGFloat(maxVolume)
         let height = bounds.height * waterRatio
-        UIView.animateWithDuration(0.8) { () -> Void in
+        if animate {
+            UIView.animateWithDuration(0.6) { () -> Void in
+                self.waterView.frame = CGRectMake(0, bounds.height - height, bounds.width, height)
+            }
+        } else {
             self.waterView.frame = CGRectMake(0, bounds.height - height, bounds.width, height)
         }
+        
     }
     func pickerView(pickerView: UIPickerView, rowHeightForComponent component: Int) -> CGFloat {
         return 32.0
+    }
+    func initPickedVolume(volume: Int) {
+        volumePicker.selectRow(volume / 100, inComponent: 0, animated: false)
+        volumePicker.selectRow((volume % 100) / 10, inComponent: 1, animated: false)
+        pickedVolume = volume
+        pickVolume(true)
+    }
+    func tapSubmitBtn(button: UIButton) {
+        if let presented = self.presentingViewController as? DrinkingViewController {
+            presented.pickedVolume = pickedVolume
+            presented.dismissWaterVolumeViewController(pickedVolume)
+        }
     }
 }
