@@ -209,7 +209,7 @@ class DrinkingViewController: UIViewController, UITableViewDataSource, UITableVi
             } else {
                 weekDay = weekDay - 1
             }
-            recordDaily!.weekDay = components.weekday
+            recordDaily!.weekDay = weekDay
         }
         
         let detail = NSEntityDescription.insertNewObjectForEntityForName("RecordDetail", inManagedObjectContext: addingContext) as! RecordDetail
@@ -341,7 +341,7 @@ class DrinkingViewController: UIViewController, UITableViewDataSource, UITableVi
         
         let calendar = NSCalendar.currentCalendar()
         
-        for dayIdx in 5 ... 30 {
+        for dayIdx in 1 ... 30 {
             let now = NSDate(timeInterval: -NSTimeInterval(dayIdx * 24 * 3600), sinceDate: NSDate())
             let components = calendar.components([.Hour, .Minute, .Weekday], fromDate: now)
          
@@ -354,7 +354,7 @@ class DrinkingViewController: UIViewController, UITableViewDataSource, UITableVi
             } else {
                 weekDay = weekDay - 1
             }
-            recordDaily.weekDay = components.weekday
+            recordDaily.weekDay = weekDay
             for _ in 0 ... 5 {
                 let detail = NSEntityDescription.insertNewObjectForEntityForName("RecordDetail", inManagedObjectContext: context) as! RecordDetail
                 let drinkedVolume = random() % 600
@@ -376,6 +376,22 @@ class DrinkingViewController: UIViewController, UITableViewDataSource, UITableVi
             try context.save()
         } catch {
             fatalError("Failure to save context:\(error)")
+        }
+    }
+    func clearAllRecords() -> Bool {
+        let context = self.mangedObjectContext
+        var fetchRequest = NSFetchRequest(entityName: "RecordDaily")
+        var deleteRequest = NSBatchDeleteRequest(fetchRequest: fetchRequest)
+        
+        do {
+            try persistentStoreCoordinator.executeRequest(deleteRequest, withContext: context)
+            fetchRequest = NSFetchRequest(entityName: "RecordDetail")
+            deleteRequest = NSBatchDeleteRequest(fetchRequest: fetchRequest)
+            try persistentStoreCoordinator.executeRequest(deleteRequest, withContext: context)
+            return true
+        } catch {
+            return false
+            //fatalError("delete records error: \(error)")
         }
     }
 }

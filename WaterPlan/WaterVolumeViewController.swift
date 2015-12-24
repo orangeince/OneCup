@@ -144,7 +144,7 @@ class WaterVolumeViewController: UIViewController, UIPickerViewDelegate, UIPicke
         let waterRatio = CGFloat(pickedVolume) / CGFloat(maxVolume)
         let height = bounds.height * waterRatio
         if animate {
-            UIView.animateWithDuration(0.6) { () -> Void in
+            UIView.animateWithDuration(0.3) { () -> Void in
                 self.waterView.frame = CGRectMake(0, bounds.height - height, bounds.width, height)
             }
         } else {

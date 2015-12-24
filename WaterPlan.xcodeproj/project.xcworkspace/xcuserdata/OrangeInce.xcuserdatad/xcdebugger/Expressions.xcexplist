@@ -3,46 +3,25 @@
    version = "1.0">
    <ContextStates>
       <ContextState
-         contextName = "OIBarChartView.drawRect(CGRect) -&gt; ():OIBarChartView.swift">
+         contextName = "StatisticViewController.pageViewController(UIPageViewController, viewControllerAfterViewController : UIViewController) -&gt; UIViewController?:StatisticViewController.swift">
       </ContextState>
       <ContextState
-         contextName = "ReminderNewViewController.keyboardWillShow(NSNotification) -&gt; ():ReminderNewViewController.swift">
-         <PersistentStrings>
-            <PersistentString
-               value = "self.keyBoardShowed">
-            </PersistentString>
-            <PersistentString
-               value = "self.view.window!.bounds.height">
-            </PersistentString>
-         </PersistentStrings>
-      </ContextState>
-      <ContextState
-         contextName = "ReminderNewViewController.pickerView(UIPickerView, didSelectRow : Int, inComponent : Int) -&gt; ():ReminderNewViewController.swift">
-      </ContextState>
-      <ContextState
-         contextName = "ReminderTableViewController.saveReminderSetting() -&gt; ():ReminderTableViewController.swift">
-         <PersistentStrings>
-            <PersistentString
-               value = "settings.reminderArray">
-            </PersistentString>
-         </PersistentStrings>
-      </ContextState>
-      <ContextState
-         contextName = "DrinkingViewController.viewDidLoad() -&gt; ():DrinkingViewController.swift">
-         <PersistentStrings>
-            <PersistentString
-               value = "recordDaily!.weekDay">
-            </PersistentString>
-         </PersistentStrings>
+         contextName = "ReminderNewViewController.saveTap(UIButton) -&gt; ():ReminderNewViewController.swift">
       </ContextState>
       <ContextState
          contextName = "DrinkingViewController.refreshRecords() -&gt; ():DrinkingViewController.swift">
       </ContextState>
       <ContextState
-         contextName = "DrinkingViewController.dismissWaterVolumeViewController(Int) -&gt; ():DrinkingViewController.swift">
+         contextName = "DrinkingViewController.tableView(UITableView, numberOfRowsInSection : Int) -&gt; Int:DrinkingViewController.swift">
       </ContextState>
       <ContextState
-         contextName = "ReminderNewViewController.saveTap(UIButton) -&gt; ():ReminderNewViewController.swift">
+         contextName = "OIBarChartView.drawRect(CGRect) -&gt; ():OIBarChartView.swift">
+      </ContextState>
+      <ContextState
+         contextName = "ChartViewController.initialChartDatas([(Int, Int)], [(Int, Int, Int)]) -&gt; ():ChartViewController.swift">
+      </ContextState>
+      <ContextState
+         contextName = "ReminderNewViewController.viewDidLoad() -&gt; ():ReminderNewViewController.swift">
       </ContextState>
       <ContextState
          contextName = "DrinkingViewController.initializeFetchedResultsController() -&gt; ():DrinkingViewController.swift">
@@ -53,10 +32,29 @@
          </PersistentStrings>
       </ContextState>
       <ContextState
-         contextName = "DrinkingViewController.DrinkingWater(Int) -&gt; ():DrinkingViewController.swift">
+         contextName = "DrinkingViewController.dismissWaterVolumeViewController(Int) -&gt; ():DrinkingViewController.swift">
+      </ContextState>
+      <ContextState
+         contextName = "StatisticViewController.ChartViewControllerAtIndex(Int) -&gt; ChartViewController?:StatisticViewController.swift">
          <PersistentStrings>
             <PersistentString
-               value = "self.drinkedTotalVolume">
+               value = "self.dataStore.count">
+            </PersistentString>
+         </PersistentStrings>
+      </ContextState>
+      <ContextState
+         contextName = "ReminderNewViewController.keyboardWillHide(NSNotification) -&gt; ():ReminderNewViewController.swift">
+         <PersistentStrings>
+            <PersistentString
+               value = "self.view.window!.bounds">
+            </PersistentString>
+         </PersistentStrings>
+      </ContextState>
+      <ContextState
+         contextName = "ReminderTableViewController.saveReminderSetting() -&gt; ():ReminderTableViewController.swift">
+         <PersistentStrings>
+            <PersistentString
+               value = "settings.reminderArray">
             </PersistentString>
          </PersistentStrings>
       </ContextState>
@@ -72,18 +70,45 @@
          </PersistentStrings>
       </ContextState>
       <ContextState
-         contextName = "ReminderNewViewController.viewDidLoad() -&gt; ():ReminderNewViewController.swift">
-      </ContextState>
-      <ContextState
-         contextName = "DrinkingViewController.tableView(UITableView, numberOfRowsInSection : Int) -&gt; Int:DrinkingViewController.swift">
-      </ContextState>
-      <ContextState
-         contextName = "ReminderNewViewController.keyboardWillHide(NSNotification) -&gt; ():ReminderNewViewController.swift">
+         contextName = "DrinkingViewController.DrinkingWater(Int) -&gt; ():DrinkingViewController.swift">
          <PersistentStrings>
             <PersistentString
-               value = "self.view.window!.bounds">
+               value = "self.drinkedTotalVolume">
             </PersistentString>
          </PersistentStrings>
+      </ContextState>
+      <ContextState
+         contextName = "ReminderNewViewController.keyboardWillShow(NSNotification) -&gt; ():ReminderNewViewController.swift">
+         <PersistentStrings>
+            <PersistentString
+               value = "self.keyBoardShowed">
+            </PersistentString>
+            <PersistentString
+               value = "self.view.window!.bounds.height">
+            </PersistentString>
+         </PersistentStrings>
+      </ContextState>
+      <ContextState
+         contextName = "DrinkingViewController.viewDidLoad() -&gt; ():DrinkingViewController.swift">
+         <PersistentStrings>
+            <PersistentString
+               value = "recordDaily!.weekDay">
+            </PersistentString>
+         </PersistentStrings>
+      </ContextState>
+      <ContextState
+         contextName = "ReminderTableViewController.removeReminderSchedule(Reminder) -&gt; ():ReminderTableViewController.swift">
+      </ContextState>
+      <ContextState
+         contextName = "ReminderTableViewController.modifyReminderSchedule(Reminder) -&gt; ():ReminderTableViewController.swift">
+         <PersistentStrings>
+            <PersistentString
+               value = "NSDate()">
+            </PersistentString>
+         </PersistentStrings>
+      </ContextState>
+      <ContextState
+         contextName = "ReminderNewViewController.pickerView(UIPickerView, didSelectRow : Int, inComponent : Int) -&gt; ():ReminderNewViewController.swift">
       </ContextState>
    </ContextStates>
 </VariablesViewState>

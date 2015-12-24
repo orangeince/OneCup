@@ -10,25 +10,13 @@ import UIKit
 import CoreData
 class StatisticViewController: UIViewController, UIPageViewControllerDataSource, UIPageViewControllerDelegate {
 
-    @IBOutlet weak var clockView: OIClockView!
-    @IBOutlet weak var volumeChart: OIBarChartView!
+    weak var clockView: OIClockView!
+    weak var volumeChart: OIBarChartView!
     @IBOutlet weak var previousBtn: UIButton!
     @IBOutlet weak var nextBtn: UIButton!
     @IBOutlet weak var curWeekLabel: UILabel!
-    @IBOutlet weak var preWeekLabel: UILabel!
-    @IBOutlet weak var nextWeekLabel: UILabel!
     @IBOutlet weak var separateView: UIView!
-    
-    struct RecordDailyOfWeekDates {
-        var curWeek: ([(Int, Int)], [(Int, Int, Int)])
-        var preWeek: ([(Int, Int)], [(Int, Int, Int)])?
-        var nextWeek: ([(Int, Int)], [(Int, Int, Int)])?
-    }
-    
-    enum PreLoadOption {
-        case Previous
-        case Next
-    }
+    @IBOutlet weak var dismissBtn: UIButton!
     
     var managedObjectContext: NSManagedObjectContext!
     var referenceIndex = 0
@@ -45,54 +33,46 @@ class StatisticViewController: UIViewController, UIPageViewControllerDataSource,
     var preWeekClockChart = OIClockView()
     var nextWeekClockChart = OIClockView()
     
-    var weeksDates = RecordDailyOfWeekDates(curWeek: ([(Int, Int)](count: 7, repeatedValue: (0,0)), []), preWeek: nil, nextWeek: nil)
     var pageViewController: UIPageViewController?
-    var curChartViewController: ChartViewController!
-    var otherChartViewController: ChartViewController?
     
-    var curIndex:Int = 0
-    var dataStore = [([(Int, Int)], [(Int, Int, Int)])]()
+    var dataStore = [([(Int, Int)], [(Int, Int, Int)], String)]()
+    var dataTitles = [String]()
+    var loadedAllDatas = false
     
-    
+    enum TurnDirection {
+        case Previous
+        case Next
+    }
     override func viewDidLoad() {
         super.viewDidLoad()
         self.view.layer.cornerRadius = 8
         self.view.layer.masksToBounds = true
+        //self.dismissBtn.layer.cornerRadius = self.dismissBtn.frame.height / 2.0
+        //self.dismissBtn.layer.masksToBounds = true
+        //self.dismissBtn.layer.borderWidth = 1.0
+        self.dismissBtn.layer.borderColor = self.dismissBtn.tintColor.CGColor
+        
+        initializeData()
         
         self.pageViewController = UIPageViewController(transitionStyle: .Scroll, navigationOrientation: .Horizontal, options: nil)
-        self.curChartViewController = self.storyboard!.instantiateViewControllerWithIdentifier("ChartViewController") as! ChartViewController
-        pageViewController!.setViewControllers([self.curChartViewController], direction: .Forward, animated: false, completion: nil)
+        let startViewController = ChartViewControllerAtIndex(0)!
+        pageViewController!.setViewControllers([startViewController], direction: .Forward, animated: false, completion: nil)
         self.pageViewController!.delegate = self
         self.pageViewController!.dataSource = self
         
         self.addChildViewController(self.pageViewController!)
         self.view.addSubview(self.pageViewController!.view)
         
-        let pageViewRect = self.view.bounds
-        let margeTop = self.separateView.frame.origin.y + self.separateView.frame.height//
-        //self.pageViewController!.view.frame = CGRectOffset(CGRectInset(pageViewRect, 0, margeTop), 0, margeTop)
-        self.pageViewController!.view.frame = CGRectInset(pageViewRect, 0, margeTop)
+        let marginTop = self.separateView.frame.origin.y + self.separateView.frame.height//
+        let marginBottom = CGFloat(self.dismissBtn.frame.height + 10.0)
+        self.pageViewController!.view.frame = CGRectMake(0, marginTop, self.view.bounds.width, self.view.bounds.height - marginTop - marginBottom)
+        //self.pageViewController!.view.frame = CGRectOffset(CGRectInset(pageViewRect, 0, (marginTop + marginBottom) / 2.0), 0, marginBottom / 2.0)
         self.pageViewController!.didMoveToParentViewController(self)
         
         self.view.gestureRecognizers = self.pageViewController!.gestureRecognizers
+        self.volumeChart = startViewController.dailyVolumeView
+        self.clockView = startViewController.clockView
         
-        
-        distanceForLabel = (curWeekLabel.layer.position.x - previousBtn.layer.position.x) / 2.0
-        
-        preWeekLabel.alpha = 0.0
-        preWeekLabel.text = "上周无数据"
-        nextWeekLabel.alpha = 0.0
-        nextWeekLabel.text = "下周无数据"
-        
-        
-        //let gesture = UIPanGestureRecognizer(target: self, action: "draggingToNextRecord:")
-        //gesture.maximumNumberOfTouches = 1
-        //self.view.addGestureRecognizer(gesture)
-        initializeData()
-        
-        self.curChartViewController.setChartDatas(weeksDates.curWeek)
-        dataStore.append(weeksDates.curWeek)
-        curIndex = 0
     }
     func initializeData() {
         let firstRecordRequest = NSFetchRequest(entityName: "RecordDaily")
@@ -102,11 +82,26 @@ class StatisticViewController: UIViewController, UIPageViewControllerDataSource,
         do {
             let firstRecord = try self.managedObjectContext.executeFetchRequest(firstRecordRequest) as! [RecordDaily]
             if firstRecord.count == 0 { //没有一条记录
+                self.dataStore = [([], [], "本周")]
                 return
             }
             self.firstRecord = firstRecord[0]
-            firstRecordDate = self.firstRecord!.date!
-            loadDataForWeeks(self.curDate, preLoad: .Previous)
+            let firstRecordDate = self.firstRecord!.date!
+            
+            let calendar = NSCalendar.currentCalendar()
+            calendar.firstWeekday = 2
+            var beginningOfWeek: NSDate?
+            calendar.rangeOfUnit(.WeekOfYear, startDate: &beginningOfWeek, interval: nil, forDate: firstRecordDate)
+            self.firstRecordDate = beginningOfWeek
+            
+            var curWeekDatas = self.loadDataForTheWeek(self.curDate)
+            curWeekDatas.2 = "本周"
+            self.dataStore.append(curWeekDatas)
+            prepareForPreviousWeekDatas()
+            if self.dataStore.count > 1 {
+                self.previousBtn.enabled = true
+            }
+            
         } catch {
             fatalError("Failed to initailize firstRecord: \(error)")
         }
@@ -114,71 +109,34 @@ class StatisticViewController: UIViewController, UIPageViewControllerDataSource,
     func getTwoDigitNumber(num: Int) -> String {
         return num < 10 ? "0" + String(num) : String(num)
     }
-    func loadDataForWeeks(curDate: NSDate, preLoad: PreLoadOption) {
-        let secondsPerDay = 24 * 60 * 60
+    func prepareForPreviousWeekDatas() {
+        self.curDate = NSDate(timeInterval: NSTimeInterval(-7 * 24 * 3600), sinceDate: self.curDate)
         let calendar = NSCalendar.currentCalendar()
-        let today = calendar.startOfDayForDate(curDate)
-        let curComponents = calendar.components([.Year, .Month, .Day, .Weekday], fromDate: curDate)
-        var weekDay = curComponents.weekday
-        if weekDay == 1 {
-            weekDay = 7
+        
+        let comparison = calendar.compareDate(self.curDate,toDate: firstRecordDate, toUnitGranularity: .Day)
+        if comparison == .OrderedAscending {
+            self.loadedAllDatas = true
         } else {
-            weekDay--
+            let datas = loadDataForTheWeek(self.curDate)
+            self.dataStore.append(datas)
         }
-        
-        let firstDateOfCurWeek = NSDate(timeInterval: -NSTimeInterval((weekDay - 1) * secondsPerDay), sinceDate: today)
-        let endDateOfCurWeek = NSDate(timeInterval: NSTimeInterval((8 - weekDay) * secondsPerDay - 1), sinceDate: today)
-        
-        
-        if preLoad == .Previous {
-            if weeksDates.preWeek != nil {
-                self.weeksDates.curWeek = weeksDates.preWeek!
-                self.weeksDates.preWeek = nil
-            } else {
-                weeksDates.curWeek = loadDate(firstDateOfCurWeek, endDate: endDateOfCurWeek)
-            }
-            let comparison = calendar.compareDate(firstRecordDate, toDate: firstDateOfCurWeek, toUnitGranularity: .Day)
-            if comparison == .OrderedAscending {
-                previousBtn.enabled = true
-                let interval = NSTimeInterval(7 * secondsPerDay)
-                let startDate = NSDate(timeInterval: -NSTimeInterval(interval), sinceDate: firstDateOfCurWeek)
-                let endDate = NSDate(timeInterval: -NSTimeInterval(interval), sinceDate: endDateOfCurWeek)
-                weeksDates.preWeek = loadDate(startDate, endDate: endDate)
-                let startComp = calendar.components([.Month, .Day], fromDate: startDate)
-                let endComp = calendar.components([.Month, .Day], fromDate: endDate)
-                preWeekLabel.text = getTwoDigitNumber(startComp.month) + "." + getTwoDigitNumber(startComp.day) + " - " + getTwoDigitNumber(endComp.month) + "." + getTwoDigitNumber(endComp.day)
-            } else {
-                previousBtn.enabled = false
-                preWeekLabel.text = "无记录"
-            }
-        } else {
-            if weeksDates.nextWeek != nil {
-                self.weeksDates.curWeek = self.weeksDates.nextWeek!
-                self.weeksDates.nextWeek = nil
-            } else {
-                weeksDates.curWeek = loadDate(firstDateOfCurWeek, endDate: endDateOfCurWeek)
-            }
-            if calendar.isDateInToday(curDate) {
-                nextBtn.enabled = false
-                nextWeekLabel.text = "无记录"
-            } else {
-                let interval = NSTimeInterval(7 * secondsPerDay)
-                let startDate = NSDate(timeInterval: NSTimeInterval(interval), sinceDate: firstDateOfCurWeek)
-                let endDate = NSDate(timeInterval: NSTimeInterval(interval), sinceDate: endDateOfCurWeek)
-                weeksDates.nextWeek = loadDate(startDate, endDate: endDate)
-                let startComp = calendar.components([.Month, .Day], fromDate: startDate)
-                let endComp = calendar.components([.Month, .Day], fromDate: endDate)
-                nextWeekLabel.text = getTwoDigitNumber(startComp.month) + "." + getTwoDigitNumber(startComp.day) + " - " + getTwoDigitNumber(endComp.month) + "." + getTwoDigitNumber(endComp.day)
-            }
-        }
-    
     }
-    func loadDate(startDate: NSDate, endDate: NSDate) -> ([(Int, Int)],[(Int, Int, Int)]) {
-        
+    func loadDataForTheWeek(theDay: NSDate) -> ([(Int, Int)],[(Int, Int, Int)], String) {
         var dailyDatas = [(Int, Int)](count: 7, repeatedValue: (0, 0))
         var detailDatas = [(Int, Int, Int)]()
+        var dataTitle = ""
+        
+        var startDate: NSDate?
+        let calendar = NSCalendar.currentCalendar()
+        calendar.firstWeekday = 2
+        calendar.rangeOfUnit(.WeekOfYear, startDate: &startDate, interval: nil, forDate: theDay)
+        let endDate = NSDate(timeInterval: NSTimeInterval(7 * 24 * 3600 - 1), sinceDate: startDate!)
+        let startComp = calendar.components([.Month, .Day], fromDate: startDate!)
+        let endComp = calendar.components([.Month, .Day], fromDate: endDate)
+        dataTitle = getTwoDigitNumber(startComp.month) + "." + getTwoDigitNumber(startComp.day) + " - " + getTwoDigitNumber(endComp.month) + "." + getTwoDigitNumber(endComp.day)
+        
         let dailyRequest = NSFetchRequest(entityName: "RecordDaily")
-        dailyRequest.predicate = NSPredicate(format: "date >= %@ AND date <= %@", startDate, endDate)
+        dailyRequest.predicate = NSPredicate(format: "date >= %@ AND date <= %@", startDate!, endDate)
         
         do {
             let recordDailys = try self.managedObjectContext.executeFetchRequest(dailyRequest) as! [RecordDaily]
@@ -195,11 +153,11 @@ class StatisticViewController: UIViewController, UIPageViewControllerDataSource,
                 }
                 dailyDatas[day - 1] = (volume, day)
             }
-            return (dailyDatas, detailDatas)
+            return (dailyDatas, detailDatas, dataTitle)
         } catch {
             fatalError("Failed to initailize FetchedResultController: \(error)")
         }
-
+        
     }
 
     override func didReceiveMemoryWarning() {
@@ -229,8 +187,10 @@ class StatisticViewController: UIViewController, UIPageViewControllerDataSource,
                     ]
         clockView.setData(datas)
         if animatied {
-            volumeChart.setData(self.weeksDates.curWeek.0)
-            clockView.setData(self.weeksDates.curWeek.1)
+            let datas = self.dataStore[0]
+            
+            volumeChart.setData(datas.0)
+            clockView.setData(datas.1)
             volumeChart.animate(xAxisDuration: 1.0, yAxisDuration: 1.0)
             clockView.animate(xAxisDuration: 1.0, yAxisDuration: 1.0)
         }
@@ -244,104 +204,6 @@ class StatisticViewController: UIViewController, UIPageViewControllerDataSource,
         //clockView.setData([])
     }
     
-    func draggingToNextRecord(gesture: UIPanGestureRecognizer) {
-        switch gesture.state {
-        case .Began:
-            gesture.setTranslation(CGPointMake(0, 0), inView: self.view)
-        case .Changed:
-            let translation = gesture.translationInView(self.view)
-            let percentage = translation.x / CGRectGetWidth(self.view.bounds)
-            self.volumeChart.dataReduceWithRatio(fabs(percentage))
-            if percentage > 0 {
-                preWeekLabel.layer.position.x = previousBtn.layer.position.x + percentage * distanceForLabel
-                preWeekLabel.alpha = 1.0 * percentage
-            } else {
-                nextWeekLabel.center.x = nextBtn.center.x + percentage * distanceForLabel
-                nextWeekLabel.alpha = 1.0 * fabs(percentage)
-            }
-            let scale = 1.0 - fabs(percentage)
-            curWeekLabel.transform = CGAffineTransformScale(CGAffineTransformIdentity, scale, scale)
-            curWeekLabel.alpha = 1.0 - fabs(percentage)
-            
-        case .Ended:
-            let translation = gesture.translationInView(self.view)
-            let percentage = translation.x / CGRectGetWidth(self.view.bounds)
-            let intervalOfWeek = NSTimeInterval(24 * 3600 * 7)
-            if percentage > 0.5 && self.previousBtn.enabled == true {
-                
-                preWeekLabel.layer.position.x = previousBtn.layer.position.x + percentage * distanceForLabel
-                self.curDate = NSDate(timeInterval: -intervalOfWeek, sinceDate: self.curDate)
-                self.weeksDates.nextWeek = self.weeksDates.curWeek
-                loadDataForWeeks(curDate, preLoad: .Previous)
-                self.volumeChart.animateReversal(0.5)
-                
-                self.volumeChart.setDataWithAnimation(self.weeksDates.curWeek.0, animationDurtion: 1.0, delay: 0.5)
-                self.clockView.setData(self.weeksDates.curWeek.1)
-                self.clockView.animate(xAxisDuration: 1.0, yAxisDuration: 1.0)
-                
-                UIView.animateWithDuration(
-                    1,
-                    animations: { () -> Void in
-                        self.preWeekLabel.layer.position.x = self.curWeekLabel.layer.position.x
-                        self.preWeekLabel.alpha = 1.0
-                        self.curWeekLabel.alpha = 0.0
-                        self.curWeekLabel.transform = CGAffineTransformScale(CGAffineTransformIdentity, 0.1, 0.1)
-                    },
-                    completion: {
-                        (finished: Bool) -> Void in
-                        self.nextWeekLabel.text = self.curWeekLabel.text
-                        self.curWeekLabel.text = self.preWeekLabel.text
-                        self.curWeekLabel.transform = CGAffineTransformIdentity
-                        self.curWeekLabel.alpha = 1.0
-                        self.preWeekLabel.alpha = 0.0
-                        self.preWeekLabel.layer.position.x = self.previousBtn.layer.position.x
-                        self.nextBtn.enabled = true
-                    }
-                )
-            } else if percentage < -0.5 && self.nextBtn.enabled == true {
-                nextWeekLabel.center.x = nextBtn.center.x + percentage * distanceForLabel
-                self.curDate = NSDate(timeInterval: intervalOfWeek, sinceDate: self.curDate)
-                self.weeksDates.preWeek = self.weeksDates.curWeek
-                loadDataForWeeks(curDate, preLoad: .Next)
-                self.volumeChart.animateReversal(0.5)
-                
-                self.volumeChart.setDataWithAnimation(self.weeksDates.curWeek.0, animationDurtion: 1.0, delay: 0.5)
-                self.clockView.setData(self.weeksDates.curWeek.1)
-                self.clockView.animate(xAxisDuration: 1.0, yAxisDuration: 1.0)
-                UIView.animateWithDuration(
-                    1,
-                    animations: { () -> Void in
-                        self.nextWeekLabel.layer.position.x = self.curWeekLabel.layer.position.x
-                        self.nextWeekLabel.alpha = 1.0
-                        self.curWeekLabel.alpha = 0.0
-                        self.curWeekLabel.transform = CGAffineTransformScale(CGAffineTransformIdentity, 0.1, 0.1)
-                    },
-                    completion: {
-                        (finished: Bool) -> Void in
-                        self.preWeekLabel.text = self.curWeekLabel.text
-                        self.curWeekLabel.text = self.nextWeekLabel.text
-                        self.curWeekLabel.transform = CGAffineTransformIdentity
-                        self.curWeekLabel.alpha = 1.0
-                        self.nextWeekLabel.alpha = 0.0
-                        self.nextWeekLabel.layer.position.x = self.nextBtn.layer.position.x
-                        self.previousBtn.enabled = true
-                    }
-                )
-            } else {
-                self.volumeChart.animate(0.5)
-                UIView.animateWithDuration(0.5, animations: { () -> Void in
-                    self.preWeekLabel.layer.position.x = self.previousBtn.layer.position.x
-                    self.preWeekLabel.alpha = 0.0
-                    self.nextWeekLabel.layer.position.x = self.nextBtn.layer.position.x
-                    self.nextWeekLabel.alpha = 0.0
-                    self.curWeekLabel.transform = CGAffineTransformIdentity
-                    self.curWeekLabel.alpha = 1.0
-                })
-            }
-        default:
-            break
-        }
-    }
     
 
     /*
@@ -394,6 +256,8 @@ class StatisticViewController: UIViewController, UIPageViewControllerDataSource,
     func ChartViewControllerAtIndex(index: Int) -> ChartViewController? {
         if index >= self.dataStore.count {
             return nil
+        } else if index == self.dataStore.count - 1 {
+            prepareForPreviousWeekDatas()
         }
         let chartViewController = self.storyboard!.instantiateViewControllerWithIdentifier("ChartViewController") as! ChartViewController
         chartViewController.dataIndex = index
@@ -403,38 +267,86 @@ class StatisticViewController: UIViewController, UIPageViewControllerDataSource,
     func pageViewController(pageViewController: UIPageViewController, viewControllerAfterViewController viewController: UIViewController) -> UIViewController? {
         let VC = viewController as! ChartViewController
         let index = VC.dataIndex - 1
-        
-        return self.ChartViewControllerAtIndex(index)
-    }
-    func pageViewController(pageViewController: UIPageViewController, viewControllerBeforeViewController viewController: UIViewController) -> UIViewController? {
-        let VC = viewController as! ChartViewController
-        let index = VC.dataIndex - 1
         if index < 0 {
             return nil
         }
         
         return self.ChartViewControllerAtIndex(index)
     }
+    func pageViewController(pageViewController: UIPageViewController, viewControllerBeforeViewController viewController: UIViewController) -> UIViewController? {
+        let VC = viewController as! ChartViewController
+        let index = VC.dataIndex + 1
+        
+        return self.ChartViewControllerAtIndex(index)
+    }
     func pageViewController(pageViewController: UIPageViewController, didFinishAnimating finished: Bool, previousViewControllers: [UIViewController], transitionCompleted completed: Bool) {
-        /*
         if completed {
-            let tempVC = self.curChartViewController
-            let intervalOfWeek = NSTimeInterval(24 * 3600 * 7)
-            if self.otherChartViewController!.loadState == .Previous {
-                self.curDate = NSDate(timeInterval: -intervalOfWeek, sinceDate: self.curDate)
-                self.weeksDates.nextWeek = self.weeksDates.curWeek
-                loadDataForWeeks(curDate, preLoad: .Previous)
-                self.curChartViewController = self.otherChartViewController!
-                self.otherChartViewController = tempVC
-            } else if self.otherChartViewController!.loadState == .Next {
-                self.curDate = NSDate(timeInterval: intervalOfWeek, sinceDate: self.curDate)
-                self.weeksDates.preWeek = self.weeksDates.curWeek
-                loadDataForWeeks(curDate, preLoad: .Next)
-                self.curChartViewController = self.otherChartViewController!
-                self.otherChartViewController = tempVC
+            if let curVC = pageViewController.viewControllers![0] as? ChartViewController {
+                self.curWeekLabel.text = curVC.topTitle
+                let curIndex = curVC.dataIndex
+                if curIndex == 0 {
+                    nextBtn.enabled = false
+                } else {
+                    nextBtn.enabled = true
+                }
+                if curIndex == self.dataStore.count - 1 {
+                    self.previousBtn.enabled = false
+                } else {
+                    self.previousBtn.enabled = true
+                }
+                self.volumeChart = curVC.dailyVolumeView
+                self.clockView = curVC.clockView
             }
         }
-        */
     }
 
+    @IBAction func previousBtnTap(sender: UIButton) {
+        turnTheChartTo(.Previous)
+    }
+    @IBAction func nextBtnTap(sender: UIButton) {
+        turnTheChartTo(.Next)
+    }
+    func turnTheChartTo(to: TurnDirection) {
+        if let curChart = self.pageViewController!.viewControllers![0] as? ChartViewController {
+            var index = curChart.dataIndex
+            let direction: UIPageViewControllerNavigationDirection
+            switch to {
+            case .Previous:
+                index += 1
+                direction = .Reverse
+            case .Next:
+                index -= 1
+                direction = .Forward
+            }
+            if index < 0 {
+                return
+            }
+            if let theChart = self.ChartViewControllerAtIndex(index) {
+                self.pageViewController!.setViewControllers(
+                    [theChart],
+                    direction: direction,
+                    animated: true,
+                    completion: {
+                        (finished: Bool) -> Void in
+                        if finished {
+                            self.curWeekLabel.text = theChart.topTitle
+                            if index == 0 {
+                                self.nextBtn.enabled = false
+                            } else {
+                                self.nextBtn.enabled = true
+                            }
+                            if index == self.dataStore.count - 1 {
+                                self.previousBtn.enabled = false
+                            } else {
+                                self.previousBtn.enabled = true
+                            }
+                            self.volumeChart = theChart.dailyVolumeView
+                            self.clockView = theChart.clockView
+                        }
+                    }
+                )
+            }
+            //self.pageViewController!.navigationController!.
+        }
+    }
 }

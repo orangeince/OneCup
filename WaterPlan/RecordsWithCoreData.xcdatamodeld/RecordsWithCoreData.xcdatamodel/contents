@@ -15,7 +15,7 @@
         <relationship name="theDay" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="RecordDaily" inverseName="details" inverseEntity="RecordDaily" syncable="YES"/>
     </entity>
     <elements>
-        <element name="RecordDaily" positionX="-63" positionY="-18" width="128" height="103"/>
-        <element name="RecordDetail" positionX="-54" positionY="9" width="128" height="135"/>
+        <element name="RecordDaily" positionX="-90" positionY="-40" width="128" height="103"/>
+        <element name="RecordDetail" positionX="153" positionY="-72" width="128" height="135"/>
     </elements>
 </model>

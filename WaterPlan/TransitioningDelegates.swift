@@ -68,11 +68,11 @@ class AnimationTransitioningForDrinkingAndWaterVolume: NSObject, UIViewControlle
             let duration = self.transitionDuration(transitionContext)
             let durationFrist = duration / 4.0
             
+                    toView.effect = UIBlurEffect(style: .Dark)
             UIView.animateWithDuration(
                 durationFrist,
                 animations: {
                     () -> Void in
-                    toView.effect = UIBlurEffect(style: .Dark)
                     cup.transform = CGAffineTransformScale(cup.transform, 2.0, 2.0)
                     cup.frame.origin.x = originX
                     cup.frame.origin.y = originY
@@ -173,12 +173,12 @@ class AnimationTransitioningForDrinkingAndWaterVolume: NSObject, UIViewControlle
                         duration - durationFrist,
                         animations: {
                             () -> Void in
-                            fromView!.effect = nil
                             cup.transform = CGAffineTransformScale(cup.transform, 0.5, 0.5)
                             cup.frame.origin = cupFinalFrame.origin
                         },
                         completion: {
                             (finished: Bool) -> Void in
+                            fromView!.effect = nil
                             let success = !transitionContext.transitionWasCancelled()
                             transitionContext.completeTransition(success)
                     })
@@ -187,7 +187,7 @@ class AnimationTransitioningForDrinkingAndWaterVolume: NSObject, UIViewControlle
         }
     }
     func transitionDuration(transitionContext: UIViewControllerContextTransitioning?) -> NSTimeInterval {
-        return 0.8
+        return 0.6
     }
 }
 /* 初版 没有自定义容量选择
@@ -348,10 +348,13 @@ class AnimationTransitioningForDrinkingAndSettings: NSObject, UIViewControllerAn
             transform = CATransform3DRotate(CATransform3DIdentity, CGFloat(M_PI_2), 0, 1, 0)
         }
         
-        UIView.animateWithDuration(self.transitionDuration(transitionContext) / 2.0, animations: { () -> Void in
+        let duration = self.transitionDuration(transitionContext)
+        let durationHalf = duration / 2.0
+        
+        UIView.animateWithDuration(durationHalf, animations: { () -> Void in
             fromView.layer.transform = transform
-            UIView.animateWithDuration(0.25,
-                delay: 0.25,
+            UIView.animateWithDuration(durationHalf,
+                delay: durationHalf,
                 options: .CurveEaseIn ,
                 animations: { () -> Void in
                     toView.layer.transform = CATransform3DIdentity

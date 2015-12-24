@@ -12,6 +12,7 @@ class SettingsTableViewController: UITableViewController {
     @IBOutlet weak var dailyGoalLabel: UILabel!
     @IBOutlet weak var reminderEnableLabel: UILabel!
     @IBOutlet weak var shortcutCupCountLabel: UILabel!
+    var manageRecordsDelegate: DrinkingViewController?
     var settings = NSMutableDictionary()
     var needSave = false
     var roundCorner = true
@@ -237,6 +238,41 @@ class SettingsTableViewController: UITableViewController {
             toVC.settingsDataSource = self
         } else if let toVC = segue.destinationViewController as? ReminderTableViewController {
             toVC.settingsDataSource = self
+        }
+    }
+    override func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
+        let row = indexPath.row
+        switch indexPath.section {
+        case 1:
+            break
+        case 2:
+            break
+        case 3:
+            if row == 0 {
+                let alert = UIAlertController(title: "抹掉所有数据", message: "确定要抹掉所有数据吗，抹掉之后数据将无法找回", preferredStyle: .Alert)
+                let clearRecordsAction = UIAlertAction(
+                    title: "抹掉",
+                    style: .Default,
+                    handler: {
+                        (action: UIAlertAction) -> Void in
+                        if let delegate = self.manageRecordsDelegate {
+                            let successed = delegate.clearAllRecords()
+                            if !successed {
+                                let failedAlert = UIAlertController(title: "Sorry", message: "哎呀，不好意思，抹除数据失败啦。>_<``", preferredStyle: .Alert)
+                                self.presentViewController(failedAlert, animated: true, completion: nil)
+                            }
+                        }
+                    })
+                let defaultAction = UIAlertAction(title: "取消", style: .Default, handler: nil)
+                alert.addAction(clearRecordsAction)
+                alert.addAction(defaultAction)
+                //self.presentViewController(alert, animated: true, completion: )
+                self.presentViewController(alert, animated: true, completion: { () -> Void in
+                    self.tableView.deselectRowAtIndexPath(indexPath, animated: true)
+                })
+            }
+        default:
+            break
         }
     }
     override func unwindForSegue(unwindSegue: UIStoryboardSegue, towardsViewController subsequentVC: UIViewController) {

@@ -20,12 +20,16 @@ class ChartViewController: UIViewController {
     }
     var loadState:RecordsLoadState = .Current
     var dataIndex: Int = 0
+    var datas:([(Int, Int)], [(Int, Int, Int)], String) = ([], [], "")
+    var topTitle:String = ""
+    var startDate: NSDate?
+    var endDate: NSDate?
     
-    var datas:([(Int, Int)], [(Int, Int, Int)]) = ([], [])
     override func viewDidLoad() {
         super.viewDidLoad()
         dailyVolumeView.setData(datas.0)
         clockView.setData(datas.1)
+        self.topTitle = datas.2
     }
 
     override func didReceiveMemoryWarning() {
@@ -34,9 +38,9 @@ class ChartViewController: UIViewController {
     }
     
     
-    func setChartDatas(datas: ([(Int, Int)], [(Int, Int, Int)])) {
-        self.dailyVolumeView.setData(datas.0)
-        self.clockView.setData(datas.1)
+    func setChartDatas(datas: ([(Int, Int)], [(Int, Int, Int)], String)) {
+        self.datas = datas
+        self.topTitle = datas.2
     }
 
 }

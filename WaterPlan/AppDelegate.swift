@@ -22,8 +22,16 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             drinkingViewController.mangedObjectContext = self.managedObjectContext
             drinkingViewController.persistentStoreCoordinator = self.persistentStoreCoordinator
         }
+        application.applicationIconBadgeNumber = 0
 
         return true
+    }
+    func application(application: UIApplication, didReceiveLocalNotification notification: UILocalNotification) {
+        print("receiveNotification")
+        //application.applicationIconBadgeNumber = 0
+        if let alertText = notification.alertBody {
+            print("receiveLocalNotification: \(alertText)")
+        }
     }
 
     func applicationWillResignActive(application: UIApplication) {
@@ -40,14 +48,14 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
     func applicationWillEnterForeground(application: UIApplication) {
         // Called as part of the transition from the background to the inactive state; here you can undo many of the changes made on entering the background.
-        if let drinkingViewController = self.window?.rootViewController as? DrinkingViewController {
-            drinkingViewController.viewWillAppear(false)
-        }
+        //if let drinkingViewController = self.window?.rootViewController as? DrinkingViewController {
+            //drinkingViewController.viewWillAppear(false)
+        //}
     }
 
     func applicationDidBecomeActive(application: UIApplication) {
         // Restart any tasks that were paused (or not yet started) while the application was inactive. If the application was previously in the background, optionally refresh the user interface.
-        //application.applicationIconBadgeNumber -= 1
+        application.applicationIconBadgeNumber = 0
     }
 
     func applicationWillTerminate(application: UIApplication) {
@@ -115,6 +123,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
                 abort()
             }
         }
+    }
+    func loadConfig() {
+        
     }
 
 

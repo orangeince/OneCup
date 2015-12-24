@@ -14,7 +14,8 @@ class ReminderTableViewCell: UITableViewCell {
     @IBOutlet weak var alertTitleLabel: UILabel!
     @IBOutlet weak var enableSwitch: UISwitch!
     
-    var reminder = ("", "", "", 0, 0, 0, true)
+    //var reminder = ("", "", "", 0, 0, 0, true)
+    var reminder: Reminder!
 
     override func awakeFromNib() {
         super.awakeFromNib()

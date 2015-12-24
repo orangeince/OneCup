@@ -37,7 +37,7 @@ class OICupButton: UIButton, OIViewAnimatorDelegate {
         let height = CGRectGetHeight(rect)
         
         let color = self.tintColor
-        UIColor.lightGrayColor().setStroke()
+        UIColor.darkGrayColor().setStroke()
         color.setFill()
         let path = CGPathCreateMutable()
         
@@ -52,10 +52,17 @@ class OICupButton: UIButton, OIViewAnimatorDelegate {
         shape.path = path
         self.layer.mask = shape
         
-        /*
         let context = UIGraphicsGetCurrentContext()
-        CGContextAddPath(context, path)
-        */
+        //CGContextAddPath(context, path)
+        CGContextMoveToPoint(context, 0, 0)
+        CGContextAddLineToPoint(context, tmpWidth, height)
+        CGContextStrokePath(context)
+        CGContextMoveToPoint(context, tmpWidth, height)
+        CGContextAddLineToPoint(context, width - tmpWidth, height)
+        CGContextStrokePath(context)
+        CGContextMoveToPoint(context, width - tmpWidth, height)
+        CGContextAddLineToPoint(context, width, 0)
+        CGContextStrokePath(context)
         
     }
     func viewAnimatorUpdated(viewAnimator: OIViewAnimator) {

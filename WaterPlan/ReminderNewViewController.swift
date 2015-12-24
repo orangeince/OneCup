@@ -19,14 +19,17 @@ class ReminderNewViewController: UIViewController, UIPickerViewDelegate, UIPicke
     @IBOutlet weak var alertTitleField: UITextField!
     
     var weekBtns = [WeekButton]()
-    var alertTime = ""
     var alertTitle = ""
-    var repeatDate = ""
-    var repeatDateMask = 0
+    //var alertTime = ""
+    //var repeatDate = ""
+    var repeatMask = 0
     var theHour = 0
     var theMinute = 0
     var enable = true
-    var reminder: ((String, String, String, Int, Int, Int, Bool), Int)?
+    var identifier = ""
+    var fireDate = NSDate()
+    //var reminder: ((String, String, String, Int, Int, Int, Bool), Int)?
+    var reminder: (Reminder, Int)?
     var SaveDataDelegate: ReminderTableViewController?
     
     
@@ -42,7 +45,14 @@ class ReminderNewViewController: UIViewController, UIPickerViewDelegate, UIPicke
         self.theMinute = calendarComponents.minute
         
         if let reminder = self.reminder {
-             ((alertTime, alertTitle, repeatDate, repeatDateMask, theHour, theMinute, enable), _) = reminder
+            self.alertTitle = reminder.0.alertTitle
+            self.repeatMask = reminder.0.repeatMask
+            self.theHour = reminder.0.theHour
+            self.theMinute = reminder.0.theMinute
+            self.enable = reminder.0.enable
+            self.fireDate = reminder.0.fireDate
+            self.identifier = reminder.0.identifier
+             //((alertTime, alertTitle, repeatDate, repeatDateMask, theHour, theMinute, enable), _) = reminder
         }
        
         self.pickerView.selectRow(self.pickerView.numberOfRowsInComponent(0) / 2 + self.theHour, inComponent: 0, animated: false)
@@ -77,8 +87,8 @@ class ReminderNewViewController: UIViewController, UIPickerViewDelegate, UIPicke
                 weekBtn.backgroundColor = btn.tintColor
                 weekBtn.bounds = btn.bounds
                 weekBtn.day = index + 1
-                let mask = repeatDateMask
-                if (mask >> index) & 1 == 1 {
+                //let mask = repeatMask
+                if (1 << index) & repeatMask == 1 {
                     btnSwapBackgroudColorWithTitleColor(weekBtn)
                 }
                 weekBtn.layer.cornerRadius = weekBtn.bounds.width / 2.0
@@ -89,7 +99,7 @@ class ReminderNewViewController: UIViewController, UIPickerViewDelegate, UIPicke
                 self.weekBtnStack.addArrangedSubview(weekBtn)
             }
         }
-        self.refreshRepeatDate()
+        //self.refreshRepeatDate()
         self.registerForKeyboardNotification()
     }
 
@@ -154,13 +164,13 @@ class ReminderNewViewController: UIViewController, UIPickerViewDelegate, UIPicke
         } else {
             self.theMinute = row % 60
         }
-        self.refreshRepeatDate()
+        //self.refreshRepeatDate()
     }
-    func refreshRepeatDate() {
-        let theHour = self.theHour >= 10 ? String(self.theHour) : String(0) + String(self.theHour)
-        let theMinute = self.theMinute >= 10 ? String(self.theMinute) : String(0) + String(self.theMinute)
-        self.alertTime = theHour + ":" + theMinute
-    }
+    //func refreshRepeatDate() {
+        //let theHour = self.theHour >= 10 ? String(self.theHour) : String(0) + String(self.theHour)
+        //let theMinute = self.theMinute >= 10 ? String(self.theMinute) : String(0) + String(self.theMinute)
+        //self.alertTime = theHour + ":" + theMinute
+    //}
     
 
     /*
@@ -189,26 +199,12 @@ class ReminderNewViewController: UIViewController, UIPickerViewDelegate, UIPicke
     }
     @IBAction func saveTap(sender: UIButton) {
         self.alertTitleField.resignFirstResponder()
-        var repeatDate = " "
         for btn in self.weekBtns {
             if btn.checked {
-                self.repeatDateMask |= (1 << (btn.day - 1))
-                repeatDate += " 周" + btn.titleLabel!.text!
+                self.repeatMask |= (1 << (btn.day - 1))
             } else {
-                self.repeatDateMask &= ~(1 << (btn.day - 1))
+                self.repeatMask &= ~(1 << (btn.day - 1))
             }
-        }
-        let index = repeatDate.startIndex.advancedBy(1)
-        repeatDate = repeatDate.substringFromIndex(index)
-        switch self.repeatDateMask {
-        case 127:
-            self.repeatDate = "每天"
-        case 96:
-            self.repeatDate = "周末"
-        case 31:
-            self.repeatDate = "工作日"
-        default:
-            self.repeatDate = repeatDate
         }
         if let alertText = alertTitleField.text {
             alertTitle = alertText
@@ -218,18 +214,47 @@ class ReminderNewViewController: UIViewController, UIPickerViewDelegate, UIPicke
         } else {
             alertTitle = "喝水提醒"
         }
-        let newReminder = (self.alertTime, self.alertTitle, self.repeatDate, self.repeatDateMask, self.theHour, self.theMinute, true)
+        let calendar = NSCalendar.currentCalendar()
+        let now = NSDate()
+        self.fireDate = calendar.dateBySettingHour(theHour, minute: theMinute, second: 0, ofDate: now, options: .MatchFirst)!
+        if self.repeatMask == 0 {
+            if calendar.compareDate(self.fireDate, toDate: now, toUnitGranularity: .Minute) != .OrderedDescending {
+                self.fireDate = NSDate(timeInterval: NSTimeInterval(24 * 3600), sinceDate: self.fireDate)
+            }
+        }
+        self.identifier = generateIdentifier()
         if let presenting = self.presentingViewController {
             if let reminderSetting = self.SaveDataDelegate {
-                if self.reminder == nil {
-                    reminderSetting.addReminder(newReminder)
+                if let theReminder = self.reminder {
+                    let newReminder = theReminder.0
+                    newReminder.alertTitle = self.alertTitle
+                    newReminder.theHour = self.theHour
+                    newReminder.theMinute = self.theMinute
+                    newReminder.enable = true
+                    //newReminder.identifier = generateIdentifier()  //Identifier不需要更新
+                    newReminder.fireDate = self.fireDate
+                    newReminder.repeatMask = self.repeatMask
+                    reminderSetting.modifyReminder(theReminder.1)
                 } else {
-                    let (_, atRow) = self.reminder!
-                    reminderSetting.modifyReminder(newReminder, atRow: atRow)
+                    let newReminder = Reminder(
+                        alertTitle: self.alertTitle,
+                        theHour: self.theHour,
+                        theMinute: self.theMinute,
+                        fireDate: self.fireDate,
+                        repeatMask: self.repeatMask,
+                        identifier: self.identifier,
+                        enable: self.enable
+                    )
+                    reminderSetting.addReminder(newReminder)
                 }
             }
             presenting.dismissViewControllerAnimated(true, completion: nil)
         }
+    }
+    func generateIdentifier() -> String {
+        let calendar = NSCalendar.currentCalendar()
+        let curComp = calendar.components([.Year,.Month,.Day,.Hour,.Minute,.Second], fromDate: NSDate())
+        return String(curComp.year) + String(curComp.month) + String(curComp.day) + String(curComp.hour) + String(curComp.minute) + String(curComp.second) + String(random() % 100)
     }
 
 }

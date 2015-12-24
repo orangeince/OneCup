@@ -37,6 +37,8 @@ class OIBarChartView: UIView, OIViewAnimatorDelegate {
     var barLabelFont = UIFont.systemFontOfSize(10.0)
     var barDescription = "每日喝水量"
     var barDataValueFont = UIFont.systemFontOfSize(8.0)
+    var drawLimitLine = true
+    var limitVolume = 2000
     
     
     override init(frame: CGRect) {
@@ -75,14 +77,16 @@ class OIBarChartView: UIView, OIViewAnimatorDelegate {
         fillColor!.setFill()
         strokeColor.setStroke()
         
-        let barAreaHeight: CGFloat = CGRectGetHeight(rect) -  _descriptionHeight - _margin - _barLabelHeight
+        let labelTextHeight = barLabelFont.lineHeight
+        
+        let barAreaHeight: CGFloat = CGRectGetHeight(rect) -  _descriptionHeight - _margin - _margin
         let barAreaWidth = CGRectGetWidth(rect) - _margin - _margin
         
         let barWidth = barAreaWidth / CGFloat(barCount)
-        let barHegiht = barAreaHeight - _barLabelHeight - _barLabelMargin - _barLabelMargin
+        let barHegiht = barAreaHeight - _barLabelHeight - _barLabelMargin - _barLabelMargin - labelTextHeight
         
         let barLineX = _margin
-        let barLineY = _margin + barHegiht
+        let barLineY = _margin + barHegiht + labelTextHeight
         
         //draw barBottomLine
         CGContextSaveGState(context)
@@ -94,19 +98,33 @@ class OIBarChartView: UIView, OIViewAnimatorDelegate {
         CGContextMoveToPoint(context, 0, 0)
         
         for idx in 0 ..< barCount {
-            let text = _barLabels[idx]
-            let textRect = CGRectMake(CGFloat(idx) * barWidth + _margin, _barLabelMargin, barWidth, barWidth)
-            
             var attrs = [String: AnyObject]()
             attrs[NSFontAttributeName] = barLabelFont
             attrs[NSForegroundColorAttributeName] = barLabelColor
-            NSString(string: text).drawInRect(textRect, withAttributes: attrs)
-            
-            
+            let text = _barLabels[idx]
+            let textWidth = text.sizeWithAttributes(attrs).width
+            //let textRect = CGRectMake(CGFloat(idx) * barWidth + _margin, _barLabelMargin, barWidth, barWidth)
+            let textPoint = CGPoint(x: (CGFloat(idx) + CGFloat(0.5)) * barWidth - textWidth / 2.0, y: _barLabelMargin)
+            //NSString(string: text).drawInRect(textRect, withAttributes: attrs)
+            NSString(string: text).drawAtPoint(textPoint, withAttributes: attrs)
         }
         CGContextRestoreGState(context)
         
-        
+        var avg = 0
+        if _data.count > 0 {
+            var sum = 0
+            var count = 0
+            for data in _data {
+                sum += data.0
+                if data.0 > 0 {
+                    count++
+                }
+            }
+            if count > 0 {
+                avg = Int(sum / count)
+            }
+        }
+        let avgText = "日平均: "
         CGContextSaveGState(context)
         //draw description
         CGContextTranslateCTM(context, 0, barAreaHeight + _margin)
@@ -124,7 +142,12 @@ class OIBarChartView: UIView, OIViewAnimatorDelegate {
         var attrs = [String: AnyObject]()
         attrs[NSFontAttributeName] = barLabelFont
         attrs[NSForegroundColorAttributeName] = barLabelColor
+        let avgWidth = avgText.sizeWithAttributes(attrs).width
+        let maxVolumeText = "10000 ml"
+        let maxVolumeTextWidth = maxVolumeText.sizeWithAttributes(attrs).width
+        let avgPoint = CGPoint(x: barAreaWidth - avgWidth - maxVolumeTextWidth + _margin , y: _descriptionMargin)
         NSString(string: barDescription).drawAtPoint(descriptionPoint, withAttributes: attrs)
+        NSString(string: avgText + String(avg) + " ml").drawAtPoint(avgPoint, withAttributes: attrs)
         CGContextRestoreGState(context)
         
         //draw bar data
@@ -155,7 +178,21 @@ class OIBarChartView: UIView, OIViewAnimatorDelegate {
             }
         }
         
+        CGContextSaveGState(context)
         CGContextTranslateCTM(context, barLineX, barLineY)
+        //draw the limitLine
+        if drawLimitLine {
+            let height = getHeihtForBar(_limitVolume, barHeight: barHegiht)
+            CGContextMoveToPoint(context, 0, -height)
+            let dashLineLenghts = [CGFloat(6),CGFloat(12)]
+            CGContextSetLineDash(context, 0.0, dashLineLenghts, 1)
+            CGContextSetLineWidth(context, 0.3)
+            UIColor.lightGrayColor().setStroke()
+            CGContextAddLineToPoint(context, barAreaWidth, -height)
+            CGContextStrokePath(context)
+        }
+        
+        //draw dataBar
         for index in 0 ..< _data.count {
             let (volume, _) = _data[index]
             let height = getHeihtForBar(volume, barHeight: barHegiht) * drawRatio
@@ -164,14 +201,18 @@ class OIBarChartView: UIView, OIViewAnimatorDelegate {
             fillColor!.setFill()
             CGContextFillRect(context, barRect)
             
-            let fontHeight = barDataValueFont.lineHeight
-            let dataValueRect = CGRectMake(CGFloat(index) * barWidth + _margin, -height - fontHeight - fontHeight / 2.0, width, fontHeight)
             attrs[NSFontAttributeName] = barDataValueFont
             attrs[NSForegroundColorAttributeName] = barLabelColor
-            //let v = Int(CGFloat(volume) * drawRatio)
-            let v = Int(CGFloat(volume))
-            NSString(string: String(v)).drawInRect(dataValueRect, withAttributes: attrs)
+            let v = String(volume)
+            let fontHeight = barDataValueFont.lineHeight
+            let fontWidth = v.sizeWithAttributes(attrs).width
+            //let dataValueRect = CGRectMake(CGFloat(index) * barWidth + _margin, , width, fontHeight)
+            let textPoint = CGPoint(x: (CGFloat(index) + CGFloat(0.5)) * barWidth - fontWidth / 2.0, y: -height - fontHeight - fontHeight / 3.0)
+            //NSString(string: v).drawInRect(dataValueRect, withAttributes: attrs)
+            NSString(string: v).drawAtPoint(textPoint, withAttributes: attrs)
         }
+        
+        CGContextRestoreGState(context)
     }
     
     func setData(data: [(Int, Int)]) {
