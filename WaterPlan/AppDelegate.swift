@@ -23,6 +23,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             drinkingViewController.persistentStoreCoordinator = self.persistentStoreCoordinator
         }
         application.applicationIconBadgeNumber = 0
+        self.registerAppDefaults()
 
         return true
     }
@@ -32,6 +33,56 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         if let alertText = notification.alertBody {
             print("receiveLocalNotification: \(alertText)")
         }
+    }
+    func registerAppDefaults() {
+        let reminderValues = [
+            //NSString(string: alertTime),
+            NSString(string: "每日第一杯水"),
+            NSNumber(integer: 8),
+            NSNumber(integer: 0),
+            NSNumber(integer: 127),
+            NSString(string: "defaultReminder"),
+            NSDate(),
+            false
+        ]
+        let reminderKeys = [
+            NSString(string: "AlertTitle"),
+            NSString(string: "TheHour"),
+            NSString(string: "TheMinute"),
+            NSString(string: "RepeatMask"),
+            NSString(string: "Identifier"),
+            NSString(string: "FireDate"),
+            NSString(string: "Enable")
+        ]
+        let reminderDict = NSDictionary(objects: reminderValues, forKeys: reminderKeys)
+        let defaultReminder = NSMutableArray(array: [reminderDict])
+        let defaultCups = NSArray(
+            array: [
+                NSDictionary(objects: [NSNumber(integer: 30), ""], forKeys: [NSString(string: "Volume"), NSString(string: "ImageName")]),
+                NSDictionary(objects: [NSNumber(integer: 100), ""], forKeys: [NSString(string: "Volume"), NSString(string: "ImageName")]),
+                NSDictionary(objects: [NSNumber(integer: 150), ""], forKeys: [NSString(string: "Volume"), NSString(string: "ImageName")]),
+                NSDictionary(objects: [NSNumber(integer: 200), ""], forKeys: [NSString(string: "Volume"), NSString(string: "ImageName")]),
+                NSDictionary(objects: [NSNumber(integer: 330), ""], forKeys: [NSString(string: "Volume"), NSString(string: "ImageName")]),
+                NSDictionary(objects: [NSNumber(integer: 500), ""], forKeys: [NSString(string: "Volume"), NSString(string: "ImageName")])
+            ]
+        )
+        let keys = [
+            "DailyGoal",
+            "ShortcutCupShowCount",
+            "ShortcutCups",
+            "ReminderEnable",
+            "Reminders"
+        ]
+        let values = [
+            2000,
+            3,
+            defaultCups,
+            false,
+            defaultReminder
+        ]
+        let appDefaults = NSDictionary(objects: values, forKeys: keys) as! [String : AnyObject]
+        NSUserDefaults.standardUserDefaults().registerDefaults(appDefaults)
+        
     }
 
     func applicationWillResignActive(application: UIApplication) {

@@ -528,14 +528,14 @@ class PresentationControllerForReminderNew: UIPresentationController {
     override func frameOfPresentedViewInContainerView() -> CGRect {
         var presentedViewFrame = CGRectZero
         let containerBounds = self.containerView!.bounds
-        presentedViewFrame.size = CGSizeMake(containerBounds.width, containerBounds.height / 2.0)
+        presentedViewFrame.size = CGSizeMake(containerBounds.width, containerBounds.height / 5.0 * 3.0)
         presentedViewFrame.origin.y = containerBounds.height - presentedViewFrame.height
         return presentedViewFrame
     }
     override init(presentedViewController: UIViewController, presentingViewController: UIViewController) {
         super.init(presentedViewController: presentedViewController, presentingViewController: presentingViewController)
         self.dimmingView = UIView()
-        self.dimmingView!.backgroundColor = UIColor(white: 0, alpha: 0.6)
+        self.dimmingView!.backgroundColor = UIColor(white: 0, alpha: 0.5)
         self.dimmingView!.alpha = 0.0
         let gesture = UITapGestureRecognizer(target: self, action: "dimmingViewTap:")
         self.dimmingView!.addGestureRecognizer(gesture)
@@ -551,11 +551,11 @@ class PresentationControllerForReminderNew: UIPresentationController {
         if let transitionCoordinator = presentedViewController.transitionCoordinator() {
             transitionCoordinator.animateAlongsideTransition({ (context: UIViewControllerTransitionCoordinatorContext) -> Void in
                 self.dimmingView!.alpha = 1.0
-                self.presentingViewController.view.transform = CGAffineTransformMakeScale(0.96, 0.96)
+                self.presentingViewController.view.transform = CGAffineTransformMakeScale(0.98, 0.98)
                 }, completion: nil)
         } else {
             self.dimmingView!.alpha = 1.0
-            self.presentingViewController.view.transform = CGAffineTransformMakeScale(0.96, 0.96)
+            self.presentingViewController.view.transform = CGAffineTransformMakeScale(0.98, 0.98)
         }
     }
     override func presentationTransitionDidEnd(completed: Bool) {

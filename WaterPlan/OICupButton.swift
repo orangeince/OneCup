@@ -52,8 +52,12 @@ class OICupButton: UIButton, OIViewAnimatorDelegate {
         shape.path = path
         self.layer.mask = shape
         
+        /*
         let context = UIGraphicsGetCurrentContext()
-        //CGContextAddPath(context, path)
+        CGContextAddPath(context, path)
+        let shadowSize = CGSize(width: 5, height: 50)
+        CGContextSetShadow(context, shadowSize, 5)
+        CGContextFillPath(context)
         CGContextMoveToPoint(context, 0, 0)
         CGContextAddLineToPoint(context, tmpWidth, height)
         CGContextStrokePath(context)
@@ -63,6 +67,7 @@ class OICupButton: UIButton, OIViewAnimatorDelegate {
         CGContextMoveToPoint(context, width - tmpWidth, height)
         CGContextAddLineToPoint(context, width, 0)
         CGContextStrokePath(context)
+        */
         
     }
     func viewAnimatorUpdated(viewAnimator: OIViewAnimator) {

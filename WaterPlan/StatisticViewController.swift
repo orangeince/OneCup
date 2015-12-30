@@ -83,6 +83,7 @@ class StatisticViewController: UIViewController, UIPageViewControllerDataSource,
             let firstRecord = try self.managedObjectContext.executeFetchRequest(firstRecordRequest) as! [RecordDaily]
             if firstRecord.count == 0 { //没有一条记录
                 self.dataStore = [([], [], "本周")]
+                self.loadedAllDatas = true
                 return
             }
             self.firstRecord = firstRecord[0]
@@ -256,7 +257,7 @@ class StatisticViewController: UIViewController, UIPageViewControllerDataSource,
     func ChartViewControllerAtIndex(index: Int) -> ChartViewController? {
         if index >= self.dataStore.count {
             return nil
-        } else if index == self.dataStore.count - 1 {
+        } else if index == self.dataStore.count - 1 && !self.loadedAllDatas {
             prepareForPreviousWeekDatas()
         }
         let chartViewController = self.storyboard!.instantiateViewControllerWithIdentifier("ChartViewController") as! ChartViewController

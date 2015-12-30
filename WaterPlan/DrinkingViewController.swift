@@ -25,7 +25,11 @@ class DrinkingViewController: UIViewController, UITableViewDataSource, UITableVi
     //var records = [DrinkingRecord]()
     var drinkedTotalVolume = 0
     var pickedVolume = 0
-    var targetVolume = 2000
+    var targetVolume = 2000 {
+        didSet {
+            self.targetLable.text = String(targetVolume)
+        }
+    }
     var digitalWheelLabel: DigitalWheelLabel?
     var cupTransfrom = false
     //var volumesView: UIView?
@@ -64,6 +68,16 @@ class DrinkingViewController: UIViewController, UITableViewDataSource, UITableVi
         
         statisticBtn.layer.cornerRadius = settingBtn.frame.width / 2.0
         statisticBtn.layer.masksToBounds = true
+        
+        let userDefaults = NSUserDefaults.standardUserDefaults()
+        let dailyGoal = userDefaults.integerForKey("DailyGoal")
+        if dailyGoal == 0 {
+            self.targetVolume = 2000
+        } else {
+            self.targetVolume = dailyGoal
+        }
+        
+        //self.targetLable.text = String(self.targetVolume)
         
         
         initializeFetchedResultsController()
@@ -164,6 +178,24 @@ class DrinkingViewController: UIViewController, UITableViewDataSource, UITableVi
         }
     }
     
+    func tableView(tableView: UITableView, editActionsForRowAtIndexPath indexPath: NSIndexPath) -> [UITableViewRowAction]? {
+        let deleteAction = UITableViewRowAction(style: .Normal, title: "delete") { (action: UITableViewRowAction, indexPath: NSIndexPath) -> Void in
+            let record = self.fetchedResultsController.objectAtIndexPath(indexPath) as! RecordDetail
+            let volume = Int(record.volume!)
+            let context = self.mangedObjectContext
+            context.deleteObject(record)
+            self.recordDaily!.totalVolume! = Int(self.recordDaily!.totalVolume!) - volume
+            do {
+                try context.save()
+            } catch {
+                fatalError("Failure to save context:\(error)")
+            }
+            self.DrinkingWater(-volume)
+        }
+        deleteAction.backgroundColor = UIColor(white: 0.5, alpha: 0.0)
+        return [deleteAction]
+    }
+    
     // MARK: presentation
     @IBAction func drinkingBtnTap(sender: UIButton) {
         
@@ -251,6 +283,10 @@ class DrinkingViewController: UIViewController, UITableViewDataSource, UITableVi
     }
     @IBAction func unwindToSegue(unwindSegue: UIStoryboardSegue) {
         //
+        let userDefaults = NSUserDefaults.standardUserDefaults()
+        self.targetVolume = userDefaults.integerForKey("DailyGoal")
+        self.DrinkingWater(0)
+        //self.targetLable.text
     }
     func initializeFetchedResultsController() {
         loadRecords()

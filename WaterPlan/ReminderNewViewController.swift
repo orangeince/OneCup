@@ -88,7 +88,7 @@ class ReminderNewViewController: UIViewController, UIPickerViewDelegate, UIPicke
                 weekBtn.bounds = btn.bounds
                 weekBtn.day = index + 1
                 //let mask = repeatMask
-                if (1 << index) & repeatMask == 1 {
+                if (1 << index) & repeatMask > 0 {
                     btnSwapBackgroudColorWithTitleColor(weekBtn)
                 }
                 weekBtn.layer.cornerRadius = weekBtn.bounds.width / 2.0
@@ -119,7 +119,7 @@ class ReminderNewViewController: UIViewController, UIPickerViewDelegate, UIPicke
         if kbRect.origin.y >= windowHeight {
             return
         }
-        let y = windowHeight - self.view.frame.height - kbRect.height
+        let y = windowHeight - self.view.frame.height - kbRect.height + 4.0
         UIView.animateWithDuration(0.3) { () -> Void in
             self.view.frame.origin.y = y
         }
@@ -131,7 +131,7 @@ class ReminderNewViewController: UIViewController, UIPickerViewDelegate, UIPicke
             return
         }
         UIView.animateWithDuration(0.3) { () -> Void in
-            self.view.frame = self.view.frame.offsetBy(dx: 0, dy: kbRect.height)
+            self.view.frame = self.view.frame.offsetBy(dx: 0, dy: kbRect.height - 4.0)
         }
     }
     //MARK: Delegate and DateSource
@@ -156,7 +156,8 @@ class ReminderNewViewController: UIViewController, UIPickerViewDelegate, UIPicke
             number = row % 60
         }
         let string = number < 10 ? ("0" + String(number)) : String(number)
-        return NSAttributedString(string: string, attributes: [NSForegroundColorAttributeName: UIColor.whiteColor()])
+        let color = UIColor.blackColor()//self.pickerView.tintColor
+        return NSAttributedString(string: string, attributes: [NSForegroundColorAttributeName: color])
     }
     func pickerView(pickerView: UIPickerView, didSelectRow row: Int, inComponent component: Int) {
         if component == 0 {

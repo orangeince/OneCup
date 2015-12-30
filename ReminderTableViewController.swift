@@ -41,7 +41,7 @@ class ReminderTableViewController: UITableViewController {
     var needSave = false
     var roundCorner = true
     var tmpMaskLayer: CALayer?
-    var notificationsCount = 0
+    var maxNotificationsCount = 40
     var notificationsGroup = [([UILocalNotification], Bool)]()
 
     override func viewDidLoad() {
@@ -58,9 +58,7 @@ class ReminderTableViewController: UITableViewController {
                 for item in reminderArray {
                     guard
                         let reminder = item as? NSDictionary,
-                        //time = reminder.valueForKey("AlertTime") as? String,
                         alertTitle = reminder.valueForKey("AlertTitle") as? String,
-                        //repeatDate = reminder.valueForKey("RepeatDate") as? String,
                         repeatMask = reminder.valueForKey("RepeatMask") as? NSNumber,
                         theHour = reminder.valueForKey("TheHour") as? NSNumber,
                         theMinute = reminder.valueForKey("TheMinute") as? NSNumber,
@@ -81,16 +79,28 @@ class ReminderTableViewController: UITableViewController {
                         identifier: identifier,
                         enable: enable
                     )
+                    if repeatMask == 0 && enable {
+                        if NSCalendar.currentCalendar().compareDate(fireDate, toDate: NSDate(), toUnitGranularity: .Minute) != .OrderedDescending {
+                            theReminder.enable = false
+                        }
+                    }
                     self.reminders.append(theReminder)
-                    //self.reminders.append(theReminder)
-                    
-                    //let notifications = createReminderSchedules(theReminder)
-                    //self.notificationsCount += notifications.count
-                    //self.notificationsGroup.append((notifications, enable))
                 }
             }
             self.reminderEnable = settings.reminderEnable
         }
+        //self.reminders.sortInPlace({r1, r2 in r2.enable && !r1.enable})
+        /*self.reminders.sortInPlace {
+            (r1: Reminder, r2: Reminder) -> Bool in
+            if r2.enable && !r1.enable {
+                return false
+            } else if r1.enable && !r2.enable {
+                return true
+            }
+            return r1.theHour * 100 + r2.theMinute < r2.theHour * 100 + r2.theMinute
+        }*/
+        self.reminders.sortInPlace({r1, r2 in r1.theHour * 100 + r2.theMinute < r2.theHour * 100 + r2.theMinute})
+        //self.reminders.i
         //resetReminderSetting()
     }
     override func viewWillAppear(animated: Bool) {
@@ -160,18 +170,6 @@ class ReminderTableViewController: UITableViewController {
         //reminders += [reminder]
         
         saveReminderSetting()
-        
-        /*
-        if let settings = self.settingsDataSource {
-            //let reminderDict = ["Time":"00:00", "AlertTitle":"", "RepeatDate":"每天"]
-            let values = [NSString(string: "00:00"), NSString(string: "该喝水啦!! >_<!"), NSString(string: "每天")]
-            let keys = [NSString(string: "Time"), NSString(string: "AlertTitle"), NSString(string: "RepeatDate")]
-            let reminderDict = NSDictionary(objects: values, forKeys: keys)
-            settings.reminderArray.addObject(reminderDict)
-        }
-*/
-        //reminder = Reminder(time: "10:00", alertTitle: "该喝水啦!! >_<!", repeatDate: "工作日")
-        //reminders += [reminder]
     }
 
     override func didReceiveMemoryWarning() {
@@ -202,7 +200,7 @@ class ReminderTableViewController: UITableViewController {
         case 0:
             return 44.0
         case 1:
-            return 66.0
+            return 72.0
         default:
             return 44.0
             //return self.tableView.
@@ -212,7 +210,6 @@ class ReminderTableViewController: UITableViewController {
     override func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
         if indexPath.section == 0 {
             let cell = tableView.dequeueReusableCellWithIdentifier("ReminderControlCell", forIndexPath: indexPath) as! ReminderContorlCell
-            //let cell = UITableViewCell()
             self.reminderEnableSwitch = cell.reminderEnableSwitch
             cell.reminderEnableSwitch.addTarget(self, action: "reminderEnableSwitchChange:", forControlEvents: .ValueChanged)
             self.reminderEnableSwitch!.on = self.reminderEnable
@@ -223,18 +220,19 @@ class ReminderTableViewController: UITableViewController {
             let cell = tableView.dequeueReusableCellWithIdentifier(cellIdentifier, forIndexPath: indexPath) as! ReminderTableViewCell
             let reminder = reminders[indexPath.row]
             cell.reminder = reminder
-            //let (time, alertTitle, repeatDate, repeatDateMask, _, _, enable) = reminder
             cell.timeLabel.text = getTimeDescription(reminder.theHour, minute: reminder.theMinute)
             cell.alertTitleLabel.text = reminder.alertTitle
             cell.enableSwitch.on = reminder.enable
-            //cell.selectionStyle = .None
-            //cell.enableSwitch.setValue(cell, forKey: "tempCellRef")
             cell.enableSwitch.addTarget(self, action: "cellEnableSwitchChange:", forControlEvents: .ValueChanged)
             
             if !reminder.enable {
                 let tmpCell = self.tableView.dequeueReusableCellWithIdentifier("ReminderColorCell")!
                 cell.backgroundColor =  tmpCell.backgroundColor!
                 cell.timeLabel.textColor = UIColor.lightGrayColor()
+                cell.alertTitleLabel.textColor = UIColor.lightGrayColor()
+            } else {
+                cell.backgroundColor = UIColor.whiteColor()
+                cell.timeLabel.textColor = UIColor.blackColor()
                 cell.alertTitleLabel.textColor = UIColor.lightGrayColor()
             }
             
@@ -273,12 +271,10 @@ class ReminderTableViewController: UITableViewController {
             var repeatDescription = ""
             let weekDaySymbol = ["周一","周二","周三","周四","周五","周六","周日"]
             for bit in 0 ... 6 {
-                if (1 << bit) & repeatMask == 1 {
+                if (1 << bit) & repeatMask > 0 {
                     repeatDescription += (weekDaySymbol[bit] + " ")
                 }
             }
-            //let index = repeatDescription.startIndex.advancedBy(1)
-            //repeatDescription = repeatDescription.substringFromIndex(index)
             return repeatDescription
         }
     }
@@ -309,28 +305,76 @@ class ReminderTableViewController: UITableViewController {
         shape.frame = cell.contentView.bounds
         shape.path = maskPath.CGPath
         cell.layer.mask = shape
-        if let accessoryView = cell.accessoryView {
-            print(accessoryView.subviews.count)
-        }
-        if let editingAccessoryView = cell.editingAccessoryView {
-            print(editingAccessoryView.subviews.count)
-        }
-        //cell.contentView.layer.cornerRadius = 10.0
-        //cell.contentView.layer.masksToBounds = true
-        //cell.contentView.layer.mask = shape
     }
     /*
     override func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
     }
 */
+    override func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
+        if indexPath.section == 2 {
+            let scheduledCount = self.tableView.numberOfRowsInSection(1)
+            if scheduledCount >= 6 {
+                let alert = UIAlertController(title: "JustDrink", message: "最多只能设置6个提醒，请根据所需，合理分配和利用提醒设置。", preferredStyle: .Alert)
+                let alertAction = UIAlertAction(title: "好的", style: .Default, handler: nil)
+                alert.addAction(alertAction)
+                self.presentViewController(alert, animated: true, completion: nil)
+                self.tableView.deselectRowAtIndexPath(indexPath, animated: false)
+            } else {
+                let sb = UIStoryboard(name: "Main", bundle: nil)
+                let presented = sb.instantiateViewControllerWithIdentifier("ReminderNewViewController") as! ReminderNewViewController
+                if self.transitionDelegateForNew == nil {
+                    self.transitionDelegateForNew = TransitioningDelegateForReminderNew()
+                }
+                presented.modalPresentationStyle = .Custom
+                presented.transitioningDelegate = self.transitionDelegateForNew
+                presented.SaveDataDelegate = self
+                self.presentViewController(presented, animated: true, completion: nil)
+            }
+        }
+    }
+    func refreshCellMask() {
+        let cellCount = self.reminders.count
+        guard cellCount > 0 && self.roundCorner else { return }
+        let cornerSize: CGFloat = 5.0
+        let margin: CGFloat = 5.0
+        
+        for row in 0 ..< self.reminders.count {
+            let indexPath = NSIndexPath(forRow: row, inSection: 1)
+            let cell = self.tableView.cellForRowAtIndexPath(indexPath)!
+            let originX = cell.bounds.origin.x + margin
+            let width = cell.bounds.width - margin * 2.0
+            let cellBounds = CGRectMake(originX, cell.bounds.origin.y, width, cell.bounds.height)
+            let maskPath: UIBezierPath
+            if indexPath.row == 0 && indexPath.row == tableView.numberOfRowsInSection(indexPath.section) - 1 {
+                maskPath = UIBezierPath(roundedRect: cellBounds, byRoundingCorners: [.TopLeft, .TopRight, .BottomLeft, .BottomRight], cornerRadii: CGSizeMake(cornerSize, cornerSize))
+            } else if indexPath.row == 0 {
+                
+                maskPath = UIBezierPath(roundedRect: cellBounds, byRoundingCorners: [.TopLeft, .TopRight], cornerRadii: CGSizeMake(cornerSize, cornerSize))
+            } else  if indexPath.row == tableView.numberOfRowsInSection(indexPath.section) - 1 {
+                maskPath = UIBezierPath(roundedRect: cellBounds, byRoundingCorners: [.BottomLeft, .BottomRight], cornerRadii: CGSizeMake(cornerSize, cornerSize))
+            } else {
+                maskPath = UIBezierPath(rect: cellBounds)
+            }
+            let shape = CAShapeLayer()
+            shape.frame = cell.contentView.bounds
+            shape.path = maskPath.CGPath
+            cell.layer.mask = shape
+        }
+    }
     override func tableView(tableView: UITableView, willBeginEditingRowAtIndexPath indexPath: NSIndexPath) {
         let cell = self.tableView.cellForRowAtIndexPath(indexPath)!
         self.tmpMaskLayer = cell.layer.mask
         cell.layer.mask = nil
     }
     override func tableView(tableView: UITableView, didEndEditingRowAtIndexPath indexPath: NSIndexPath) {
-        let cell = self.tableView.cellForRowAtIndexPath(indexPath)!
-        cell.layer.mask = self.tmpMaskLayer
+        if let cell = self.tableView.cellForRowAtIndexPath(indexPath) {
+            cell.layer.mask = self.tmpMaskLayer
+        } else if indexPath.row != 0 {
+            let theIndexPath = NSIndexPath(forRow: indexPath.row - 1, inSection: indexPath.section)
+            if let theCell = self.tableView.cellForRowAtIndexPath(theIndexPath) {
+                theCell.layer.mask = self.tmpMaskLayer
+            }
+        }
     }
     override func tableView(tableView: UITableView, canEditRowAtIndexPath indexPath: NSIndexPath) -> Bool {
         if indexPath.section == 1 {
@@ -340,7 +384,12 @@ class ReminderTableViewController: UITableViewController {
     }
     override func tableView(tableView: UITableView, commitEditingStyle editingStyle: UITableViewCellEditingStyle, forRowAtIndexPath indexPath: NSIndexPath) {
         if editingStyle == .Delete {
+            let reminder = self.reminders[indexPath.row]
+            if reminder.enable {
+                removeReminderSchedule(reminder)
+            }
             self.reminders.removeAtIndex(indexPath.row)
+            self.tableView.deleteRowsAtIndexPaths([indexPath], withRowAnimation: .None)
         }
     }
     override func tableView(tableView: UITableView, editingStyleForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCellEditingStyle {
@@ -350,67 +399,21 @@ class ReminderTableViewController: UITableViewController {
     override func tableView(tableView: UITableView, editActionsForRowAtIndexPath indexPath: NSIndexPath) -> [UITableViewRowAction]? {
         if indexPath.section == 1 {
             let deleteAction = UITableViewRowAction(style: .Normal, title: "delete") { (action: UITableViewRowAction, indexPath: NSIndexPath) -> Void in
-                //self.tableView.deleteRowsAtIndexPaths([indexPath], withRowAnimation: .Automatic)
+                let reminder = self.reminders[indexPath.row]
+                if reminder.enable {
+                    self.removeReminderSchedule(reminder)
+                }
+                self.reminders.removeAtIndex(indexPath.row)
+                self.tableView.deleteRowsAtIndexPaths([indexPath], withRowAnimation: .None)
+                self.saveReminderSetting()
+                self.refreshCellMask()
             }
             deleteAction.backgroundColor = UIColor(white: 0.5, alpha: 0.0)
-            let editAction = UITableViewRowAction(style: .Default, title: "edit", handler: { (action: UITableViewRowAction, indexPath: NSIndexPath) -> Void in
-                //
-            })
-            editAction.backgroundColor = UIColor.purpleColor()
             return [deleteAction]
         }
         return nil
     }
 
-
-    /*
-    // Override to support conditional editing of the table view.
-    override func tableView(tableView: UITableView, canEditRowAtIndexPath indexPath: NSIndexPath) -> Bool {
-        // Return false if you do not want the specified item to be editable.
-        return true
-    }
-    */
-
-    /*
-    // Override to support editing the table view.
-    override func tableView(tableView: UITableView, commitEditingStyle editingStyle: UITableViewCellEditingStyle, forRowAtIndexPath indexPath: NSIndexPath) {
-        if editingStyle == .Delete {
-            // Delete the row from the data source
-            tableView.deleteRowsAtIndexPaths([indexPath], withRowAnimation: .Fade)
-        } else if editingStyle == .Insert {
-            // Create a new instance of the appropriate class, insert it into the array, and add a new row to the table view
-        }    
-    }
-    */
-
-    /*
-    // Override to support rearranging the table view.
-    override func tableView(tableView: UITableView, moveRowAtIndexPath fromIndexPath: NSIndexPath, toIndexPath: NSIndexPath) {
-
-    }
-    */
-
-    @IBAction func swipeReminderCell(sender: UIPanGestureRecognizer) {
-        switch sender.state {
-        case .Began:
-            sender.setTranslation(CGPointMake(0, 0), inView: self.view)
-        case .Changed:
-            let translation = sender.translationInView(self.view)
-            let percentage = translation.x / CGRectGetWidth(self.view.bounds)
-            print(percentage)
-        case .Ended:
-            break
-        default:
-            break
-        }
-    }
-    /*
-    // Override to support conditional rearranging of the table view.
-    override func tableView(tableView: UITableView, canMoveRowAtIndexPath indexPath: NSIndexPath) -> Bool {
-        // Return false if you do not want the item to be re-orderable.
-        return true
-    }
-    */
 
     // MARK: - Navigation
 
@@ -439,7 +442,6 @@ class ReminderTableViewController: UITableViewController {
     func reminderEnableSwitchChange(sender: UISwitch) {
         let curNoificationSettings = UIApplication.sharedApplication().currentUserNotificationSettings()!
         if curNoificationSettings.types == .None {
-            print("not allow the notification")
             let alert = UIAlertController(title: "提醒", message: "如果需要使用定时提醒功能，请先允许此应用发送通知。在设置中找到本应用并更改允许发送通知的设置", preferredStyle: .Alert)
             alert.addAction(UIAlertAction(title: "ok", style: .Default, handler: nil))
             self.presentViewController(alert, animated: true, completion: nil)
@@ -468,29 +470,71 @@ class ReminderTableViewController: UITableViewController {
             cell.hidden = !sender.on
         }
     }
+    func isAsendingOrderFor(first: Reminder, second: Reminder) -> Bool {
+        return first.theHour * 100 + first.theMinute < second.theHour * 100 + second.theMinute
+    }
     func addReminder(reminder: Reminder) {
-        self.reminders.append(reminder)
-        let row = self.tableView.numberOfRowsInSection(1)
+        var row = 0
+        for index in 0 ..< self.reminders.count {
+            let tmpReminder = self.reminders[index]
+            if isAsendingOrderFor(reminder, second: tmpReminder) {
+                break
+            }
+            row++
+        }
+        self.reminders.insert(reminder, atIndex: row)
+        //let section = NSIndexSet(index: 1)
+        //self.tableView.reloadSections(section, withRowAnimation: .None)
         let indexPath = NSIndexPath(forRow: row, inSection: 1)
         self.tableView.insertRowsAtIndexPaths([indexPath], withRowAnimation: .None)
+        self.refreshCellMask()
+        
         saveReminderSetting()
-        //resetAllNotifications()
         addReminderSchedule(reminder)
     }
     func modifyReminder(atRow: Int) {
         let reminder = self.reminders[atRow]
-        let indexPath = NSIndexPath(forRow: atRow, inSection: 1)
-        self.tableView.reloadRowsAtIndexPaths([indexPath], withRowAnimation: .None)
+        var toRow = 0
+        for index in 0 ..< self.reminders.count {
+            if index == atRow {
+                continue
+            }
+            let tmpReminder = self.reminders[index]
+            if isAsendingOrderFor(reminder, second: tmpReminder) {
+                break
+            }
+            toRow++
+        }
+        let atIndexPath = NSIndexPath(forRow: atRow, inSection: 1)
+        if toRow != atRow {
+            self.reminders.removeAtIndex(atRow)
+            self.tableView.deleteRowsAtIndexPaths([atIndexPath], withRowAnimation: .None)
+            //self.reminders.sortInPlace({r1, r2 in r1.theHour * 100 + r2.theMinute < r2.theHour * 100 + r2.theMinute})
+            self.reminders.insert(reminder, atIndex: toRow)
+            let toIndexPath = NSIndexPath(forRow: toRow, inSection: 1)
+            self.tableView.insertRowsAtIndexPaths([toIndexPath], withRowAnimation: .None)
+            self.refreshCellMask()
+            /*
+            if toRow == 0 {
+                let tmpIndexPath = NSIndexPath(forRow: 1, inSection: 1)
+                self.tableView.reloadRowsAtIndexPaths([tmpIndexPath], withRowAnimation: .None)
+            } else if toRow == self.reminders.count - 1 {
+                let tmpIndexPath = NSIndexPath(forRow: toRow - 1, inSection: 1)
+                self.tableView.reloadRowsAtIndexPaths([tmpIndexPath], withRowAnimation: .None)
+            }
+            */
+        } else {
+            self.tableView.reloadRowsAtIndexPaths([atIndexPath], withRowAnimation: .None)
+        }
         saveReminderSetting()
-        //resetAllNotifications()
         modifyReminderSchedule(reminder)
     }
     func cellEnableSwitchChange(sender: UISwitch) {
         if let view = sender.superview?.superview?.superview {
             if let cell = view as? ReminderTableViewCell {
                 if sender.on {
-                    let tmpCell = self.tableView.dequeueReusableCellWithIdentifier("ReminderAddCell")!
-                    cell.backgroundColor =  tmpCell.backgroundColor!
+                    //let tmpCell = self.tableView.dequeueReusableCellWithIdentifier("ReminderAddCell")!
+                    cell.backgroundColor =  UIColor.whiteColor()
                     cell.timeLabel.textColor = UIColor.blackColor()
                     cell.alertTitleLabel.textColor = UIColor.blackColor()
                 } else {
@@ -543,10 +587,12 @@ class ReminderTableViewController: UITableViewController {
     func removeReminderSchedule(reminder: Reminder) {
         if let scheduledNotifications = UIApplication.sharedApplication().scheduledLocalNotifications {
             for notification in scheduledNotifications {
-                let dict = notification.userInfo! as NSDictionary
-                let identifier = dict.valueForKey("identifier")! as! String
-                if identifier == reminder.identifier {
-                    UIApplication.sharedApplication().cancelLocalNotification(notification)
+                if notification.userInfo != nil {
+                    let dict = notification.userInfo! as NSDictionary
+                    let identifier = dict.valueForKey("identifier")! as! String
+                    if identifier == reminder.identifier {
+                        UIApplication.sharedApplication().cancelLocalNotification(notification)
+                    }
                 }
             }
         }

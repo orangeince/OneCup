@@ -250,7 +250,7 @@ class OIClockView: UIView, OIViewAnimatorDelegate  {
             }
             var attrs = [String: AnyObject]()
             attrs[NSFontAttributeName] = descriptionFont
-            attrs[NSForegroundColorAttributeName] = UIColor.blackColor()
+            //attrs[NSForegroundColorAttributeName] = UIColor.blackColor()
             attrs[NSForegroundColorAttributeName] = UIColor.whiteColor()
             /*
             var descriptionText = "   "

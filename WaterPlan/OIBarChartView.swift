@@ -38,7 +38,14 @@ class OIBarChartView: UIView, OIViewAnimatorDelegate {
     var barDescription = "每日喝水量"
     var barDataValueFont = UIFont.systemFontOfSize(8.0)
     var drawLimitLine = true
-    var limitVolume = 2000
+    var limitVolume: Int {
+        get {
+            return _limitVolume
+        }
+        set {
+            _limitVolume = newValue
+        }
+    }
     
     
     override init(frame: CGRect) {

@@ -152,11 +152,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "WaterPlan/DrinkingViewController.swift"
-            timestampString = "472549592.68549"
+            timestampString = "472734609.619294"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "476"
-            endingLineNumber = "476">
+            startingLineNumber = "512"
+            endingLineNumber = "512">
          </BreakpointContent>
       </BreakpointProxy>
       <BreakpointProxy
@@ -166,11 +166,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "WaterPlan/DrinkingViewController.swift"
-            timestampString = "472549592.68549"
+            timestampString = "472734609.619294"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "430"
-            endingLineNumber = "430">
+            startingLineNumber = "466"
+            endingLineNumber = "466">
          </BreakpointContent>
       </BreakpointProxy>
       <BreakpointProxy
@@ -180,11 +180,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "WaterPlan/DrinkingViewController.swift"
-            timestampString = "472549592.68549"
+            timestampString = "472734609.619294"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "428"
-            endingLineNumber = "428">
+            startingLineNumber = "464"
+            endingLineNumber = "464">
          </BreakpointContent>
       </BreakpointProxy>
       <BreakpointProxy
@@ -194,11 +194,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "WaterPlan/DrinkingViewController.swift"
-            timestampString = "472549592.68549"
+            timestampString = "472734609.619294"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "514"
-            endingLineNumber = "514">
+            startingLineNumber = "550"
+            endingLineNumber = "550">
          </BreakpointContent>
       </BreakpointProxy>
       <BreakpointProxy
@@ -208,11 +208,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "WaterPlan/DrinkingViewController.swift"
-            timestampString = "472549592.68549"
+            timestampString = "472734609.619294"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "467"
-            endingLineNumber = "467">
+            startingLineNumber = "503"
+            endingLineNumber = "503">
          </BreakpointContent>
       </BreakpointProxy>
       <BreakpointProxy
@@ -222,11 +222,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "WaterPlan/DrinkingViewController.swift"
-            timestampString = "472549592.68549"
+            timestampString = "472734609.619294"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "508"
-            endingLineNumber = "508">
+            startingLineNumber = "544"
+            endingLineNumber = "544">
          </BreakpointContent>
       </BreakpointProxy>
       <BreakpointProxy
@@ -236,11 +236,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "WaterPlan/DrinkingViewController.swift"
-            timestampString = "472549592.68549"
+            timestampString = "472734609.619294"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "546"
-            endingLineNumber = "546">
+            startingLineNumber = "582"
+            endingLineNumber = "582">
          </BreakpointContent>
       </BreakpointProxy>
       <BreakpointProxy
@@ -256,6 +256,22 @@
             startingLineNumber = "84"
             endingLineNumber = "84"
             landmarkName = "changeBtnTap(_:)"
+            landmarkType = "5">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "WaterPlan/ReminderNewViewController.swift"
+            timestampString = "472702504.565336"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "39"
+            endingLineNumber = "39"
+            landmarkName = "viewDidLoad()"
             landmarkType = "5">
          </BreakpointContent>
       </BreakpointProxy>

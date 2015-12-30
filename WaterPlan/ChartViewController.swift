@@ -27,6 +27,8 @@ class ChartViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        let userDefaults = NSUserDefaults.standardUserDefaults()
+        dailyVolumeView.limitVolume = userDefaults.integerForKey("DailyGoal")
         dailyVolumeView.setData(datas.0)
         clockView.setData(datas.1)
         self.topTitle = datas.2

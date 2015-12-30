@@ -129,6 +129,9 @@ class DailyGoalTableViewController: UITableViewController {
             if let goal = Int(text) {
             if let settings = self.settingsDataSource {
                 settings.dailyGoal = goal
+                //let userDefaults = NSUserDefaults.standardUserDefaults()
+                //userDefaults.setInteger(goal, forKey: "DailyGoal")
+                //userDefaults.synchronize()
             }
             }
         }

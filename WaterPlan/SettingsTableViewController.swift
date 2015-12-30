@@ -19,7 +19,12 @@ class SettingsTableViewController: UITableViewController {
     var dailyGoal = 2000 {
         didSet {
             self.dailyGoalLabel.text = String(self.dailyGoal) + " ml"
-            self.settings.setValue(dailyGoal, forKey: "DailyGoal")
+            //self.settings.setValue(dailyGoal, forKey: "DailyGoal")
+            if needSave {
+                let userDefaults = NSUserDefaults.standardUserDefaults()
+                userDefaults.setInteger(dailyGoal, forKey: "DailyGoal")
+                userDefaults.synchronize()
+            }
         }
     }
     var reminderEnable = false {
@@ -27,21 +32,40 @@ class SettingsTableViewController: UITableViewController {
             self.reminderEnableLabel.text = reminderEnable ? "开启":"关闭"
             self.settings.setValue(reminderEnable, forKey: "ReminderEnable")
             if needSave {
-                self.saveSettings()
+                //self.saveSettings()
+                let userDefaults = NSUserDefaults.standardUserDefaults()
+                userDefaults.setBool(reminderEnable, forKey: "ReminderEnable")
+                userDefaults.synchronize()
             }
         }
     }
     var shortcutCupCount = 4 {
         didSet {
             self.shortcutCupCountLabel.text = String(shortcutCupCount)
-            self.settings.setValue(shortcutCupCount, forKey: "ShortcutCupCount")
+            //self.settings.setValue(shortcutCupCount, forKey: "ShortcutCupCount")
+            if needSave {
+                let userDefaults = NSUserDefaults.standardUserDefaults()
+                userDefaults.setInteger(shortcutCupCount, forKey: "ShortcutCupShowCount")
+                userDefaults.synchronize()
+            }
+        }
+    }
+    var shortcutCupArray = NSMutableArray() {
+        didSet {
+            if needSave {
+                let userDefaults = NSUserDefaults.standardUserDefaults()
+                userDefaults.setObject(shortcutCupArray, forKey: "ShortcutCups")
+                userDefaults.synchronize()
+            }
         }
     }
     var reminderArray = NSMutableArray() {
         didSet {
-            self.settings.setValue(reminderArray, forKey: "Reminders")
+            //self.settings.setValue(reminderArray, forKey: "Reminders")
             if needSave {
-                self.saveSettings()
+                let userDefaults = NSUserDefaults.standardUserDefaults()
+                userDefaults.setObject(reminderArray, forKey: "Reminders")
+                userDefaults.synchronize()
             }
         }
     }
@@ -66,6 +90,7 @@ class SettingsTableViewController: UITableViewController {
         }
     }
     func loadSettings() {
+        /*
         if self.settings.count == 0 {
             let rootPath = NSSearchPathForDirectoriesInDomains(.DocumentationDirectory, .UserDomainMask, true)[0]
             var plistPath = rootPath.stringByAppendingString("Settings.plist")
@@ -97,6 +122,21 @@ class SettingsTableViewController: UITableViewController {
                 //--logpoint
                 print("load plist failed")
             }    
+        }
+        */
+        if self.settings.count == 0 {
+            let userDefaults = NSUserDefaults.standardUserDefaults()
+            self.dailyGoal = userDefaults.integerForKey("DailyGoal")
+            self.reminderEnable = userDefaults.boolForKey("ReminderEnable")
+            self.shortcutCupCount = userDefaults.integerForKey("ShortcutCupShowCount")
+            let originObject = userDefaults.objectForKey("Reminders")
+            if let reminders = originObject as? NSArray {
+                self.reminderArray = NSMutableArray(array: reminders)
+            }
+            let cupObject = userDefaults.objectForKey("ShortcutCups")
+            if let cups = cupObject as? NSArray {
+                self.shortcutCupArray = NSMutableArray(array: cups)
+            }
         }
     }
     /*
@@ -238,6 +278,8 @@ class SettingsTableViewController: UITableViewController {
             toVC.settingsDataSource = self
         } else if let toVC = segue.destinationViewController as? ReminderTableViewController {
             toVC.settingsDataSource = self
+        } else if let toVC = segue.destinationViewController as? ShortcutCupTableViewController {
+            toVC.settingsDataSource = self
         }
     }
     override func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
@@ -277,7 +319,6 @@ class SettingsTableViewController: UITableViewController {
     }
     override func unwindForSegue(unwindSegue: UIStoryboardSegue, towardsViewController subsequentVC: UIViewController) {
         //
-        print("hello")
     }
     @IBAction func unwindToSettings(unwindSegue: UIStoryboardSegue ) {
         //
