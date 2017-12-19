@@ -14,21 +14,21 @@ class ChartViewController: UIViewController {
     @IBOutlet weak var clockView: OIClockView!
     
     enum RecordsLoadState {
-        case Previous
-        case Current
-        case Next
+        case previous
+        case current
+        case next
     }
-    var loadState:RecordsLoadState = .Current
+    var loadState:RecordsLoadState = .current
     var dataIndex: Int = 0
     var datas:([(Int, Int)], [(Int, Int, Int)], String) = ([], [], "")
     var topTitle:String = ""
-    var startDate: NSDate?
-    var endDate: NSDate?
+    var startDate: Date?
+    var endDate: Date?
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        let userDefaults = NSUserDefaults.standardUserDefaults()
-        dailyVolumeView.limitVolume = userDefaults.integerForKey("DailyGoal")
+        let userDefaults = UserDefaults.standard
+        dailyVolumeView.limitVolume = userDefaults.integer(forKey: "DailyGoal")
         dailyVolumeView.setData(datas.0)
         clockView.setData(datas.1)
         self.topTitle = datas.2
@@ -40,7 +40,7 @@ class ChartViewController: UIViewController {
     }
     
     
-    func setChartDatas(datas: ([(Int, Int)], [(Int, Int, Int)], String)) {
+    func setChartDatas(_ datas: ([(Int, Int)], [(Int, Int, Int)], String)) {
         self.datas = datas
         self.topTitle = datas.2
     }

@@ -9,10 +9,10 @@
 import UIKit
 
 class OICupButton: UIButton, OIViewAnimatorDelegate {
-    private var _animator: OIViewAnimator!
-    private var image: UIImage?
+    fileprivate var _animator: OIViewAnimator!
+    fileprivate var image: UIImage?
     
-    private var _gradient: CGFloat = 0.18
+    fileprivate var _gradient: CGFloat = 0.18
     
     override init(frame: CGRect) {
         super.init(frame: frame)
@@ -29,25 +29,30 @@ class OICupButton: UIButton, OIViewAnimatorDelegate {
     func abseverForWaterFrame() {
         
     }
-    override func drawRect(rect: CGRect) {
+    override func draw(_ rect: CGRect) {
         //
-        super.drawRect(rect)
+        super.draw(rect)
         //let radius = min(CGRectGetHeight(rect), CGRectGetWidth(rect)) / 2.0
-        let width = CGRectGetWidth(rect)
-        let height = CGRectGetHeight(rect)
+        let width = rect.width
+        let height = rect.height
         
         let color = self.tintColor
-        UIColor.darkGrayColor().setStroke()
-        color.setFill()
-        let path = CGPathCreateMutable()
+        UIColor.darkGray.setStroke()
+        color?.setFill()
+        let path = CGMutablePath()
         
-        CGPathMoveToPoint(path, nil, 0, 0)
+        path.move(to: .zero)
+        
         let tmpWidth = CGFloat(width * _gradient)
-        CGPathAddLineToPoint(path, nil, tmpWidth, height)
-        CGPathAddLineToPoint(path, nil, width - tmpWidth, height)
-        CGPathAddLineToPoint(path, nil, width, 0)
-        CGPathAddLineToPoint(path, nil, 0, 0)
-        CGPathCloseSubpath(path)
+        //CGPathAddLineToPoint(path, nil, tmpWidth, height)
+        //CGPathAddLineToPoint(path, nil, width - tmpWidth, height)
+        //CGPathAddLineToPoint(path, nil, width, 0)
+        //CGPathAddLineToPoint(path, nil, 0, 0)
+        path.addLine(to: CGPoint(x: tmpWidth, y: height))
+        path.addLine(to: CGPoint(x: width - tmpWidth, y: height))
+        path.addLine(to: CGPoint(x: width, y: 0))
+        path.addLine(to: .zero)
+        path.closeSubpath()
         let shape = CAShapeLayer()
         shape.path = path
         self.layer.mask = shape
@@ -70,10 +75,10 @@ class OICupButton: UIButton, OIViewAnimatorDelegate {
         */
         
     }
-    func viewAnimatorUpdated(viewAnimator: OIViewAnimator) {
+    func viewAnimatorUpdated(_ viewAnimator: OIViewAnimator) {
         self.setNeedsDisplay()
     }
-    func viewAnimatorStopped(viewAnimator: OIViewAnimator) {
+    func viewAnimatorStopped(_ viewAnimator: OIViewAnimator) {
     }
     func setGradient() {
         if _animator.isReversal {
@@ -82,31 +87,31 @@ class OICupButton: UIButton, OIViewAnimatorDelegate {
             self._gradient = 0.18
         }
     }
-    func animate(duration: NSTimeInterval)
+    func animate(_ duration: TimeInterval)
     {
         _animator.isReversal = false
         _animator.animate(yAxisDuration: duration)
     }
-    func animateRevarsal(duration: NSTimeInterval) {
+    func animateRevarsal(_ duration: TimeInterval) {
         _animator.isReversal = true
         _animator.animate(yAxisDuration: duration)
     }
     
-    func animate(xDuration duration: NSTimeInterval)
+    func animate(xDuration duration: TimeInterval)
     {
         setGradient()
         _animator.animate(xAxisDuration: duration)
     }
-    func animateRevarsal(xDuration duration: NSTimeInterval) {
+    func animateRevarsal(xDuration duration: TimeInterval) {
         _animator.isReversal = true
         _animator.animate(xAxisDuration: duration)
     }
     
-    func animate(xDuration: NSTimeInterval, yDuration: NSTimeInterval) {
+    func animate(_ xDuration: TimeInterval, yDuration: TimeInterval) {
         _animator.isReversal = false
         _animator.animate(xAxisDuration: xDuration, yAxisDuration: yDuration)
     }
-    func animateRevasal(xDuration: NSTimeInterval, yDuration: NSTimeInterval) {
+    func animateRevasal(_ xDuration: TimeInterval, yDuration: TimeInterval) {
         _animator.isReversal = true
         _animator.animate(xAxisDuration: xDuration, yAxisDuration: yDuration)
     }

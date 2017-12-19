@@ -36,13 +36,13 @@ class DrinkingViewController: UIViewController, UITableViewDataSource, UITableVi
     var transitioningDelegateForWVVC = TransitioningDelegateForWaterVolume()
     var transitioningDelegateForSettings: TransitioningDelegateForSettings?
     var transitioningDelegateForStatistic: TransitioningDelegateForStatistic?
-    var fetchedResultsController: NSFetchedResultsController!
+    var fetchedResultsController: NSFetchedResultsController<NSFetchRequestResult>!
     var mangedObjectContext: NSManagedObjectContext!
     var persistentStoreCoordinator: NSPersistentStoreCoordinator!
-    var curDay = NSDate()
+    var curDay = Date()
     var recordDaily: RecordDaily?
     
-    var _fetchedResultsController: NSFetchedResultsController?
+    var _fetchedResultsController: NSFetchedResultsController<NSFetchRequestResult>?
     
 
     override func viewDidLoad() {
@@ -61,7 +61,7 @@ class DrinkingViewController: UIViewController, UITableViewDataSource, UITableVi
         
         digitalWheelLabel = DigitalWheelLabel(label:drinkedTotalLabel , number: 0)
         drinkedStack.addArrangedSubview(digitalWheelLabel!)
-        drinkedTotalLabel.hidden = true
+        drinkedTotalLabel.isHidden = true
         
         settingBtn.layer.cornerRadius = settingBtn.frame.width / 2.0
         settingBtn.layer.masksToBounds = true
@@ -69,8 +69,8 @@ class DrinkingViewController: UIViewController, UITableViewDataSource, UITableVi
         statisticBtn.layer.cornerRadius = settingBtn.frame.width / 2.0
         statisticBtn.layer.masksToBounds = true
         
-        let userDefaults = NSUserDefaults.standardUserDefaults()
-        let dailyGoal = userDefaults.integerForKey("DailyGoal")
+        let userDefaults = UserDefaults.standard
+        let dailyGoal = userDefaults.integer(forKey: "DailyGoal")
         if dailyGoal == 0 {
             self.targetVolume = 2000
         } else {
@@ -85,19 +85,19 @@ class DrinkingViewController: UIViewController, UITableViewDataSource, UITableVi
             drinkedTotalVolume = Int(recordDaily!.totalVolume!)
         }
     }
-    override func viewWillAppear(animated: Bool) {
+    override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         refreshRecords()
         DrinkingWater(0)
     }
-    func DrinkingWater(volume: Int) {
+    func DrinkingWater(_ volume: Int) {
         drinkedTotalVolume += volume
         drinkedTotalLabel.text = String(drinkedTotalVolume)
         var ratio = CGFloat(drinkedTotalVolume) / CGFloat(targetVolume)
         ratio = ratio > 1 ? 1: ratio
         let height = self.view.frame.height * ratio
         waterViewTopConstraint.constant = -height
-        UIView.animateWithDuration(1.5, animations: {
+        UIView.animate(withDuration: 1.5, animations: {
             self.waterView.superview!.layoutIfNeeded()
             //self.view.layoutIfNeeded()
         })
@@ -108,13 +108,13 @@ class DrinkingViewController: UIViewController, UITableViewDataSource, UITableVi
         self.view.layoutIfNeeded()
         
         var offsetY = self.view.bounds.height - self.drinkingCup.frame.origin.y 
-        self.drinkingCup.transform = CGAffineTransformTranslate(self.drinkingCup.transform, 0, offsetY)
+        self.drinkingCup.transform = self.drinkingCup.transform.translatedBy(x: 0, y: offsetY)
         //self.drinkingCup.transform = CGAffineTransformRotate(self.drinkingCup.transform, CGFloat(M_PI))
         
         //offsetY = self.volumeStackView.frame.origin.y + self.volumeStackView.frame.height
         //self.volumeStackView.transform = CGAffineTransformTranslate(self.volumeStackView.transform, 0, -offsetY)
         offsetY = self.goalBackgroudView.frame.origin.y + self.goalBackgroudView.frame.height
-        self.goalBackgroudView.transform = CGAffineTransformTranslate(self.goalBackgroudView.transform, 0, -offsetY)
+        self.goalBackgroudView.transform = self.goalBackgroudView.transform.translatedBy(x: 0, y: -offsetY)
         
         self.drinkedTableView.alpha = 0.0
         self.settingBtn.alpha = 0.0
@@ -122,8 +122,8 @@ class DrinkingViewController: UIViewController, UITableViewDataSource, UITableVi
     }
     func restoreDrinkedVolume() {
         DrinkingWater(0)
-        self.drinkingCup.transform = CGAffineTransformIdentity
-        self.goalBackgroudView.transform = CGAffineTransformIdentity
+        self.drinkingCup.transform = CGAffineTransform.identity
+        self.goalBackgroudView.transform = CGAffineTransform.identity
         self.drinkedTableView.alpha = 1.0
         self.settingBtn.alpha = 1.0
         self.statisticBtn.alpha = 1.0
@@ -135,11 +135,11 @@ class DrinkingViewController: UIViewController, UITableViewDataSource, UITableVi
     }
     
     // MARK: delegation
-    func numberOfSectionsInTableView(tableView: UITableView) -> Int {
+    func numberOfSections(in tableView: UITableView) -> Int {
         return 1
         //return self.fetchedResultsController.sections!.count
     }
-    func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         //return records.count
         //return self.fetchedResultsController
         if let sections = self.fetchedResultsController.sections {
@@ -148,29 +148,29 @@ class DrinkingViewController: UIViewController, UITableViewDataSource, UITableVi
         }
         return 0
     }
-    func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
-        let cell = drinkedTableView.dequeueReusableCellWithIdentifier("drinkedCell", forIndexPath: indexPath) as! drinkedCell
+    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+        let cell = drinkedTableView.dequeueReusableCell(withIdentifier: "drinkedCell", for: indexPath) as! drinkedCell
         //let record = records[indexPath.row]
         //cell.timeLabel.text = record.drinkingTime
         //cell.volumeLabel.text = String(record.drinkingVolume)
         self.configureCell(cell, indexPath: indexPath)
         return cell
     }
-    func tableView(tableView: UITableView, canEditRowAtIndexPath indexPath: NSIndexPath) -> Bool {
+    func tableView(_ tableView: UITableView, canEditRowAt indexPath: IndexPath) -> Bool {
         return true
     }
-    func tableView(tableView: UITableView, commitEditingStyle editingStyle: UITableViewCellEditingStyle, forRowAtIndexPath indexPath: NSIndexPath) {
-        if editingStyle == .Delete {
+    func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCellEditingStyle, forRowAt indexPath: IndexPath) {
+        if editingStyle == .delete {
             //let volume = records[indexPath.row].drinkingVolume
             //records.removeAtIndex(indexPath.row)
             //drinkedTableView.deleteRowsAtIndexPaths([indexPath], withRowAnimation: .Left)
-            let record = self.fetchedResultsController.objectAtIndexPath(indexPath) as! RecordDetail
+            let record = self.fetchedResultsController.object(at: indexPath) as! RecordDetail
             let volume = Int(record.volume!)
             let context = self.mangedObjectContext
-            context.deleteObject(record)
-            recordDaily!.totalVolume! = Int(recordDaily!.totalVolume!) - volume
+            context?.delete(record)
+            recordDaily!.totalVolume! = (Int(recordDaily!.totalVolume!) - volume) as NSNumber
             do {
-                try context.save()
+                try context?.save()
             } catch {
                 fatalError("Failure to save context:\(error)")
             }
@@ -178,15 +178,15 @@ class DrinkingViewController: UIViewController, UITableViewDataSource, UITableVi
         }
     }
     
-    func tableView(tableView: UITableView, editActionsForRowAtIndexPath indexPath: NSIndexPath) -> [UITableViewRowAction]? {
-        let deleteAction = UITableViewRowAction(style: .Normal, title: "delete") { (action: UITableViewRowAction, indexPath: NSIndexPath) -> Void in
-            let record = self.fetchedResultsController.objectAtIndexPath(indexPath) as! RecordDetail
+    func tableView(_ tableView: UITableView, editActionsForRowAt indexPath: IndexPath) -> [UITableViewRowAction]? {
+        let deleteAction = UITableViewRowAction(style: .normal, title: "delete") { (action: UITableViewRowAction, indexPath: IndexPath) -> Void in
+            let record = self.fetchedResultsController.object(at: indexPath) as! RecordDetail
             let volume = Int(record.volume!)
             let context = self.mangedObjectContext
-            context.deleteObject(record)
-            self.recordDaily!.totalVolume! = Int(self.recordDaily!.totalVolume!) - volume
+            context?.delete(record)
+            self.recordDaily!.totalVolume! = (Int(self.recordDaily!.totalVolume!) - volume) as NSNumber
             do {
-                try context.save()
+                try context?.save()
             } catch {
                 fatalError("Failure to save context:\(error)")
             }
@@ -197,19 +197,19 @@ class DrinkingViewController: UIViewController, UITableViewDataSource, UITableVi
     }
     
     // MARK: presentation
-    @IBAction func drinkingBtnTap(sender: UIButton) {
+    @IBAction func drinkingBtnTap(_ sender: UIButton) {
         
         let presentedVC = WaterVolumeViewController()
         presentedVC.transitioningDelegate = self.transitioningDelegateForWVVC
-        presentedVC.modalPresentationStyle = .Custom
-        presentViewController(presentedVC, animated: true, completion: nil)
+        presentedVC.modalPresentationStyle = .custom
+        present(presentedVC, animated: true, completion: nil)
     }
-    func getTwoDigitNumber(num: Int) -> String {
+    func getTwoDigitNumber(_ num: Int) -> String {
         return num < 10 ? "0" + String(num) : String(num)
     }
-    func dismissWaterVolumeViewController(drinkedVolume: Int) {
+    func dismissWaterVolumeViewController(_ drinkedVolume: Int) {
         self.drinkingCup.alpha = 0.0
-        dismissViewControllerAnimated(true, completion:{() -> Void in self.drinkingCup.alpha = 1.0 } )
+        dismiss(animated: true, completion:{() -> Void in self.drinkingCup.alpha = 1.0 } )
         
         if drinkedVolume == 10 {
             resetAllTestData()
@@ -218,11 +218,11 @@ class DrinkingViewController: UIViewController, UITableViewDataSource, UITableVi
         }
         refreshRecords()
         
-        let now = NSDate()
-        let calendar = NSCalendar.currentCalendar()
+        let now = Date()
+        let calendar = Calendar.current
         //calendar.
-        let components = calendar.components([.Hour, .Minute, .Weekday], fromDate: now)
-        let drinkingTime = getTwoDigitNumber(components.hour) + ":" + getTwoDigitNumber(components.minute)
+        let components = (calendar as NSCalendar).components([.hour, .minute, .weekday], from: now)
+        let drinkingTime = getTwoDigitNumber(components.hour!) + ":" + getTwoDigitNumber(components.minute!)
         
         //let addingContext = NSManagedObjectContext(concurrencyType: .MainQueueConcurrencyType)
         //addingContext.parentContext = self.fetchedResultsController.managedObjectContext
@@ -230,31 +230,31 @@ class DrinkingViewController: UIViewController, UITableViewDataSource, UITableVi
         
         if let daily = recordDaily {
             drinkedTotalVolume = Int(daily.totalVolume!)
-            daily.totalVolume = drinkedTotalVolume + drinkedVolume
+            daily.totalVolume = drinkedTotalVolume + drinkedVolume as NSNumber
         } else {
-            recordDaily = NSEntityDescription.insertNewObjectForEntityForName("RecordDaily", inManagedObjectContext: addingContext) as? RecordDaily
+            recordDaily = NSEntityDescription.insertNewObject(forEntityName: "RecordDaily", into: addingContext!) as? RecordDaily
             recordDaily!.date = now
-            recordDaily!.totalVolume = drinkedVolume
+            recordDaily!.totalVolume = drinkedVolume as NSNumber
             var weekDay = components.weekday
             if weekDay == 1 {
                 weekDay = 7
             } else {
-                weekDay = weekDay - 1
+                weekDay = weekDay! - 1
             }
-            recordDaily!.weekDay = weekDay
+            recordDaily!.weekDay = weekDay! as NSNumber
         }
         
-        let detail = NSEntityDescription.insertNewObjectForEntityForName("RecordDetail", inManagedObjectContext: addingContext) as! RecordDetail
-        detail.time = drinkingTime
-        detail.theHour = components.hour
-        detail.theMinute = components.minute
+        let detail = NSEntityDescription.insertNewObject(forEntityName: "RecordDetail", into: addingContext!) as! RecordDetail
+        detail.time = drinkingTime as NSString
+        detail.theHour = components.hour! as NSNumber
+        detail.theMinute = components.minute! as NSNumber
         detail.date = now
-        detail.volume = drinkedVolume
+        detail.volume = drinkedVolume as NSNumber
         detail.theDay = recordDaily
         
-        recordDaily!.mutableSetValueForKey("details").addObject(detail)
+        recordDaily!.mutableSetValue(forKey: "details").add(detail)
         do {
-            try addingContext.save()
+            try addingContext?.save()
         } catch {
             fatalError("Failure to save context:\(error)")
         }
@@ -262,8 +262,8 @@ class DrinkingViewController: UIViewController, UITableViewDataSource, UITableVi
     }
     
     //MARK: segue and unsegue
-    override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject?) {
-        if let toVC = segue.destinationViewController as? UINavigationController {
+    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
+        if let toVC = segue.destination as? UINavigationController {
             toVC.view.layer.cornerRadius = 8
             toVC.view.layer.masksToBounds = true
             
@@ -273,7 +273,7 @@ class DrinkingViewController: UIViewController, UITableViewDataSource, UITableVi
             toVC.transitioningDelegate = self.transitioningDelegateForSettings
         }
         
-        if let toVC = segue.destinationViewController as? StatisticViewController {
+        if let toVC = segue.destination as? StatisticViewController {
             if self.transitioningDelegateForStatistic == nil {
                 self.transitioningDelegateForStatistic = TransitioningDelegateForStatistic()
             }
@@ -281,10 +281,10 @@ class DrinkingViewController: UIViewController, UITableViewDataSource, UITableVi
             toVC.managedObjectContext = self.mangedObjectContext
         }
     }
-    @IBAction func unwindToSegue(unwindSegue: UIStoryboardSegue) {
+    @IBAction func unwindToSegue(_ unwindSegue: UIStoryboardSegue) {
         //
-        let userDefaults = NSUserDefaults.standardUserDefaults()
-        self.targetVolume = userDefaults.integerForKey("DailyGoal")
+        let userDefaults = UserDefaults.standard
+        self.targetVolume = userDefaults.integer(forKey: "DailyGoal")
         self.DrinkingWater(0)
         //self.targetLable.text
     }
@@ -293,11 +293,11 @@ class DrinkingViewController: UIViewController, UITableViewDataSource, UITableVi
     }
     
     func refreshRecords() {
-        let calendar = NSCalendar.currentCalendar()
+        let calendar = Calendar.current
         if calendar.isDateInToday(curDay) {
             return
         }
-        curDay = NSDate()
+        curDay = Date()
         drinkedTotalVolume = 0
         loadRecords()
         drinkedTableView.reloadData()
@@ -308,24 +308,24 @@ class DrinkingViewController: UIViewController, UITableViewDataSource, UITableVi
     
     func loadRecords() {
         
-        let date = NSDate()
-        let calendar = NSCalendar.currentCalendar()
-        let today = calendar.startOfDayForDate(date)
+        let date = Date()
+        let calendar = Calendar.current
+        let today = calendar.startOfDay(for: date)
         
-        let detailRequest = NSFetchRequest(entityName: "RecordDetail")
+        let detailRequest = NSFetchRequest<NSFetchRequestResult>(entityName: "RecordDetail")
         let dateSort = NSSortDescriptor(key: "date", ascending: false)
         detailRequest.sortDescriptors = [dateSort]
-        detailRequest.predicate = NSPredicate(format: "date >= %@", today)
+        detailRequest.predicate = NSPredicate(format: "date >= %@", today as CVarArg)
         
-        let dailyRequest = NSFetchRequest(entityName: "RecordDaily")
-        dailyRequest.predicate = NSPredicate(format: "date >= %@", today)
+        let dailyRequest = NSFetchRequest<NSFetchRequestResult>(entityName: "RecordDaily")
+        dailyRequest.predicate = NSPredicate(format: "date >= %@", today as CVarArg)
         
         self.fetchedResultsController = NSFetchedResultsController(fetchRequest: detailRequest, managedObjectContext: self.mangedObjectContext, sectionNameKeyPath: nil, cacheName: nil)
         self.fetchedResultsController.delegate = self
         
         do {
             try self.fetchedResultsController.performFetch()
-            let recordDailys = try self.mangedObjectContext.executeFetchRequest(dailyRequest) as! [RecordDaily]
+            let recordDailys = try self.mangedObjectContext.fetch(dailyRequest) as! [RecordDaily]
             if recordDailys.count != 0 {
                 self.recordDaily = recordDailys[0]
             } else {
@@ -336,94 +336,94 @@ class DrinkingViewController: UIViewController, UITableViewDataSource, UITableVi
         }
         
     }
-    func configureCell(cell: drinkedCell, indexPath: NSIndexPath) {
-        let record = self.fetchedResultsController.objectAtIndexPath(indexPath) as! RecordDetail
+    func configureCell(_ cell: drinkedCell, indexPath: IndexPath) {
+        let record = self.fetchedResultsController.object(at: indexPath) as! RecordDetail
         cell.timeLabel.text = record.time! as String
-        cell.volumeLabel.text = String(record.volume!)
+        cell.volumeLabel.text = String(describing: record.volume!)
     }
-    func controllerWillChangeContent(controller: NSFetchedResultsController) {
+    func controllerWillChangeContent(_ controller: NSFetchedResultsController<NSFetchRequestResult>) {
         drinkedTableView.beginUpdates()
     }
-    func controller(controller: NSFetchedResultsController, didChangeObject anObject: AnyObject, atIndexPath indexPath: NSIndexPath?, forChangeType type: NSFetchedResultsChangeType, newIndexPath: NSIndexPath?) {
+    func controller(_ controller: NSFetchedResultsController<NSFetchRequestResult>, didChange anObject: Any, at indexPath: IndexPath?, for type: NSFetchedResultsChangeType, newIndexPath: IndexPath?) {
         switch type {
-        case .Insert:
-            drinkedTableView.insertRowsAtIndexPaths([newIndexPath!], withRowAnimation: .Fade)
-        case .Delete:
-            drinkedTableView.deleteRowsAtIndexPaths([indexPath!], withRowAnimation: .Fade)
-        case .Update:
-            self.configureCell(self.drinkedTableView.cellForRowAtIndexPath(indexPath!)! as! drinkedCell, indexPath: indexPath!)
-        case .Move:
-            drinkedTableView.deleteRowsAtIndexPaths([indexPath!], withRowAnimation: .Fade)
-            drinkedTableView.insertRowsAtIndexPaths([newIndexPath!], withRowAnimation: .Fade)
+        case .insert:
+            drinkedTableView.insertRows(at: [newIndexPath!], with: .fade)
+        case .delete:
+            drinkedTableView.deleteRows(at: [indexPath!], with: .fade)
+        case .update:
+            self.configureCell(self.drinkedTableView.cellForRow(at: indexPath!)! as! drinkedCell, indexPath: indexPath!)
+        case .move:
+            drinkedTableView.deleteRows(at: [indexPath!], with: .fade)
+            drinkedTableView.insertRows(at: [newIndexPath!], with: .fade)
         }
     }
-    func controllerDidChangeContent(controller: NSFetchedResultsController) {
+    func controllerDidChangeContent(_ controller: NSFetchedResultsController<NSFetchRequestResult>) {
         self.drinkedTableView.endUpdates()
     }
     func resetAllTestData() {
         
         let context = self.mangedObjectContext
-        var fetchRequest = NSFetchRequest(entityName: "RecordDaily")
+        var fetchRequest = NSFetchRequest<NSFetchRequestResult>(entityName: "RecordDaily")
         var deleteRequest = NSBatchDeleteRequest(fetchRequest: fetchRequest)
         
         do {
-            try persistentStoreCoordinator.executeRequest(deleteRequest, withContext: context)
+            try persistentStoreCoordinator.execute(deleteRequest, with: context!)
             fetchRequest = NSFetchRequest(entityName: "RecordDetail")
             deleteRequest = NSBatchDeleteRequest(fetchRequest: fetchRequest)
-            try persistentStoreCoordinator.executeRequest(deleteRequest, withContext: context)
+            try persistentStoreCoordinator.execute(deleteRequest, with: context!)
         } catch {
             fatalError("delete records error: \(error)")
         }
         
-        let calendar = NSCalendar.currentCalendar()
+        let calendar = Calendar.current
         
         for dayIdx in 1 ... 30 {
-            let now = NSDate(timeInterval: -NSTimeInterval(dayIdx * 24 * 3600), sinceDate: NSDate())
-            let components = calendar.components([.Hour, .Minute, .Weekday], fromDate: now)
+            let now = Date(timeInterval: -TimeInterval(dayIdx * 24 * 3600), since: Date())
+            let components = (calendar as NSCalendar).components([.hour, .minute, .weekday], from: now)
          
-            let recordDaily = NSEntityDescription.insertNewObjectForEntityForName("RecordDaily", inManagedObjectContext: context) as! RecordDaily
+            let recordDaily = NSEntityDescription.insertNewObject(forEntityName: "RecordDaily", into: context!) as! RecordDaily
             recordDaily.date = now
             recordDaily.totalVolume = 0
             var weekDay = components.weekday
             if weekDay == 1 {
                 weekDay = 7
             } else {
-                weekDay = weekDay - 1
+                weekDay = weekDay! - 1
             }
-            recordDaily.weekDay = weekDay
+            recordDaily.weekDay = weekDay! as NSNumber
             for _ in 0 ... 5 {
-                let detail = NSEntityDescription.insertNewObjectForEntityForName("RecordDetail", inManagedObjectContext: context) as! RecordDetail
-                let drinkedVolume = random() % 600
-                let hour = random() % 24
-                let minute = random() % 60
-                let drinkingTime = getTwoDigitNumber(hour) + ":" + getTwoDigitNumber(minute)
-                detail.time = drinkingTime
-                detail.theHour = hour
-                detail.theMinute = minute
+                let detail = NSEntityDescription.insertNewObject(forEntityName: "RecordDetail", into: context!) as! RecordDetail
+                let drinkedVolume = arc4random() % 600
+                let hour = arc4random() % 24
+                let minute = arc4random() % 60
+                let drinkingTime = getTwoDigitNumber(Int(hour)) + ":" + getTwoDigitNumber(Int(minute))
+                detail.time = drinkingTime as NSString
+                detail.theHour = hour as NSNumber
+                detail.theMinute = minute as NSNumber
                 detail.date = now
-                detail.volume = drinkedVolume
+                detail.volume = drinkedVolume as NSNumber
                 detail.theDay = recordDaily
-                recordDaily.totalVolume = Int(recordDaily.totalVolume!) + drinkedVolume
+                recordDaily.totalVolume = (Int(recordDaily.totalVolume!) + Int(drinkedVolume)) as NSNumber
                 
-                recordDaily.mutableSetValueForKey("details").addObject(detail)
+                recordDaily.mutableSetValue(forKey: "details").add(detail)
             }
         }
         do {
-            try context.save()
+            try context?.save()
         } catch {
             fatalError("Failure to save context:\(error)")
         }
     }
     func clearAllRecords() -> Bool {
         let context = self.mangedObjectContext
-        var fetchRequest = NSFetchRequest(entityName: "RecordDaily")
+        var fetchRequest = NSFetchRequest<NSFetchRequestResult>(entityName: "RecordDaily")
         var deleteRequest = NSBatchDeleteRequest(fetchRequest: fetchRequest)
         
         do {
-            try persistentStoreCoordinator.executeRequest(deleteRequest, withContext: context)
+            try persistentStoreCoordinator.execute(deleteRequest, with: context!)
             fetchRequest = NSFetchRequest(entityName: "RecordDetail")
             deleteRequest = NSBatchDeleteRequest(fetchRequest: fetchRequest)
-            try persistentStoreCoordinator.executeRequest(deleteRequest, withContext: context)
+            try persistentStoreCoordinator.execute(deleteRequest, with: context!)
             return true
         } catch {
             return false

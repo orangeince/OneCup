@@ -27,7 +27,7 @@ class ReminderNewViewController: UIViewController, UIPickerViewDelegate, UIPicke
     var theMinute = 0
     var enable = true
     var identifier = ""
-    var fireDate = NSDate()
+    var fireDate = Date()
     //var reminder: ((String, String, String, Int, Int, Int, Bool), Int)?
     var reminder: (Reminder, Int)?
     var SaveDataDelegate: ReminderTableViewController?
@@ -39,10 +39,10 @@ class ReminderNewViewController: UIViewController, UIPickerViewDelegate, UIPicke
         self.pickerView.dataSource = self
         self.pickerView.delegate = self
         
-        let curDate = NSDate()
-        let calendarComponents = NSCalendar.currentCalendar().components([.Hour, .Minute], fromDate: curDate)
-        self.theHour = calendarComponents.hour
-        self.theMinute = calendarComponents.minute
+        let curDate = Date()
+        let calendarComponents = (Calendar.current as NSCalendar).components([.hour, .minute], from: curDate)
+        self.theHour = calendarComponents.hour!
+        self.theMinute = calendarComponents.minute!
         
         if let reminder = self.reminder {
             self.alertTitle = reminder.0.alertTitle
@@ -50,13 +50,13 @@ class ReminderNewViewController: UIViewController, UIPickerViewDelegate, UIPicke
             self.theHour = reminder.0.theHour
             self.theMinute = reminder.0.theMinute
             self.enable = reminder.0.enable
-            self.fireDate = reminder.0.fireDate
+            self.fireDate = reminder.0.fireDate as Date
             self.identifier = reminder.0.identifier
              //((alertTime, alertTitle, repeatDate, repeatDateMask, theHour, theMinute, enable), _) = reminder
         }
        
-        self.pickerView.selectRow(self.pickerView.numberOfRowsInComponent(0) / 2 + self.theHour, inComponent: 0, animated: false)
-        self.pickerView.selectRow(self.pickerView.numberOfRowsInComponent(1) / 2 + self.theMinute, inComponent: 1, animated: false)
+        self.pickerView.selectRow(self.pickerView.numberOfRows(inComponent: 0) / 2 + self.theHour, inComponent: 0, animated: false)
+        self.pickerView.selectRow(self.pickerView.numberOfRows(inComponent: 1) / 2 + self.theMinute, inComponent: 1, animated: false)
         self.alertTitleField.text = self.alertTitle
         
         self.view.layer.cornerRadius = 8.0
@@ -65,25 +65,25 @@ class ReminderNewViewController: UIViewController, UIPickerViewDelegate, UIPicke
         self.cancelBtn.layer.cornerRadius = 8.0
         self.cancelBtn.layer.masksToBounds = true
         self.cancelBtn.layer.borderWidth = 1.0
-        self.cancelBtn.layer.borderColor = self.cancelBtn.titleColorForState(.Normal)?.CGColor
+        self.cancelBtn.layer.borderColor = self.cancelBtn.titleColor(for: UIControlState())?.cgColor
         
         self.saveBtn.layer.cornerRadius = 8.0
         self.saveBtn.layer.masksToBounds = true
         self.saveBtn.layer.borderWidth = 1.0
-        self.saveBtn.layer.borderColor = self.saveBtn.titleColorForState(.Normal)?.CGColor
+        self.saveBtn.layer.borderColor = self.saveBtn.titleColor(for: UIControlState())?.cgColor
         
         
-        self.cancelBtn.addTarget(self, action: "btnSwapBackgroudColorWithTitleColor:", forControlEvents: .TouchDown)
-        self.cancelBtn.addTarget(self, action: "btnSwapBackgroudColorWithTitleColor:", forControlEvents: .TouchUpOutside)
-        self.saveBtn.addTarget(self, action: "btnSwapBackgroudColorWithTitleColor:", forControlEvents: .TouchDown)
-        self.saveBtn.addTarget(self, action: "btnSwapBackgroudColorWithTitleColor:", forControlEvents: .TouchUpOutside)
+        self.cancelBtn.addTarget(self, action: #selector(ReminderNewViewController.btnSwapBackgroudColorWithTitleColor(_:)), for: .touchDown)
+        self.cancelBtn.addTarget(self, action: #selector(ReminderNewViewController.btnSwapBackgroudColorWithTitleColor(_:)), for: .touchUpOutside)
+        self.saveBtn.addTarget(self, action: #selector(ReminderNewViewController.btnSwapBackgroudColorWithTitleColor(_:)), for: .touchDown)
+        self.saveBtn.addTarget(self, action: #selector(ReminderNewViewController.btnSwapBackgroudColorWithTitleColor(_:)), for: .touchUpOutside)
         
         let btnsCount = self.weekBtnStack.arrangedSubviews.count
         for index in 0 ... btnsCount-1 {
             if let btn = self.weekBtnStack.arrangedSubviews[index] as? UIButton {
                 let weekBtn = WeekButton()
-                weekBtn.setTitle(btn.titleForState(.Normal), forState: .Normal)
-                weekBtn.setTitleColor(btn.titleColorForState(.Normal), forState: .Normal)
+                weekBtn.setTitle(btn.title(for: UIControlState()), for: UIControlState())
+                weekBtn.setTitleColor(btn.titleColor(for: UIControlState()), for: UIControlState())
                 weekBtn.backgroundColor = btn.tintColor
                 weekBtn.bounds = btn.bounds
                 weekBtn.day = index + 1
@@ -93,8 +93,8 @@ class ReminderNewViewController: UIViewController, UIPickerViewDelegate, UIPicke
                 }
                 weekBtn.layer.cornerRadius = weekBtn.bounds.width / 2.0
                 weekBtn.layer.masksToBounds = true
-                btn.hidden = true
-                weekBtn.addTarget(self, action: "btnSwapBackgroudColorWithTitleColor:", forControlEvents: .TouchDown)
+                btn.isHidden = true
+                weekBtn.addTarget(self, action: #selector(ReminderNewViewController.btnSwapBackgroudColorWithTitleColor(_:)), for: .touchDown)
                 self.weekBtns.append(weekBtn)
                 self.weekBtnStack.addArrangedSubview(weekBtn)
             }
@@ -109,46 +109,46 @@ class ReminderNewViewController: UIViewController, UIPickerViewDelegate, UIPicke
     }
     
     func registerForKeyboardNotification() {
-        NSNotificationCenter.defaultCenter().addObserver(self, selector: "keyboardWillShow:", name: UIKeyboardWillShowNotification, object: nil)
-        NSNotificationCenter.defaultCenter().addObserver(self, selector: "keyboardWillHide:", name: UIKeyboardWillHideNotification, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(ReminderNewViewController.keyboardWillShow(_:)), name: NSNotification.Name.UIKeyboardWillShow, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(ReminderNewViewController.keyboardWillHide(_:)), name: NSNotification.Name.UIKeyboardWillHide, object: nil)
     }
-    func keyboardWillShow(notification: NSNotification) {
+    func keyboardWillShow(_ notification: Notification) {
         let userInfo = notification.userInfo!
-        let kbRect = userInfo[UIKeyboardFrameEndUserInfoKey]!.CGRectValue
+        let kbRect = (userInfo[UIKeyboardFrameEndUserInfoKey]! as AnyObject).cgRectValue
         let windowHeight = self.view.window!.bounds.height
-        if kbRect.origin.y >= windowHeight {
+        if (kbRect?.origin.y)! >= windowHeight {
             return
         }
-        let y = windowHeight - self.view.frame.height - kbRect.height + 4.0
-        UIView.animateWithDuration(0.3) { () -> Void in
+        let y = windowHeight - self.view.frame.height - (kbRect?.height)! + 4.0
+        UIView.animate(withDuration: 0.3, animations: { () -> Void in
             self.view.frame.origin.y = y
-        }
+        }) 
     }
-    func keyboardWillHide(notification: NSNotification) {
+    func keyboardWillHide(_ notification: Notification) {
         let userInfo = notification.userInfo!
-        let kbRect = userInfo[UIKeyboardFrameBeginUserInfoKey]!.CGRectValue
-        if kbRect.origin.y >= self.view.window!.bounds.height {
+        let kbRect = (userInfo[UIKeyboardFrameBeginUserInfoKey]! as AnyObject).cgRectValue
+        if (kbRect?.origin.y)! >= self.view.window!.bounds.height {
             return
         }
-        UIView.animateWithDuration(0.3) { () -> Void in
-            self.view.frame = self.view.frame.offsetBy(dx: 0, dy: kbRect.height - 4.0)
-        }
+        UIView.animate(withDuration: 0.3, animations: { () -> Void in
+            self.view.frame = self.view.frame.offsetBy(dx: 0, dy: (kbRect?.height)! - 4.0)
+        }) 
     }
     //MARK: Delegate and DateSource
     
-    func numberOfComponentsInPickerView(pickerView: UIPickerView) -> Int {
+    func numberOfComponents(in pickerView: UIPickerView) -> Int {
         return 2
     }
-    func pickerView(pickerView: UIPickerView, numberOfRowsInComponent component: Int) -> Int {
+    func pickerView(_ pickerView: UIPickerView, numberOfRowsInComponent component: Int) -> Int {
         return 12 * 60
     }
-    func pickerView(pickerView: UIPickerView, rowHeightForComponent component: Int) -> CGFloat {
+    func pickerView(_ pickerView: UIPickerView, rowHeightForComponent component: Int) -> CGFloat {
         return 34
     }
-    func pickerView(pickerView: UIPickerView, widthForComponent component: Int) -> CGFloat {
+    func pickerView(_ pickerView: UIPickerView, widthForComponent component: Int) -> CGFloat {
         return 80.0
     }
-    func pickerView(pickerView: UIPickerView, attributedTitleForRow row: Int, forComponent component: Int) -> NSAttributedString? {
+    func pickerView(_ pickerView: UIPickerView, attributedTitleForRow row: Int, forComponent component: Int) -> NSAttributedString? {
         let number: Int
         if component == 0 {
             number = row % 24
@@ -156,10 +156,10 @@ class ReminderNewViewController: UIViewController, UIPickerViewDelegate, UIPicke
             number = row % 60
         }
         let string = number < 10 ? ("0" + String(number)) : String(number)
-        let color = UIColor.blackColor()//self.pickerView.tintColor
+        let color = UIColor.black//self.pickerView.tintColor
         return NSAttributedString(string: string, attributes: [NSForegroundColorAttributeName: color])
     }
-    func pickerView(pickerView: UIPickerView, didSelectRow row: Int, inComponent component: Int) {
+    func pickerView(_ pickerView: UIPickerView, didSelectRow row: Int, inComponent component: Int) {
         if component == 0 {
             self.theHour = row % 24
         } else {
@@ -183,22 +183,22 @@ class ReminderNewViewController: UIViewController, UIPickerViewDelegate, UIPicke
         // Pass the selected object to the new view controller.
     }
     */
-    func btnSwapBackgroudColorWithTitleColor(sender: UIButton) {
-        let color = sender.titleColorForState(.Normal)
-        sender.setTitleColor(sender.backgroundColor, forState: .Normal)
+    func btnSwapBackgroudColorWithTitleColor(_ sender: UIButton) {
+        let color = sender.titleColor(for: UIControlState())
+        sender.setTitleColor(sender.backgroundColor, for: UIControlState())
         sender.backgroundColor = color
         if let btn = sender as? WeekButton {
             btn.checked = !btn.checked
         }
         //self.alertTitleField.resignFirstResponder()
     }
-    @IBAction func cancelTap(sender: UIButton) {
+    @IBAction func cancelTap(_ sender: UIButton) {
         self.alertTitleField.resignFirstResponder()
         if let presenting = self.presentingViewController {
-            presenting.dismissViewControllerAnimated(true, completion: nil)
+            presenting.dismiss(animated: true, completion: nil)
         }
     }
-    @IBAction func saveTap(sender: UIButton) {
+    @IBAction func saveTap(_ sender: UIButton) {
         self.alertTitleField.resignFirstResponder()
         for btn in self.weekBtns {
             if btn.checked {
@@ -215,12 +215,12 @@ class ReminderNewViewController: UIViewController, UIPickerViewDelegate, UIPicke
         } else {
             alertTitle = "喝水提醒"
         }
-        let calendar = NSCalendar.currentCalendar()
-        let now = NSDate()
-        self.fireDate = calendar.dateBySettingHour(theHour, minute: theMinute, second: 0, ofDate: now, options: .MatchFirst)!
+        let calendar = Calendar.current
+        let now = Date()
+        self.fireDate = (calendar as NSCalendar).date(bySettingHour: theHour, minute: theMinute, second: 0, of: now, options: .matchFirst)!
         if self.repeatMask == 0 {
-            if calendar.compareDate(self.fireDate, toDate: now, toUnitGranularity: .Minute) != .OrderedDescending {
-                self.fireDate = NSDate(timeInterval: NSTimeInterval(24 * 3600), sinceDate: self.fireDate)
+            if (calendar as NSCalendar).compare(self.fireDate, to: now, toUnitGranularity: .minute) != .orderedDescending {
+                self.fireDate = Date(timeInterval: TimeInterval(24 * 3600), since: self.fireDate)
             }
         }
         self.identifier = generateIdentifier()
@@ -249,13 +249,13 @@ class ReminderNewViewController: UIViewController, UIPickerViewDelegate, UIPicke
                     reminderSetting.addReminder(newReminder)
                 }
             }
-            presenting.dismissViewControllerAnimated(true, completion: nil)
+            presenting.dismiss(animated: true, completion: nil)
         }
     }
     func generateIdentifier() -> String {
-        let calendar = NSCalendar.currentCalendar()
-        let curComp = calendar.components([.Year,.Month,.Day,.Hour,.Minute,.Second], fromDate: NSDate())
-        return String(curComp.year) + String(curComp.month) + String(curComp.day) + String(curComp.hour) + String(curComp.minute) + String(curComp.second) + String(random() % 100)
+        let calendar = Calendar.current
+        let curComp = (calendar as NSCalendar).components([.year,.month,.day,.hour,.minute,.second], from: Date())
+        return String(describing: curComp.year) + String(describing: curComp.month) + String(describing: curComp.day) + String(describing: curComp.hour) + String(describing: curComp.minute) + String(describing: curComp.second) + String(Int(arc4random()) % 100)
     }
 
 }

@@ -21,8 +21,8 @@ class SettingsTableViewController: UITableViewController {
             self.dailyGoalLabel.text = String(self.dailyGoal) + " ml"
             //self.settings.setValue(dailyGoal, forKey: "DailyGoal")
             if needSave {
-                let userDefaults = NSUserDefaults.standardUserDefaults()
-                userDefaults.setInteger(dailyGoal, forKey: "DailyGoal")
+                let userDefaults = UserDefaults.standard
+                userDefaults.set(dailyGoal, forKey: "DailyGoal")
                 userDefaults.synchronize()
             }
         }
@@ -33,8 +33,8 @@ class SettingsTableViewController: UITableViewController {
             self.settings.setValue(reminderEnable, forKey: "ReminderEnable")
             if needSave {
                 //self.saveSettings()
-                let userDefaults = NSUserDefaults.standardUserDefaults()
-                userDefaults.setBool(reminderEnable, forKey: "ReminderEnable")
+                let userDefaults = UserDefaults.standard
+                userDefaults.set(reminderEnable, forKey: "ReminderEnable")
                 userDefaults.synchronize()
             }
         }
@@ -44,8 +44,8 @@ class SettingsTableViewController: UITableViewController {
             self.shortcutCupCountLabel.text = String(shortcutCupCount)
             //self.settings.setValue(shortcutCupCount, forKey: "ShortcutCupCount")
             if needSave {
-                let userDefaults = NSUserDefaults.standardUserDefaults()
-                userDefaults.setInteger(shortcutCupCount, forKey: "ShortcutCupShowCount")
+                let userDefaults = UserDefaults.standard
+                userDefaults.set(shortcutCupCount, forKey: "ShortcutCupShowCount")
                 userDefaults.synchronize()
             }
         }
@@ -53,8 +53,8 @@ class SettingsTableViewController: UITableViewController {
     var shortcutCupArray = NSMutableArray() {
         didSet {
             if needSave {
-                let userDefaults = NSUserDefaults.standardUserDefaults()
-                userDefaults.setObject(shortcutCupArray, forKey: "ShortcutCups")
+                let userDefaults = UserDefaults.standard
+                userDefaults.set(shortcutCupArray, forKey: "ShortcutCups")
                 userDefaults.synchronize()
             }
         }
@@ -63,8 +63,8 @@ class SettingsTableViewController: UITableViewController {
         didSet {
             //self.settings.setValue(reminderArray, forKey: "Reminders")
             if needSave {
-                let userDefaults = NSUserDefaults.standardUserDefaults()
-                userDefaults.setObject(reminderArray, forKey: "Reminders")
+                let userDefaults = UserDefaults.standard
+                userDefaults.set(reminderArray, forKey: "Reminders")
                 userDefaults.synchronize()
             }
         }
@@ -78,15 +78,15 @@ class SettingsTableViewController: UITableViewController {
 
         // Uncomment the following line to display an Edit button in the navigation bar for this view controller.
         // self.navigationItem.rightBarButtonItem = self.editButtonItem()
-        self.navigationController!.navigationBar.tintColor = UIColor.whiteColor()
+        self.navigationController!.navigationBar.tintColor = UIColor.white
         //UITableViewCell.appearance().backgroundColor
         loadSettings()
         self.needSave = true
     }
-    override func viewWillAppear(animated: Bool) {
+    override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         if let indexPathForSelectedRow = self.tableView.indexPathForSelectedRow {
-            self.tableView.deselectRowAtIndexPath(indexPathForSelectedRow, animated: animated)
+            self.tableView.deselectRow(at: indexPathForSelectedRow, animated: animated)
         }
     }
     func loadSettings() {
@@ -125,15 +125,15 @@ class SettingsTableViewController: UITableViewController {
         }
         */
         if self.settings.count == 0 {
-            let userDefaults = NSUserDefaults.standardUserDefaults()
-            self.dailyGoal = userDefaults.integerForKey("DailyGoal")
-            self.reminderEnable = userDefaults.boolForKey("ReminderEnable")
-            self.shortcutCupCount = userDefaults.integerForKey("ShortcutCupShowCount")
-            let originObject = userDefaults.objectForKey("Reminders")
+            let userDefaults = UserDefaults.standard
+            self.dailyGoal = userDefaults.integer(forKey: "DailyGoal")
+            self.reminderEnable = userDefaults.bool(forKey: "ReminderEnable")
+            self.shortcutCupCount = userDefaults.integer(forKey: "ShortcutCupShowCount")
+            let originObject = userDefaults.object(forKey: "Reminders")
             if let reminders = originObject as? NSArray {
                 self.reminderArray = NSMutableArray(array: reminders)
             }
-            let cupObject = userDefaults.objectForKey("ShortcutCups")
+            let cupObject = userDefaults.object(forKey: "ShortcutCups")
             if let cups = cupObject as? NSArray {
                 self.shortcutCupArray = NSMutableArray(array: cups)
             }
@@ -146,11 +146,11 @@ class SettingsTableViewController: UITableViewController {
     }
 */
     func saveSettings() {
-        let rootPath = NSSearchPathForDirectoriesInDomains(.DocumentationDirectory, .UserDomainMask, true)[0]
-        let plistPath = rootPath.stringByAppendingString("Settings.plist")
+        let rootPath = NSSearchPathForDirectoriesInDomains(.documentationDirectory, .userDomainMask, true)[0]
+        let plistPath = rootPath + "Settings.plist"
         do {
-            let plistData = try NSPropertyListSerialization.dataWithPropertyList(self.settings, format: .XMLFormat_v1_0, options: 0)
-            plistData.writeToFile(plistPath, atomically: true)
+            let plistData = try PropertyListSerialization.data(fromPropertyList: self.settings, format: .xml, options: 0)
+            try? plistData.write(to: URL(fileURLWithPath: plistPath), options: [.atomic])
             //--logpoint
             print("save success")
         } catch {
@@ -166,12 +166,12 @@ class SettingsTableViewController: UITableViewController {
 
     // MARK: - Table view data source
 
-    override func numberOfSectionsInTableView(tableView: UITableView) -> Int {
+    override func numberOfSections(in tableView: UITableView) -> Int {
         // #warning Incomplete implementation, return the number of sections
         return 4
     }
 
-    override func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+    override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         // #warning Incomplete implementation, return the number of rows
         switch section {
         case 0:
@@ -185,7 +185,7 @@ class SettingsTableViewController: UITableViewController {
         }
     }
     
-    override func tableView(tableView: UITableView, willDisplayCell cell: UITableViewCell, forRowAtIndexPath indexPath: NSIndexPath) {
+    override func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
         //cell.frame = CGRectMake(5.0, cell.frame.origin.y, cell.frame.width - 10.0, cell.frame.height)
         
         if !roundCorner {
@@ -199,16 +199,16 @@ class SettingsTableViewController: UITableViewController {
         let margin = CGFloat(6.0)
         let originX = cell.bounds.origin.x + margin
         let width = cell.bounds.width - margin * 2.0
-        let cellBounds = CGRectMake(originX, cell.bounds.origin.y, width, CGRectGetHeight(cell.bounds))
+        let cellBounds = CGRect(x: originX, y: cell.bounds.origin.y, width: width, height: cell.bounds.height)
         let maskPath: UIBezierPath
-        if indexPath.row == 0 && indexPath.row == tableView.numberOfRowsInSection(indexPath.section) - 1 {
+        if indexPath.row == 0 && indexPath.row == tableView.numberOfRows(inSection: indexPath.section) - 1 {
             
-            maskPath = UIBezierPath(roundedRect: cellBounds, byRoundingCorners: [.TopLeft, .TopRight, .BottomLeft, .BottomRight], cornerRadii: CGSizeMake(cornerSize, cornerSize))
+            maskPath = UIBezierPath(roundedRect: cellBounds, byRoundingCorners: [.topLeft, .topRight, .bottomLeft, .bottomRight], cornerRadii: CGSize(width: cornerSize, height: cornerSize))
         } else if indexPath.row == 0 {
             
-            maskPath = UIBezierPath(roundedRect: cellBounds, byRoundingCorners: [.TopLeft, .TopRight], cornerRadii: CGSizeMake(cornerSize, cornerSize))
-        } else  if indexPath.row == tableView.numberOfRowsInSection(indexPath.section) - 1 {
-            maskPath = UIBezierPath(roundedRect: cellBounds, byRoundingCorners: [.BottomLeft, .BottomRight], cornerRadii: CGSizeMake(cornerSize, cornerSize))
+            maskPath = UIBezierPath(roundedRect: cellBounds, byRoundingCorners: [.topLeft, .topRight], cornerRadii: CGSize(width: cornerSize, height: cornerSize))
+        } else  if indexPath.row == tableView.numberOfRows(inSection: indexPath.section) - 1 {
+            maskPath = UIBezierPath(roundedRect: cellBounds, byRoundingCorners: [.bottomLeft, .bottomRight], cornerRadii: CGSize(width: cornerSize, height: cornerSize))
         } else {
             maskPath = UIBezierPath(rect: cellBounds)
         }
@@ -217,7 +217,7 @@ class SettingsTableViewController: UITableViewController {
         let shape = CAShapeLayer()
         shape.frame = cell.bounds
         //shape.frame = CGRectMake(cell.bounds.origin.x + CGFloat(10.0), cell.bounds.origin.y, cell.bounds.width - 40.0, cell.bounds.height)
-        shape.path = maskPath.CGPath
+        shape.path = maskPath.cgPath
         cell.layer.mask = shape
         //cell.layer.borderWidth = 1.0
         //cell.layer.borderColor = UIColor(white: 0.0, alpha: 0.0).CGColor
@@ -271,18 +271,18 @@ class SettingsTableViewController: UITableViewController {
     // MARK: - Navigation
 
     // In a storyboard-based application, you will often want to do a little preparation before navigation
-    override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject?) {
+    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         // Get the new view controller using segue.destinationViewController.
         // Pass the selected object to the new view controller.
-        if let toVC = segue.destinationViewController as? DailyGoalTableViewController {
+        if let toVC = segue.destination as? DailyGoalTableViewController {
             toVC.settingsDataSource = self
-        } else if let toVC = segue.destinationViewController as? ReminderTableViewController {
+        } else if let toVC = segue.destination as? ReminderTableViewController {
             toVC.settingsDataSource = self
-        } else if let toVC = segue.destinationViewController as? ShortcutCupTableViewController {
+        } else if let toVC = segue.destination as? ShortcutCupTableViewController {
             toVC.settingsDataSource = self
         }
     }
-    override func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
+    override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         let row = indexPath.row
         switch indexPath.section {
         case 1:
@@ -291,36 +291,36 @@ class SettingsTableViewController: UITableViewController {
             break
         case 3:
             if row == 0 {
-                let alert = UIAlertController(title: "抹掉所有数据", message: "确定要抹掉所有数据吗，抹掉之后数据将无法找回", preferredStyle: .Alert)
+                let alert = UIAlertController(title: "抹掉所有数据", message: "确定要抹掉所有数据吗，抹掉之后数据将无法找回", preferredStyle: .alert)
                 let clearRecordsAction = UIAlertAction(
                     title: "抹掉",
-                    style: .Default,
+                    style: .default,
                     handler: {
                         (action: UIAlertAction) -> Void in
                         if let delegate = self.manageRecordsDelegate {
                             let successed = delegate.clearAllRecords()
                             if !successed {
-                                let failedAlert = UIAlertController(title: "Sorry", message: "哎呀，不好意思，抹除数据失败啦。>_<``", preferredStyle: .Alert)
-                                self.presentViewController(failedAlert, animated: true, completion: nil)
+                                let failedAlert = UIAlertController(title: "Sorry", message: "哎呀，不好意思，抹除数据失败啦。>_<``", preferredStyle: .alert)
+                                self.present(failedAlert, animated: true, completion: nil)
                             }
                         }
                     })
-                let defaultAction = UIAlertAction(title: "取消", style: .Default, handler: nil)
+                let defaultAction = UIAlertAction(title: "取消", style: .default, handler: nil)
                 alert.addAction(clearRecordsAction)
                 alert.addAction(defaultAction)
                 //self.presentViewController(alert, animated: true, completion: )
-                self.presentViewController(alert, animated: true, completion: { () -> Void in
-                    self.tableView.deselectRowAtIndexPath(indexPath, animated: true)
+                self.present(alert, animated: true, completion: { () -> Void in
+                    self.tableView.deselectRow(at: indexPath, animated: true)
                 })
             }
         default:
             break
         }
     }
-    override func unwindForSegue(unwindSegue: UIStoryboardSegue, towardsViewController subsequentVC: UIViewController) {
+    override func unwind(for unwindSegue: UIStoryboardSegue, towardsViewController subsequentVC: UIViewController) {
         //
     }
-    @IBAction func unwindToSettings(unwindSegue: UIStoryboardSegue ) {
+    @IBAction func unwindToSettings(_ unwindSegue: UIStoryboardSegue ) {
         //
     }
 

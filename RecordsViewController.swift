@@ -25,11 +25,11 @@ class RecordsViewController: UIViewController, UIPageViewControllerDelegate {
         self.view.layer.cornerRadius = 8.0
         self.view.layer.masksToBounds = true
         // Do any additional setup after loading the view.
-        self.pageViewController = UIPageViewController(transitionStyle: .Scroll, navigationOrientation: .Horizontal, options: nil)
+        self.pageViewController = UIPageViewController(transitionStyle: .scroll, navigationOrientation: .horizontal, options: nil)
         self.pageViewController!.delegate = self
         let startViewController: StatisticViewController = self.modelController.viewControllerAtIndex(0, storyboard: self.storyboard!)!
         let viewControllers = [startViewController]
-        self.pageViewController!.setViewControllers(viewControllers, direction: .Forward, animated: false, completion: nil)
+        self.pageViewController!.setViewControllers(viewControllers, direction: .forward, animated: false, completion: nil)
         self.pageViewController!.dataSource = self.modelController
         
         self.addChildViewController(self.pageViewController!)
@@ -37,10 +37,10 @@ class RecordsViewController: UIViewController, UIPageViewControllerDelegate {
         
         let pageViewRect = self.view.bounds
         
-        self.pageViewController!.view.frame = CGRectOffset(CGRectInset(pageViewRect, 0, 30.0), 0.0, 30.0)
+        self.pageViewController!.view.frame = pageViewRect.insetBy(dx: 0, dy: 30.0).offsetBy(dx: 0.0, dy: 30.0)
         //self.pageViewController!.view.frame = pageViewRect
         
-        self.pageViewController!.didMoveToParentViewController(self)
+        self.pageViewController!.didMove(toParentViewController: self)
         
         self.view.gestureRecognizers = self.pageViewController!.gestureRecognizers
         

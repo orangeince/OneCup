@@ -12,40 +12,40 @@ class OIClockView: UIView, OIViewAnimatorDelegate  {
     
     // Only override drawRect: if you perform custom drawing.
     // An empty implementation adversely affects performance during animation.
-    private var _data = [(Int, Int, Int)]() {
+    fileprivate var _data = [(Int, Int, Int)]() {
         didSet {
             self.setNeedsDisplay()
         }
     }
-    private var _animator: OIViewAnimator!
-    private var _radius = CGFloat(0)
-    private var _margin = CGFloat(0)
-    private var _centre = CGPoint(x: 0, y: 0)
-    private var _dataAreaRadius = CGFloat(0)
-    private var _phases:Int = 7
-    private var _volumeOfPhase: Int = 100
-    private var _maxVolume = 1000
-    private var _drawScaleLine = false
-    private var _descriptionAreaHeight = CGFloat(80.0)
-    private var _descriptionMargin = CGFloat(16.0)
-    private var _centreRadius = CGFloat(0)
+    fileprivate var _animator: OIViewAnimator!
+    fileprivate var _radius = CGFloat(0)
+    fileprivate var _margin = CGFloat(0)
+    fileprivate var _centre = CGPoint(x: 0, y: 0)
+    fileprivate var _dataAreaRadius = CGFloat(0)
+    fileprivate var _phases:Int = 7
+    fileprivate var _volumeOfPhase: Int = 100
+    fileprivate var _maxVolume = 1000
+    fileprivate var _drawScaleLine = false
+    fileprivate var _descriptionAreaHeight = CGFloat(80.0)
+    fileprivate var _descriptionMargin = CGFloat(16.0)
+    fileprivate var _centreRadius = CGFloat(0)
     
     var fillClock = true
-    var fillColor = UIColor.whiteColor()
+    var fillColor = UIColor.white
     var dataFillColor: UIColor!
-    var strokeColor = UIColor.blackColor()
-    var scaleColor = UIColor.blackColor()
+    var strokeColor = UIColor.black
+    var scaleColor = UIColor.black
     var dataPointRedius = CGFloat(3.0)
     var drawDataPoint = false
     
     enum Location {
-        case Center
-        case LeftBottom
-        case RightBottom
+        case center
+        case leftBottom
+        case rightBottom
     }
-    var descriptionLocation: Location = .Center
+    var descriptionLocation: Location = .center
     
-    var descriptionFont = UIFont.systemFontOfSize(12.0)
+    var descriptionFont = UIFont.systemFont(ofSize: 12.0)
     var descriptionTexts = [("喝水次数 ", " 0"), ("每次平均 ", " 0ml"), ("最早时间 "," 无记录"), ("最常时段 "," 无记录")]
     var drinkedCount = 0 {
         didSet {
@@ -81,13 +81,13 @@ class OIClockView: UIView, OIViewAnimatorDelegate  {
         _animator.delegate = self
     }
     
-    override func drawRect(rect: CGRect) {
+    override func draw(_ rect: CGRect) {
         // Drawing code
-        super.drawRect(rect)
+        super.draw(rect)
         let context = UIGraphicsGetCurrentContext()
         let clockAreaHeight = drawDescription ? rect.height - _descriptionMargin - _descriptionAreaHeight : rect.height
-        let radius = min(clockAreaHeight, CGRectGetWidth(rect)) / 2.0
-        let orginX = CGRectGetWidth(rect) / 2.0
+        let radius = min(clockAreaHeight, rect.width) / 2.0
+        let orginX = rect.width / 2.0
         let orginY = clockAreaHeight / 2.0
         
         if self.dataFillColor == nil {
@@ -96,20 +96,20 @@ class OIClockView: UIView, OIViewAnimatorDelegate  {
         
         fillColor.setFill()
         strokeColor.setStroke()
-        CGContextSetLineWidth(context, 2)
+        context?.setLineWidth(2)
         
         let margin = 0.0
-        let tmpRect = CGRectMake(
-            orginX - radius * CGFloat(1.0 - margin),
-            orginY - radius * CGFloat(1.0 - margin),
-            2 * CGFloat(1 - margin) * radius,
-            2 * CGFloat(1 - margin) * radius
+        let tmpRect = CGRect(
+            x: orginX - radius * CGFloat(1.0 - margin),
+            y: orginY - radius * CGFloat(1.0 - margin),
+            width: 2 * CGFloat(1 - margin) * radius,
+            height: 2 * CGFloat(1 - margin) * radius
         )
-        CGContextAddEllipseInRect(context, tmpRect)
+        context?.addEllipse(in: tmpRect)
         if fillClock {
-            CGContextFillPath(context)
+            context?.fillPath()
         } else {
-            CGContextStrokePath(context)
+            context?.strokePath()
         }
         
         _radius = CGFloat(1 - margin) * radius
@@ -128,27 +128,27 @@ class OIClockView: UIView, OIViewAnimatorDelegate  {
             //if angle > phaseAngle || (_animator.isReversal && phaseAngle == 0.0) {
                 //break
             //}
-            CGContextSaveGState(context)
-            CGContextTranslateCTM(context, orginX, orginY)
-            CGContextRotateCTM(context, angle)
-            CGContextMoveToPoint(context, 0, _radius)
+            context?.saveGState()
+            context?.translateBy(x: orginX, y: orginY)
+            context?.rotate(by: angle)
+            context?.move(to: CGPoint(x: 0, y: _radius))
             let lengthFactor = i % 6 == 0 ? 0.01 : 0.01
             let length = _radius *  CGFloat(lengthFactor)
             if _drawScaleLine {
             //CGContextSetLineWidth(context, 1)
-                CGContextAddLineToPoint(context, 0, _radius - length)
-                CGContextStrokePath(context)
+                context?.addLine(to: CGPoint(x: 0, y: _radius - length))
+                context?.strokePath()
             }
             if drawDataPoint {
-                CGContextMoveToPoint(context, 0, 0)
+                context?.move(to: CGPoint(x: 0, y: 0))
             } else {
-                CGContextMoveToPoint(context, 0, _centreRadius)
+                context?.move(to: CGPoint(x: 0, y: _centreRadius))
             }
-            CGContextAddLineToPoint(context, 0, _radius - 3 * length)
-            CGContextSetLineWidth(context, 0.05)
-            CGContextStrokePath(context)
+            context?.addLine(to: CGPoint(x: 0, y: _radius - 3 * length))
+            context?.setLineWidth(0.05)
+            context?.strokePath()
             if (font == nil) {
-                font = UIFont.systemFontOfSize(UIFont.systemFontSize())
+                font = UIFont.systemFont(ofSize: UIFont.systemFontSize)
             }
             let textHeight = font!.lineHeight
             _dataAreaRadius = _radius - length - textHeight - _centreRadius
@@ -156,18 +156,18 @@ class OIClockView: UIView, OIViewAnimatorDelegate  {
             if i % 2 == 0 {
                 let offX: CGFloat = i < 10 ? 4.0 : 2.0
                 //CGContextTranslateCTM(context, 0, _radius + textHeight / 2.0)
-                CGContextTranslateCTM(context, 0, _radius - length - textHeight / 2.0)
+                context?.translateBy(x: 0, y: _radius - length - textHeight / 2.0)
                 //CGContextMoveToPoint(context, 0, length + textHeight)
-                CGContextRotateCTM(context, -CGFloat(Double(i) * M_PI / 12.0 - M_PI))
-                let textRect = CGRectMake(0 - textHeight / offX, -textHeight / 2.0, textHeight, textHeight)
+                context?.rotate(by: -CGFloat(Double(i) * M_PI / 12.0 - M_PI))
+                let textRect = CGRect(x: 0 - textHeight / offX, y: -textHeight / 2.0, width: textHeight, height: textHeight)
                 var attrs = [String: AnyObject]()
                 attrs[NSFontAttributeName] = font
                 attrs[NSForegroundColorAttributeName] = scaleColor
                 //NSString(string: String(i)).drawAtPoint(textPoint, withAttributes: attrs)
-                NSString(string: String(i)).drawInRect(textRect, withAttributes: attrs)
+                NSString(string: String(i)).draw(in: textRect, withAttributes: attrs)
                 //--end
             }
-            CGContextRestoreGState(context)
+            context?.restoreGState()
         }
         
         //draw the datapoint or dataline
@@ -179,23 +179,23 @@ class OIClockView: UIView, OIViewAnimatorDelegate  {
                 continue
             }
             let distance = distanceToCentre(volume)
-            CGContextSaveGState(context)
-            CGContextTranslateCTM(context, orginX, orginY)
-            CGContextRotateCTM(context, angle)
-            CGContextTranslateCTM(context, 0, _centreRadius)
+            context?.saveGState()
+            context?.translateBy(x: orginX, y: orginY)
+            context?.rotate(by: angle)
+            context?.translateBy(x: 0, y: _centreRadius)
             if drawDataPoint {
-                let pointRect = CGRectMake(0, distance, dataPointRedius, dataPointRedius)
-                CGContextAddEllipseInRect(context, pointRect)
-                CGContextFillPath(context)
+                let pointRect = CGRect(x: 0, y: distance, width: dataPointRedius, height: dataPointRedius)
+                context?.addEllipse(in: pointRect)
+                context?.fillPath()
             } else { //draw dataline
                 dataFillColor.setStroke()
-                CGContextMoveToPoint(context, 0, 0)
-                CGContextSetLineWidth(context, 0.8)
-                CGContextAddLineToPoint(context, 0, distance)
-                CGContextStrokePath(context)
+                context?.move(to: CGPoint(x: 0, y: 0))
+                context?.setLineWidth(0.8)
+                context?.addLine(to: CGPoint(x: 0, y: distance))
+                context?.strokePath()
             }
-            CGContextMoveToPoint(context, 0, 0)
-            CGContextRestoreGState(context)
+            context?.move(to: CGPoint(x: 0, y: 0))
+            context?.restoreGState()
             
         }
         strokeColor.setStroke()
@@ -203,21 +203,21 @@ class OIClockView: UIView, OIViewAnimatorDelegate  {
         
         if _animator.phaseY > 0.0 && _animator.phaseY < 1.0
         {
-            CGContextSaveGState(context)
-            CGContextTranslateCTM(context, orginX, orginY)
-            CGContextRotateCTM(context, phaseAngle)
-            CGContextMoveToPoint(context, 0, 0)
-            CGContextAddLineToPoint(context, 0, _radius)
-            CGContextSetLineWidth(context, 0.5)
+            context?.saveGState()
+            context?.translateBy(x: orginX, y: orginY)
+            context?.rotate(by: phaseAngle)
+            context?.move(to: CGPoint(x: 0, y: 0))
+            context?.addLine(to: CGPoint(x: 0, y: _radius))
+            context?.setLineWidth(0.5)
             //UIColor.redColor().setStroke()
             //CGContextSetStrokeColor(context, UIColor.redColor().CGColor)
-            CGContextStrokePath(context)
-            CGContextRestoreGState(context)
+            context?.strokePath()
+            context?.restoreGState()
         }
         
         if drawDescription {
-            CGContextSaveGState(context)
-            CGContextMoveToPoint(context, 0, 0)
+            context?.saveGState()
+            context?.move(to: CGPoint(x: 0, y: 0))
             self.totalVolume = 0
             self.drinkedCount = 0
             for idx in 0 ..< self.perInervalCount.count {
@@ -227,9 +227,9 @@ class OIClockView: UIView, OIViewAnimatorDelegate  {
                 let (hour, minute, volume) = data
                 let intervalIndex = hour / frequentlyTimeInterval
                 if intervalIndex < self.perInervalCount.count {
-                    self.perInervalCount[intervalIndex].1++
+                    self.perInervalCount[intervalIndex].1 += 1
                     self.totalVolume += volume
-                    self.drinkedCount++
+                    self.drinkedCount += 1
                     let tmpTime = hour * 100 + minute
                     if tmpTime < minDrinkTime {
                         self.descriptionTexts[2].1 = (hour < 10 ? "0" + String(hour) : String(hour)) + ":" + (minute < 10 ? "0" + String(minute) : String(minute))
@@ -251,7 +251,7 @@ class OIClockView: UIView, OIViewAnimatorDelegate  {
             var attrs = [String: AnyObject]()
             attrs[NSFontAttributeName] = descriptionFont
             //attrs[NSForegroundColorAttributeName] = UIColor.blackColor()
-            attrs[NSForegroundColorAttributeName] = UIColor.whiteColor()
+            attrs[NSForegroundColorAttributeName] = UIColor.white
             /*
             var descriptionText = "   "
             for texts in self.descriptionTexts {
@@ -268,25 +268,25 @@ class OIClockView: UIView, OIViewAnimatorDelegate  {
             NSString(string: descriptionText).drawAtPoint(textPoint, withAttributes: attrs)
             */
             let maxWidthKeyText = "最常时段 "
-            let maxKeyTextwidth = maxWidthKeyText.sizeWithAttributes(attrs).width
+            let maxKeyTextwidth = maxWidthKeyText.size(attributes: attrs).width
             let textHeight = descriptionFont.lineHeight
             let textMargin = (_descriptionAreaHeight - textHeight * 4.0) / 5.0
-            if descriptionLocation == .Center {
-                CGContextTranslateCTM(context, rect.width / 2.0 - maxKeyTextwidth, rect.height - _descriptionAreaHeight)
-            } else if descriptionLocation == .LeftBottom {
-                CGContextTranslateCTM(context, 0, rect.height - _descriptionAreaHeight)
+            if descriptionLocation == .center {
+                context?.translateBy(x: rect.width / 2.0 - maxKeyTextwidth, y: rect.height - _descriptionAreaHeight)
+            } else if descriptionLocation == .leftBottom {
+                context?.translateBy(x: 0, y: rect.height - _descriptionAreaHeight)
             }
             for index in 0 ..< descriptionTexts.count {
                 let key = descriptionTexts[index].0
                 let value = " " + descriptionTexts[index].1
                 let offsetY = CGFloat(index) * (textHeight + textMargin)
-                let keyTextWidth = key.sizeWithAttributes(attrs).width
+                let keyTextWidth = key.size(attributes: attrs).width
                 let keyTextPoint = CGPoint(x: maxKeyTextwidth - keyTextWidth, y: offsetY)
-                NSString(string: key).drawAtPoint(keyTextPoint, withAttributes: attrs)
+                NSString(string: key).draw(at: keyTextPoint, withAttributes: attrs)
                 
                 //let valueTextWidth = value.sizeWithAttributes(attrs).width
                 let valueTextPoint = CGPoint(x: maxKeyTextwidth, y: offsetY)
-                NSString(string: value).drawAtPoint(valueTextPoint, withAttributes: attrs)
+                NSString(string: value).draw(at: valueTextPoint, withAttributes: attrs)
             }
             
             /*
@@ -347,12 +347,12 @@ class OIClockView: UIView, OIViewAnimatorDelegate  {
     
     }
     */
-    private func angleInClock(hour: Int, _ minute: Int) -> CGFloat {
+    fileprivate func angleInClock(_ hour: Int, _ minute: Int) -> CGFloat {
         let hourAngle = CGFloat(M_PI / 12.0)
         let minuteAngle = hourAngle / 60.0
         return CGFloat(hour) * hourAngle + CGFloat(minute) * minuteAngle + CGFloat(M_PI)
     }
-    private func distanceToCentre(volume: Int) -> CGFloat {
+    fileprivate func distanceToCentre(_ volume: Int) -> CGFloat {
         let v = min(volume, _maxVolume)
         let phaseLength = _dataAreaRadius / CGFloat(_phases)
         switch v {
@@ -362,20 +362,20 @@ class OIClockView: UIView, OIViewAnimatorDelegate  {
             return CGFloat(v - 500) / CGFloat(500) * phaseLength + 6 * phaseLength
         }
     }
-    func setData(data: [(Int, Int, Int)]) {
+    func setData(_ data: [(Int, Int, Int)]) {
         _data = data
     }
-    func viewAnimatorUpdated(viewAnimator: OIViewAnimator) {
+    func viewAnimatorUpdated(_ viewAnimator: OIViewAnimator) {
         self.setNeedsDisplay()
     }
-    func viewAnimatorStopped(viewAnimator: OIViewAnimator) {
+    func viewAnimatorStopped(_ viewAnimator: OIViewAnimator) {
         //
     }
-    func animate(xAxisDuration xAxisDuration: NSTimeInterval, yAxisDuration: NSTimeInterval)
+    func animate(xAxisDuration: TimeInterval, yAxisDuration: TimeInterval)
     {
         _animator.animate(xAxisDuration: xAxisDuration, yAxisDuration: yAxisDuration)
     }
-    func animateReversal(duration: NSTimeInterval) {
+    func animateReversal(_ duration: TimeInterval) {
         _animator.isReversal = true
         _animator.animate(yAxisDuration: duration)
     }

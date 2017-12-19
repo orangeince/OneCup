@@ -13,41 +13,41 @@ import UIKit
 public protocol OIViewAnimatorDelegate
 {
     /// Called when the Animator has stepped.
-    func viewAnimatorUpdated(viewAnimator: OIViewAnimator)
+    func viewAnimatorUpdated(_ viewAnimator: OIViewAnimator)
     
     /// Called when the Animator has stopped.
-    func viewAnimatorStopped(viewAnimator: OIViewAnimator)
+    func viewAnimatorStopped(_ viewAnimator: OIViewAnimator)
 }
 
-public class OIViewAnimator: NSObject {
+open class OIViewAnimator: NSObject {
     
-    public weak var delegate: OIViewAnimatorDelegate?
-    public var updateBlock: (() -> Void)?
-    public var stopBlock: (() -> Void)?
-    
-    /// the phase that is animated and influences the drawn values on the y-axis
-    public var phaseX: CGFloat = 1.0
+    open weak var delegate: OIViewAnimatorDelegate?
+    open var updateBlock: (() -> Void)?
+    open var stopBlock: (() -> Void)?
     
     /// the phase that is animated and influences the drawn values on the y-axis
-    public var phaseY: CGFloat = 1.0
+    open var phaseX: CGFloat = 1.0
     
-    public var isReversal: Bool = false
+    /// the phase that is animated and influences the drawn values on the y-axis
+    open var phaseY: CGFloat = 1.0
     
-    private var _startTimeX: NSTimeInterval = 0.0
-    private var _startTimeY: NSTimeInterval = 0.0
-    private var _displayLink: CADisplayLink!
+    open var isReversal: Bool = false
     
-    private var _durationX: NSTimeInterval = 0.0
-    private var _durationY: NSTimeInterval = 0.0
+    fileprivate var _startTimeX: TimeInterval = 0.0
+    fileprivate var _startTimeY: TimeInterval = 0.0
+    fileprivate var _displayLink: CADisplayLink!
     
-    private var _endTimeX: NSTimeInterval = 0.0
-    private var _endTimeY: NSTimeInterval = 0.0
-    private var _endTime: NSTimeInterval = 0.0
+    fileprivate var _durationX: TimeInterval = 0.0
+    fileprivate var _durationY: TimeInterval = 0.0
     
-    private var _enabledX: Bool = false
-    private var _enabledY: Bool = false
+    fileprivate var _endTimeX: TimeInterval = 0.0
+    fileprivate var _endTimeY: TimeInterval = 0.0
+    fileprivate var _endTime: TimeInterval = 0.0
     
-    public var enabled:Bool {
+    fileprivate var _enabledX: Bool = false
+    fileprivate var _enabledY: Bool = false
+    
+    open var enabled:Bool {
         return _enabledX || _enabledY
     }
     
@@ -65,11 +65,11 @@ public class OIViewAnimator: NSObject {
         stop()
     }
     
-    public func stop()
+    open func stop()
     {
         if (_displayLink != nil)
         {
-            _displayLink.removeFromRunLoop(NSRunLoop.mainRunLoop(), forMode: NSRunLoopCommonModes)
+            _displayLink.remove(from: RunLoop.main, forMode: RunLoopMode.commonModes)
             _displayLink = nil
             
             _enabledX = false
@@ -101,13 +101,13 @@ public class OIViewAnimator: NSObject {
             }
         }
     }
-    private func updateAnimationPhases(currentTime: NSTimeInterval)
+    fileprivate func updateAnimationPhases(_ currentTime: TimeInterval)
     {
         if (_enabledX)
         {
-            let elapsedTime: NSTimeInterval = currentTime - _startTimeX
-            let duration: NSTimeInterval = _durationX
-            var elapsed: NSTimeInterval = elapsedTime
+            let elapsedTime: TimeInterval = currentTime - _startTimeX
+            let duration: TimeInterval = _durationX
+            var elapsed: TimeInterval = elapsedTime
             if (elapsed > duration)
             {
                 elapsed = duration
@@ -116,9 +116,9 @@ public class OIViewAnimator: NSObject {
         }
         if (_enabledY)
         {
-            let elapsedTime: NSTimeInterval = currentTime - _startTimeY
-            let duration: NSTimeInterval = _durationY
-            var elapsed: NSTimeInterval = elapsedTime
+            let elapsedTime: TimeInterval = currentTime - _startTimeY
+            let duration: TimeInterval = _durationY
+            var elapsed: TimeInterval = elapsedTime
             if (elapsed > duration)
             {
                 elapsed = duration
@@ -126,9 +126,9 @@ public class OIViewAnimator: NSObject {
             phaseY = CGFloat(elapsed / duration)
         }
     }
-    @objc private func animationLoop()
+    @objc fileprivate func animationLoop()
     {
-        let currentTime: NSTimeInterval = CACurrentMediaTime()
+        let currentTime: TimeInterval = CACurrentMediaTime()
         
         updateAnimationPhases(currentTime)
         
@@ -153,7 +153,7 @@ public class OIViewAnimator: NSObject {
     /// - parameter yAxisDuration: duration for animating the y axis
     /// - parameter easingX: an easing function for the animation on the x axis
     /// - parameter easingY: an easing function for the animation on the y axis
-    public func animate(xAxisDuration xAxisDuration: NSTimeInterval, yAxisDuration: NSTimeInterval)
+    open func animate(xAxisDuration: TimeInterval, yAxisDuration: TimeInterval)
     {
         stop()
         
@@ -172,8 +172,8 @@ public class OIViewAnimator: NSObject {
         
         if (_enabledX || _enabledY)
         {
-            _displayLink = CADisplayLink(target: self, selector: Selector("animationLoop"))
-            _displayLink.addToRunLoop(NSRunLoop.mainRunLoop(), forMode: NSRunLoopCommonModes)
+            _displayLink = CADisplayLink(target: self, selector: #selector(OIViewAnimator.animationLoop))
+            _displayLink.add(to: RunLoop.main, forMode: RunLoopMode.commonModes)
         }
     }
     
@@ -181,7 +181,7 @@ public class OIViewAnimator: NSObject {
     /// If `animate(...)` is called, no further calling of `invalidate()` is necessary to refresh the chart.
     /// - parameter xAxisDuration: duration for animating the x axis
     /// - parameter easing: an easing function for the animation
-    public func animate(xAxisDuration xAxisDuration: NSTimeInterval)
+    open func animate(xAxisDuration: TimeInterval)
     {
         _startTimeX = CACurrentMediaTime()
         _durationX = xAxisDuration
@@ -196,8 +196,8 @@ public class OIViewAnimator: NSObject {
         {
             if _displayLink === nil
             {
-                _displayLink = CADisplayLink(target: self, selector: Selector("animationLoop"))
-                _displayLink.addToRunLoop(NSRunLoop.mainRunLoop(), forMode: NSRunLoopCommonModes)
+                _displayLink = CADisplayLink(target: self, selector: #selector(OIViewAnimator.animationLoop))
+                _displayLink.add(to: RunLoop.main, forMode: RunLoopMode.commonModes)
             }
         }
     }
@@ -206,7 +206,7 @@ public class OIViewAnimator: NSObject {
     /// If `animate(...)` is called, no further calling of `invalidate()` is necessary to refresh the chart.
     /// - parameter yAxisDuration: duration for animating the y axis
     /// - parameter easing: an easing function for the animation
-    public func animate(yAxisDuration yAxisDuration: NSTimeInterval)
+    open func animate(yAxisDuration: TimeInterval)
     {
         _startTimeY = CACurrentMediaTime()
         _durationY = yAxisDuration
@@ -221,8 +221,8 @@ public class OIViewAnimator: NSObject {
         {
             if _displayLink === nil
             {
-                _displayLink = CADisplayLink(target: self, selector: Selector("animationLoop"))
-                _displayLink.addToRunLoop(NSRunLoop.mainRunLoop(), forMode: NSRunLoopCommonModes)
+                _displayLink = CADisplayLink(target: self, selector: #selector(OIViewAnimator.animationLoop))
+                _displayLink.add(to: RunLoop.main, forMode: RunLoopMode.commonModes)
             }
         }
     }

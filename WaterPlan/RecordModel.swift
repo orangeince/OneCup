@@ -11,7 +11,7 @@ import CoreData
 //import Foundation
 
 class RecordDetail: NSManagedObject {
-    @NSManaged var date: NSDate?
+    @NSManaged var date: Date?
     @NSManaged var volume: NSNumber?
     @NSManaged var time: NSString?
     @NSManaged var theHour: NSNumber?
@@ -19,7 +19,7 @@ class RecordDetail: NSManagedObject {
     @NSManaged var theDay: RecordDaily?
 }
 class RecordDaily: NSManagedObject {
-    @NSManaged var date: NSDate?
+    @NSManaged var date: Date?
     @NSManaged var totalVolume: NSNumber?
     @NSManaged var weekDay: NSNumber?
     @NSManaged var details: NSSet?

@@ -25,7 +25,7 @@ class DailyGoalTableViewController: UITableViewController {
             goalTextFiled.text = String(settings.dailyGoal)
         }
     }
-    override func viewDidAppear(animated: Bool) {
+    override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
         goalTextFiled.becomeFirstResponder()
     }
@@ -37,36 +37,36 @@ class DailyGoalTableViewController: UITableViewController {
 
     // MARK: - Table view data source
 
-    override func numberOfSectionsInTableView(tableView: UITableView) -> Int {
+    override func numberOfSections(in tableView: UITableView) -> Int {
         // #warning Incomplete implementation, return the number of sections
         return 1
     }
 
-    override func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+    override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         // #warning Incomplete implementation, return the number of rows
         return 1
     }
-    override func tableView(tableView: UITableView, willDisplayCell cell: UITableViewCell, forRowAtIndexPath indexPath: NSIndexPath) {
+    override func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
         cell.bounds = cell.bounds.insetBy(dx: 5.0, dy: 0.0)
         cell.layer.masksToBounds = true
         
         let cornerSize: CGFloat = 5.0
         
         let maskPath: UIBezierPath
-        if indexPath.row == 0 && indexPath.row == tableView.numberOfRowsInSection(indexPath.section) - 1 {
+        if indexPath.row == 0 && indexPath.row == tableView.numberOfRows(inSection: indexPath.section) - 1 {
             
-            maskPath = UIBezierPath(roundedRect: cell.bounds, byRoundingCorners: [.TopLeft, .TopRight, .BottomLeft, .BottomRight], cornerRadii: CGSizeMake(cornerSize, cornerSize))
+            maskPath = UIBezierPath(roundedRect: cell.bounds, byRoundingCorners: [.topLeft, .topRight, .bottomLeft, .bottomRight], cornerRadii: CGSize(width: cornerSize, height: cornerSize))
         } else if indexPath.row == 0 {
             
-            maskPath = UIBezierPath(roundedRect: cell.bounds, byRoundingCorners: [.TopLeft, .TopRight], cornerRadii: CGSizeMake(cornerSize, cornerSize))
-        } else  if indexPath.row == tableView.numberOfRowsInSection(indexPath.section) - 1 {
-            maskPath = UIBezierPath(roundedRect: cell.bounds, byRoundingCorners: [.BottomLeft, .BottomRight], cornerRadii: CGSizeMake(cornerSize, cornerSize))
+            maskPath = UIBezierPath(roundedRect: cell.bounds, byRoundingCorners: [.topLeft, .topRight], cornerRadii: CGSize(width: cornerSize, height: cornerSize))
+        } else  if indexPath.row == tableView.numberOfRows(inSection: indexPath.section) - 1 {
+            maskPath = UIBezierPath(roundedRect: cell.bounds, byRoundingCorners: [.bottomLeft, .bottomRight], cornerRadii: CGSize(width: cornerSize, height: cornerSize))
         } else {
             maskPath = UIBezierPath(rect: cell.bounds)
         }
         let shape = CAShapeLayer()
         shape.frame = cell.bounds
-        shape.path = maskPath.CGPath
+        shape.path = maskPath.cgPath
         cell.layer.mask = shape
     }
 
@@ -124,7 +124,7 @@ class DailyGoalTableViewController: UITableViewController {
         // Pass the selected object to the new view controller.
     }
     */
-    @IBAction func textChenged(sender: UITextField) {
+    @IBAction func textChenged(_ sender: UITextField) {
         if let text = sender.text {
             if let goal = Int(text) {
             if let settings = self.settingsDataSource {

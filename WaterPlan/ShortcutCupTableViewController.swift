@@ -44,7 +44,7 @@ class ShortcutCup {
 
 class ShortcutCupTableViewController: UITableViewController, UIPickerViewDataSource, UIPickerViewDelegate {
     var shortcutCups = [ShortcutCup]()
-    var lastOtherIndexPath: NSIndexPath?
+    var lastOtherIndexPath: IndexPath?
     var pickerView: UIPickerView!
     var needSave = false
     var settingsDataSource: SettingsTableViewController!
@@ -53,7 +53,7 @@ class ShortcutCupTableViewController: UITableViewController, UIPickerViewDataSou
         super.viewDidLoad()
         for item in settingsDataSource.shortcutCupArray {
             if let cup = item as? NSDictionary,
-                volume = cup.valueForKey("Volume") as? NSNumber {
+                let volume = cup.value(forKey: "Volume") as? NSNumber {
                 let shortcutCup = ShortcutCup(volume: Int(volume))
                 self.shortcutCups.append(shortcutCup)
             }
@@ -75,29 +75,29 @@ class ShortcutCupTableViewController: UITableViewController, UIPickerViewDataSou
 
     // MARK: - Table view data source
 
-    override func numberOfSectionsInTableView(tableView: UITableView) -> Int {
+    override func numberOfSections(in tableView: UITableView) -> Int {
         // #warning Incomplete implementation, return the number of sections
         return 1
     }
 
-    override func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+    override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         // #warning Incomplete implementation, return the number of rows
         return self.shortcutCups.count
     }
-    override func tableView(tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
+    override func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
         return 104.0
     }
-    override func tableView(tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
+    override func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
         let view = UIView()
-        view.backgroundColor = UIColor.whiteColor()
-        if let cell = self.tableView.cellForRowAtIndexPath(NSIndexPath(forRow: 0, inSection: 0)) {
+        view.backgroundColor = UIColor.white
+        if let cell = self.tableView.cellForRow(at: IndexPath(row: 0, section: 0)) {
             let width = cell.frame.width - 12.0
             let height = cell.frame.height
-            let bounds = CGRectMake(6.0, 30.0, width, height)
+            let bounds = CGRect(x: 6.0, y: 30.0, width: width, height: height)
             let maskPath = UIBezierPath(roundedRect: bounds, cornerRadius: 5.0)
             let mask = CAShapeLayer()
             mask.frame = view.bounds
-            mask.path = maskPath.CGPath
+            mask.path = maskPath.cgPath
             view.layer.mask = mask
             
             let leftLebal = UILabel()
@@ -107,13 +107,13 @@ class ShortcutCupTableViewController: UITableViewController, UIPickerViewDataSou
             let lebalHeight = leftLebal.font.lineHeight
             var attrs = [String: AnyObject]()
             attrs[NSFontAttributeName] = leftLebal.font
-            let lebalWidth = leftLebal.text!.sizeWithAttributes(attrs).width
+            let lebalWidth = leftLebal.text!.size(attributes: attrs).width
             let orginY = 30.0 + (height - lebalHeight) / 2.0
-            leftLebal.frame = CGRectMake(20.0, orginY, lebalWidth, lebalHeight)
+            leftLebal.frame = CGRect(x: 20.0, y: orginY, width: lebalWidth, height: lebalHeight)
             view.addSubview(leftLebal)
             
             let pickerView = UIPickerView()
-            pickerView.frame = CGRectMake(width - 54.0, 30.0, 40.0, height)
+            pickerView.frame = CGRect(x: width - 54.0, y: 30.0, width: 40.0, height: height)
             pickerView.dataSource = self
             pickerView.delegate = self
             pickerView.selectRow(self.settingsDataSource.shortcutCupCount, inComponent: 0, animated: false)
@@ -129,12 +129,12 @@ class ShortcutCupTableViewController: UITableViewController, UIPickerViewDataSou
     //override func tableView(tableView: UITableView, didEndDisplayingHeaderView view: UIView, forSection section: Int) {
         //self.pickerView.selectRow(self.pickedCount, inComponent: 0, animated: false)
     //}
-    override func tableView(tableView: UITableView, willDisplayHeaderView view: UIView, forSection section: Int) {
+    override func tableView(_ tableView: UITableView, willDisplayHeaderView view: UIView, forSection section: Int) {
         //self.pickerView.selectRow(self.pickedCount + 1, inComponent: 0, animated: false)
         //self.pickerView.sele
     }
     
-    override func tableView(tableView: UITableView, willDisplayCell cell: UITableViewCell, forRowAtIndexPath indexPath: NSIndexPath) {
+    override func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
         cell.layer.masksToBounds = true
         
         let cornerSize: CGFloat = 5.0
@@ -142,49 +142,49 @@ class ShortcutCupTableViewController: UITableViewController, UIPickerViewDataSou
         let margin = CGFloat(6.0)
         let originX = cell.bounds.origin.x + margin
         let width = cell.bounds.width - margin * 2.0
-        let cellBounds = CGRectMake(originX, cell.bounds.origin.y, width, CGRectGetHeight(cell.bounds))
+        let cellBounds = CGRect(x: originX, y: cell.bounds.origin.y, width: width, height: cell.bounds.height)
         let maskPath: UIBezierPath
-        if indexPath.row == 0 && indexPath.row == tableView.numberOfRowsInSection(indexPath.section) - 1 {
+        if indexPath.row == 0 && indexPath.row == tableView.numberOfRows(inSection: indexPath.section) - 1 {
             
-            maskPath = UIBezierPath(roundedRect: cellBounds, byRoundingCorners: [.TopLeft, .TopRight, .BottomLeft, .BottomRight], cornerRadii: CGSizeMake(cornerSize, cornerSize))
+            maskPath = UIBezierPath(roundedRect: cellBounds, byRoundingCorners: [.topLeft, .topRight, .bottomLeft, .bottomRight], cornerRadii: CGSize(width: cornerSize, height: cornerSize))
         } else if indexPath.row == 0 {
             
-            maskPath = UIBezierPath(roundedRect: cellBounds, byRoundingCorners: [.TopLeft, .TopRight], cornerRadii: CGSizeMake(cornerSize, cornerSize))
-        } else  if indexPath.row == tableView.numberOfRowsInSection(indexPath.section) - 1 {
-            maskPath = UIBezierPath(roundedRect: cellBounds, byRoundingCorners: [.BottomLeft, .BottomRight], cornerRadii: CGSizeMake(cornerSize, cornerSize))
+            maskPath = UIBezierPath(roundedRect: cellBounds, byRoundingCorners: [.topLeft, .topRight], cornerRadii: CGSize(width: cornerSize, height: cornerSize))
+        } else  if indexPath.row == tableView.numberOfRows(inSection: indexPath.section) - 1 {
+            maskPath = UIBezierPath(roundedRect: cellBounds, byRoundingCorners: [.bottomLeft, .bottomRight], cornerRadii: CGSize(width: cornerSize, height: cornerSize))
         } else {
             maskPath = UIBezierPath(rect: cellBounds)
         }
         let shape = CAShapeLayer()
         shape.frame = cell.bounds
-        shape.path = maskPath.CGPath
+        shape.path = maskPath.cgPath
         cell.layer.mask = shape
     }
-    override func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCellWithIdentifier("ShortcutCupCell", forIndexPath: indexPath) as! ShortcutCupCell
+    override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+        let cell = tableView.dequeueReusableCell(withIdentifier: "ShortcutCupCell", for: indexPath) as! ShortcutCupCell
         let cup = shortcutCups[indexPath.row]
         cell.volume = cup.volume
         cell.showsReorderControl = true
         return cell
     }
-    override func tableView(tableView: UITableView, canMoveRowAtIndexPath indexPath: NSIndexPath) -> Bool {
+    override func tableView(_ tableView: UITableView, canMoveRowAt indexPath: IndexPath) -> Bool {
         return true
     }
-    override func tableView(tableView: UITableView, canEditRowAtIndexPath indexPath: NSIndexPath) -> Bool {
+    override func tableView(_ tableView: UITableView, canEditRowAt indexPath: IndexPath) -> Bool {
         return true
     }
-    override func tableView(tableView: UITableView, moveRowAtIndexPath sourceIndexPath: NSIndexPath, toIndexPath destinationIndexPath: NSIndexPath) {
+    override func tableView(_ tableView: UITableView, moveRowAt sourceIndexPath: IndexPath, to destinationIndexPath: IndexPath) {
         
         let theCup = self.shortcutCups[sourceIndexPath.row]
-        self.shortcutCups.removeAtIndex(sourceIndexPath.row)
-        self.shortcutCups.insert(theCup, atIndex: destinationIndexPath.row)
+        self.shortcutCups.remove(at: sourceIndexPath.row)
+        self.shortcutCups.insert(theCup, at: destinationIndexPath.row)
         self.lastOtherIndexPath = nil
         
         let cupArray = NSMutableArray()
         
         for cup in self.shortcutCups {
             let values = [
-                NSNumber(integer: cup.volume),
+                NSNumber(value: cup.volume as Int),
                 NSString(string: cup.imageName)
             ]
             let keys = [
@@ -192,18 +192,18 @@ class ShortcutCupTableViewController: UITableViewController, UIPickerViewDataSou
                 NSString(string: "ImageName")
             ]
             let cupDict = NSDictionary(objects: values, forKeys: keys)
-            cupArray.addObject(cupDict)
+            cupArray.add(cupDict)
         }
         self.settingsDataSource.shortcutCupArray = cupArray
     }
-    func swipeCellMask(firstIndex: NSIndexPath, secondIndex: NSIndexPath) {
-        let firstCell = self.tableView.cellForRowAtIndexPath(firstIndex)!
-        let secondCell = self.tableView.cellForRowAtIndexPath(secondIndex)!
+    func swipeCellMask(_ firstIndex: IndexPath, secondIndex: IndexPath) {
+        let firstCell = self.tableView.cellForRow(at: firstIndex)!
+        let secondCell = self.tableView.cellForRow(at: secondIndex)!
         let firstMask = firstCell.layer.mask
         firstCell.layer.mask = secondCell.layer.mask
         secondCell.layer.mask = firstMask
     }
-    override func tableView(tableView: UITableView, targetIndexPathForMoveFromRowAtIndexPath sourceIndexPath: NSIndexPath, toProposedIndexPath proposedDestinationIndexPath: NSIndexPath) -> NSIndexPath {
+    override func tableView(_ tableView: UITableView, targetIndexPathForMoveFromRowAt sourceIndexPath: IndexPath, toProposedIndexPath proposedDestinationIndexPath: IndexPath) -> IndexPath {
         if sourceIndexPath.row != proposedDestinationIndexPath.row {
             swipeCellMask(sourceIndexPath, secondIndex: proposedDestinationIndexPath)
         } else {
@@ -212,27 +212,27 @@ class ShortcutCupTableViewController: UITableViewController, UIPickerViewDataSou
         self.lastOtherIndexPath = proposedDestinationIndexPath
         return proposedDestinationIndexPath
     }
-    override func tableView(tableView: UITableView, shouldIndentWhileEditingRowAtIndexPath indexPath: NSIndexPath) -> Bool {
+    override func tableView(_ tableView: UITableView, shouldIndentWhileEditingRowAt indexPath: IndexPath) -> Bool {
         return false
     }
-    override func tableView(tableView: UITableView, editingStyleForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCellEditingStyle {
-        return .None
+    override func tableView(_ tableView: UITableView, editingStyleForRowAt indexPath: IndexPath) -> UITableViewCellEditingStyle {
+        return .none
     }
 
     
-    func numberOfComponentsInPickerView(pickerView: UIPickerView) -> Int {
+    func numberOfComponents(in pickerView: UIPickerView) -> Int {
         return 1
     }
-    func pickerView(pickerView: UIPickerView, numberOfRowsInComponent component: Int) -> Int {
+    func pickerView(_ pickerView: UIPickerView, numberOfRowsInComponent component: Int) -> Int {
         return self.shortcutCups.count + 1
     }
-    func pickerView(pickerView: UIPickerView, titleForRow row: Int, forComponent component: Int) -> String? {
+    func pickerView(_ pickerView: UIPickerView, titleForRow row: Int, forComponent component: Int) -> String? {
         return String(row)
     }
-    func pickerView(pickerView: UIPickerView, widthForComponent component: Int) -> CGFloat {
+    func pickerView(_ pickerView: UIPickerView, widthForComponent component: Int) -> CGFloat {
         return 40.0
     }
-    func pickerView(pickerView: UIPickerView, didSelectRow row: Int, inComponent component: Int) {
+    func pickerView(_ pickerView: UIPickerView, didSelectRow row: Int, inComponent component: Int) {
         //self.pickedCount = row
         self.settingsDataSource.shortcutCupCount = row
     }

@@ -20,15 +20,14 @@ class DigitLabelStack: UIStackView {
     }
     var digitLabels = [UILabel]()
     
-    init(frame: CGRect, digit: Int, let label: UILabel) {
+    init(frame: CGRect, digit: Int, label: UILabel) {
         //给StackView的frame赋值，height应该是10个数字label的高度之和。因为想要得到的StackView是竖直排列从上到下的label是9876543210这个顺序，所以数字9的label则是在point(x:0.0,y:0.0)的位置处，为了让初始时刻StackView可视区域显示数值为digit的label，就需要使frame的y坐标上移（9-digit）＊ label.height
-        super.init(frame: CGRectMake(frame.origin.x, frame.origin.y - (CGFloat(10) * frame.height), frame.width, 10 * frame.height))
+        super.init(frame: CGRect(x: frame.origin.x, y: frame.origin.y - (CGFloat(10) * frame.height), width: frame.width, height: 10 * frame.height))
         //self.backgroundColor = UIColor.blackColor()
-        self.axis = .Vertical
-        self.alignment = .Center
-        self.distribution = .FillEqually
-        var index: Int
-        for index = 9; index >= 0; index-- {
+        self.axis = .vertical
+        self.alignment = .center
+        self.distribution = .fillEqually
+        for index in (0...9).reversed() {
             let newLabel = UILabel()
             newLabel.textColor = label.textColor
             newLabel.font = label.font
@@ -40,7 +39,7 @@ class DigitLabelStack: UIStackView {
         self.digit = digit
     }
 
-    required init?(coder aDecoder: NSCoder) {
+    required init(coder aDecoder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
 }
@@ -52,15 +51,15 @@ class DigitLabel: UILabel {
     }
     var digitStack: DigitLabelStack?
     
-    init(let label: UILabel) {
+    init(label: UILabel) {
         super.init(frame: label.bounds)
-        self.textColor = label.textColor.colorWithAlphaComponent(1.0)
+        self.textColor = label.textColor.withAlphaComponent(1.0)
         self.font = label.font
         self.text = "0"
         self.layer.masksToBounds = true
         self.digitStack = DigitLabelStack(frame: self.bounds, digit: -1, label: self)
         self.addSubview(self.digitStack!)
-        self.textColor = self.textColor.colorWithAlphaComponent(0.0)
+        self.textColor = self.textColor.withAlphaComponent(0.0)
     }
 
     required init?(coder aDecoder: NSCoder) {
@@ -84,15 +83,15 @@ class DigitalWheelLabel: UIStackView {
                 var tmpDigits = [Int]()
                 repeat {
                     tmpDigits.append(targetNum % 10)
-                    figures++
+                    figures += 1
                     targetNum /= 10
                 } while targetNum > 0
                 
                 if figures == self.figures { //显示位数没有变化
                     for index in 0 ..< tmpDigits.count {
-                        UIView.animateWithDuration(self.animationDuration,
+                        UIView.animate(withDuration: self.animationDuration,
                             delay: 0.2 * Double(index),
-                            options: .CurveEaseIn,
+                            options: .curveEaseIn,
                             animations: { [unowned self] () -> Void in
                                 self.digitLabels[index].digit = tmpDigits[index]
                             },
@@ -103,10 +102,10 @@ class DigitalWheelLabel: UIStackView {
                         if index + 1 > digitLabels.count {
                             let digitLabel = DigitLabel(label: self.arrangedSubviews[0] as! UILabel)
                             //self.addArrangedSubview(digitLabel)
-                            self.insertArrangedSubview(digitLabel, atIndex: 0)
+                            self.insertArrangedSubview(digitLabel, at: 0)
                             digitLabels.append(digitLabel)
                         } else if index >= self.figures {
-                            self.digitLabels[index].hidden = false
+                            self.digitLabels[index].isHidden = false
                         }
                     }
                         /*
@@ -119,7 +118,7 @@ class DigitalWheelLabel: UIStackView {
                             },
                             completion: nil)
                         */
-                        UIView.animateWithDuration(0.6,
+                        UIView.animate(withDuration: 0.6,
                             animations: {
                                 [unowned self]
                                 () -> Void in
@@ -129,9 +128,9 @@ class DigitalWheelLabel: UIStackView {
                                 [unowned self]
                                 (finish: Bool) -> Void in
                                 for index in 0 ..< tmpDigits.count {
-                                    UIView.animateWithDuration(self.animationDuration,
+                                    UIView.animate(withDuration: self.animationDuration,
                                     delay: 0.2 * Double(index),
-                                    options: .CurveEaseIn,
+                                    options: .curveEaseIn,
                                     animations: { [unowned self] () -> Void in
                                         self.digitLabels[index].digit = tmpDigits[index]
                                     },
@@ -140,12 +139,12 @@ class DigitalWheelLabel: UIStackView {
                             }
                         )
                 } else { //显示位数变小啦，也就是变小啦
-                    var index: Int
                     self.tmpIndex = self.figures - 1
-                    for index = self.figures-1; index >= 0; index-- {
-                        UIView.animateWithDuration(self.animationDuration,
+                    for index in (0...self.figures-1).reversed() {
+                    //for index = self.figures-1; index >= 0; index -= 1 {
+                        UIView.animate(withDuration: self.animationDuration,
                             delay: 0.2 * Double(self.figures - 1 - index),
-                            options: .CurveEaseIn,
+                            options: .curveEaseIn,
                             animations: { [unowned self] () -> Void in
                                 self.digitLabels[index].digit = index > figures-1 ? -1 :tmpDigits[index]
                                 if index > figures-1 {
@@ -154,9 +153,10 @@ class DigitalWheelLabel: UIStackView {
                             completion: {
                                 [unowned self]
                                 (finish: Bool) -> Void in
-                                UIView.animateWithDuration(self.animationDuration, animations: { () -> Void in
+                                UIView.animate(withDuration: self.animationDuration, animations: { () -> Void in
                                     if self.tmpIndex > figures-1 {
-                                        self.digitLabels[self.tmpIndex--].hidden = true
+                                        self.digitLabels[self.tmpIndex].isHidden = true
+                                        self.tmpIndex -= 1
                                         self.layoutIfNeeded()
                                     }
                                 })
@@ -169,22 +169,22 @@ class DigitalWheelLabel: UIStackView {
     }
     var figures = 1
     var tmpIndex = 0
-    var digits = [Int](count: 10, repeatedValue: 0)
+    var digits = [Int](repeating: 0, count: 10)
     var digitLabelStacks = [DigitLabelStack]()
     var digitLabels = [DigitLabel]()
     var animationDuration = 0.8
     
-    init(let label: UILabel, number: Int) {
+    init(label: UILabel, number: Int) {
         super.init(frame: label.bounds)
         self.number = number
         let digitLabel = DigitLabel(label: label)
         digitLabel.digit = number
         //self.insertSubview(digitLabel, atIndex: 0)
-        self.insertArrangedSubview(digitLabel, atIndex: 0)
+        self.insertArrangedSubview(digitLabel, at: 0)
         digitLabels.append(digitLabel)
     }
     
-    required init?(coder aDecoder: NSCoder) {
+    required init(coder aDecoder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
 }
@@ -204,22 +204,22 @@ class CupView: UIView {
         self.layer.masksToBounds = true
         
         //waterView = UIView()
-        waterView.frame = CGRectMake(0, bounds.height, bounds.width, 0)
-        waterView.backgroundColor = UIColor.blueColor()
+        waterView.frame = CGRect(x: 0, y: bounds.height, width: bounds.width, height: 0)
+        waterView.backgroundColor = UIColor.blue
         
         //leftMaskView = UIView()
         leftMaskView.layer.anchorPoint = CGPoint(x: 1, y: 0)
-        leftMaskView.frame = CGRectMake(-bounds.width, 0, bounds.width, bounds.height * 2)
+        leftMaskView.frame = CGRect(x: -bounds.width, y: 0, width: bounds.width, height: bounds.height * 2)
         leftMaskView.backgroundColor = self.superview?.backgroundColor
         //leftMaskView.backgroundColor = UIColor.blueColor()
-        leftMaskView.transform = CGAffineTransformRotate(leftMaskView.transform, CGFloat(-M_PI / 18))
+        leftMaskView.transform = leftMaskView.transform.rotated(by: CGFloat(-Double.pi / 18))
         
         //rightMaskView = UIView()
         rightMaskView.layer.anchorPoint = CGPoint(x: 0, y: 0)
-        rightMaskView.frame = CGRectMake(bounds.width, 0, bounds.width, bounds.height * 2)
+        rightMaskView.frame = CGRect(x: bounds.width, y: 0, width: bounds.width, height: bounds.height * 2)
         rightMaskView.backgroundColor = self.superview?.backgroundColor
-        rightMaskView.backgroundColor = UIColor.blueColor()
-        rightMaskView.transform = CGAffineTransformRotate(rightMaskView.transform, CGFloat(M_PI / 18))
+        rightMaskView.backgroundColor = UIColor.blue
+        rightMaskView.transform = rightMaskView.transform.rotated(by: CGFloat(Double.pi / 18))
         
         self.addSubview(leftMaskView)
         self.addSubview(rightMaskView)

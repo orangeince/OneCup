@@ -24,10 +24,10 @@ class ViewController: UIViewController{
         let frame = numberLabel.frame
         self.stack = DigitLabelStack(frame: frame, digit: Int(numberLabel.text!)!, label: numberLabel)
         numberLabel.addSubview(stack)
-        numberLabel.textColor = numberLabel.textColor.colorWithAlphaComponent(0.0)
+        numberLabel.textColor = numberLabel.textColor.withAlphaComponent(0.0)
         
         for view in bottomStack.arrangedSubviews {
-            view.hidden = true
+            view.isHidden = true
         }
         digitalWheelLabel = DigitalWheelLabel(label: numberLabel, number: 0)
         digitalWheelLabel!.number = 12345
@@ -39,7 +39,7 @@ class ViewController: UIViewController{
         // Dispose of any resources that can be recreated.
     }
     
-    @IBAction func changeBtnTap(sender: UIButton) {
+    @IBAction func changeBtnTap(_ sender: UIButton) {
         //numberView.frame = visulLabel.frame
         //numberView
         //let frame = numberLabel.frame
@@ -131,9 +131,9 @@ class ViewController: UIViewController{
         //self.view.layoutIfNeeded()
 */
         
-        UIView.animateWithDuration(1.0) { () -> Void in
-            self.stack.digit = random()%10
-        }
+        UIView.animate(withDuration: 1.0, animations: { () -> Void in
+            self.stack.digit = Int(arc4random())%10
+        }) 
         /*
         UIView.animateWithDuration(1.0, animations: { () -> Void in
             digitWheelView.wheelToFigure(9)
@@ -148,9 +148,9 @@ class ViewController: UIViewController{
         */
     }
     func doAnimation() {
-        self.view.backgroundColor = UIColor.redColor()
+        self.view.backgroundColor = UIColor.red
     }
-    @IBAction func doBtnTap(sender: UIButton) {
+    @IBAction func doBtnTap(_ sender: UIButton) {
         //for view in bottomStack.arrangedSubviews {
          //   view.hidden = true
        // }
@@ -199,10 +199,11 @@ class ViewController: UIViewController{
                 x = 1
             }
             var y = 1
-            while x-- > 0 {
+            while x > 0 {
+                x -= 1
                 y *= 10
             }
-            y = random() % y
+            y = Int(arc4random()) % y
             digitalWheelLabel!.number = y
             print("y=\(y)")
         }

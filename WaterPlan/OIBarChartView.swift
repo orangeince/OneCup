@@ -12,31 +12,31 @@ class OIBarChartView: UIView, OIViewAnimatorDelegate {
 
     // Only override drawRect: if you perform custom drawing.
     // An empty implementation adversely affects performance during animation.
-    private var _data = [(Int, Int)]()
-    private var _lazyData = [(Int, Int)]()
+    fileprivate var _data = [(Int, Int)]()
+    fileprivate var _lazyData = [(Int, Int)]()
     
-    private var _animator: OIViewAnimator!
-    private var _barLabels = ["周一", "周二", "周三", "周四", "周五", "周六", "周日"]
-    private var _margin = CGFloat(10)
-    private var _descriptionHeight = CGFloat(16)
-    private var _descriptionMargin = CGFloat(5)
-    private var _phases:Int = 7
-    private var _drawSeparator = true
-    private var _maxVolume = 8000
-    private var _limitVolume = 2000
-    private var _barLabelHeight = CGFloat(15)
-    private var _barLabelMargin = CGFloat(5)
+    fileprivate var _animator: OIViewAnimator!
+    fileprivate var _barLabels = ["周一", "周二", "周三", "周四", "周五", "周六", "周日"]
+    fileprivate var _margin = CGFloat(10)
+    fileprivate var _descriptionHeight = CGFloat(16)
+    fileprivate var _descriptionMargin = CGFloat(5)
+    fileprivate var _phases:Int = 7
+    fileprivate var _drawSeparator = true
+    fileprivate var _maxVolume = 8000
+    fileprivate var _limitVolume = 2000
+    fileprivate var _barLabelHeight = CGFloat(15)
+    fileprivate var _barLabelMargin = CGFloat(5)
     
-    private var _dataReducedPercent = CGFloat(0.0)
+    fileprivate var _dataReducedPercent = CGFloat(0.0)
     
     var fillColor: UIColor?
-    var strokeColor = UIColor.blackColor()
+    var strokeColor = UIColor.black
     
-    var barColor = UIColor.blueColor()
-    var barLabelColor = UIColor.blackColor()
-    var barLabelFont = UIFont.systemFontOfSize(10.0)
+    var barColor = UIColor.blue
+    var barLabelColor = UIColor.black
+    var barLabelFont = UIFont.systemFont(ofSize: 10.0)
     var barDescription = "每日喝水量"
-    var barDataValueFont = UIFont.systemFontOfSize(8.0)
+    var barDataValueFont = UIFont.systemFont(ofSize: 8.0)
     var drawLimitLine = true
     var limitVolume: Int {
         get {
@@ -63,14 +63,14 @@ class OIBarChartView: UIView, OIViewAnimatorDelegate {
         self.layer.masksToBounds = true
     }
     
-    func dataReduceWithRatio(ratio: CGFloat) {
+    func dataReduceWithRatio(_ ratio: CGFloat) {
         _dataReducedPercent = ratio
         self.setNeedsDisplay()
     }
     
-    override func drawRect(rect: CGRect) {
+    override func draw(_ rect: CGRect) {
         // Drawing code
-        super.drawRect(rect)
+        super.draw(rect)
         
         let barCount = _barLabels.count
         if barCount == 0 {
@@ -86,8 +86,8 @@ class OIBarChartView: UIView, OIViewAnimatorDelegate {
         
         let labelTextHeight = barLabelFont.lineHeight
         
-        let barAreaHeight: CGFloat = CGRectGetHeight(rect) -  _descriptionHeight - _margin - _margin
-        let barAreaWidth = CGRectGetWidth(rect) - _margin - _margin
+        let barAreaHeight: CGFloat = rect.height -  _descriptionHeight - _margin - _margin
+        let barAreaWidth = rect.width - _margin - _margin
         
         let barWidth = barAreaWidth / CGFloat(barCount)
         let barHegiht = barAreaHeight - _barLabelHeight - _barLabelMargin - _barLabelMargin - labelTextHeight
@@ -96,26 +96,26 @@ class OIBarChartView: UIView, OIViewAnimatorDelegate {
         let barLineY = _margin + barHegiht + labelTextHeight
         
         //draw barBottomLine
-        CGContextSaveGState(context)
-        CGContextTranslateCTM(context, barLineX, barLineY)
-        CGContextMoveToPoint(context, 0, 0)
-        CGContextAddLineToPoint(context, barAreaWidth, 0)
-        CGContextSetLineWidth(context, 0.1)
-        CGContextStrokePath(context)
-        CGContextMoveToPoint(context, 0, 0)
+        context?.saveGState()
+        context?.translateBy(x: barLineX, y: barLineY)
+        context?.move(to: CGPoint(x: 0, y: 0))
+        context?.addLine(to: CGPoint(x: barAreaWidth, y: 0))
+        context?.setLineWidth(0.1)
+        context?.strokePath()
+        context?.move(to: CGPoint(x: 0, y: 0))
         
         for idx in 0 ..< barCount {
             var attrs = [String: AnyObject]()
             attrs[NSFontAttributeName] = barLabelFont
             attrs[NSForegroundColorAttributeName] = barLabelColor
             let text = _barLabels[idx]
-            let textWidth = text.sizeWithAttributes(attrs).width
+            let textWidth = text.size(attributes: attrs).width
             //let textRect = CGRectMake(CGFloat(idx) * barWidth + _margin, _barLabelMargin, barWidth, barWidth)
             let textPoint = CGPoint(x: (CGFloat(idx) + CGFloat(0.5)) * barWidth - textWidth / 2.0, y: _barLabelMargin)
             //NSString(string: text).drawInRect(textRect, withAttributes: attrs)
-            NSString(string: text).drawAtPoint(textPoint, withAttributes: attrs)
+            NSString(string: text).draw(at: textPoint, withAttributes: attrs)
         }
-        CGContextRestoreGState(context)
+        context?.restoreGState()
         
         var avg = 0
         if _data.count > 0 {
@@ -124,7 +124,7 @@ class OIBarChartView: UIView, OIViewAnimatorDelegate {
             for data in _data {
                 sum += data.0
                 if data.0 > 0 {
-                    count++
+                    count += 1
                 }
             }
             if count > 0 {
@@ -132,30 +132,30 @@ class OIBarChartView: UIView, OIViewAnimatorDelegate {
             }
         }
         let avgText = "日平均: "
-        CGContextSaveGState(context)
+        context?.saveGState()
         //draw description
-        CGContextTranslateCTM(context, 0, barAreaHeight + _margin)
-        CGContextMoveToPoint(context, 0, 0)
+        context?.translateBy(x: 0, y: barAreaHeight + _margin)
+        context?.move(to: CGPoint(x: 0, y: 0))
         if _drawSeparator {
-            CGContextAddLineToPoint(context, rect.width, 0)
-            CGContextSetLineWidth(context, 0.5)
-            CGContextStrokePath(context)
-            CGContextMoveToPoint(context, 0, 0)
+            context?.addLine(to: CGPoint(x: rect.width, y: 0))
+            context?.setLineWidth(0.5)
+            context?.strokePath()
+            context?.move(to: CGPoint(x: 0, y: 0))
         }
         let legendHeight = _descriptionHeight - _descriptionMargin
-        let legendRect = CGRectMake(_margin, _descriptionMargin + 1.0 , legendHeight, legendHeight)
-        CGContextFillRect(context, legendRect)
+        let legendRect = CGRect(x: _margin, y: _descriptionMargin + 1.0 , width: legendHeight, height: legendHeight)
+        context?.fill(legendRect)
         let descriptionPoint = CGPoint(x: _margin + legendHeight + _descriptionMargin, y: _descriptionMargin)
         var attrs = [String: AnyObject]()
         attrs[NSFontAttributeName] = barLabelFont
         attrs[NSForegroundColorAttributeName] = barLabelColor
-        let avgWidth = avgText.sizeWithAttributes(attrs).width
+        let avgWidth = avgText.size(attributes: attrs).width
         let maxVolumeText = "10000 ml"
-        let maxVolumeTextWidth = maxVolumeText.sizeWithAttributes(attrs).width
+        let maxVolumeTextWidth = maxVolumeText.size(attributes: attrs).width
         let avgPoint = CGPoint(x: barAreaWidth - avgWidth - maxVolumeTextWidth + _margin , y: _descriptionMargin)
-        NSString(string: barDescription).drawAtPoint(descriptionPoint, withAttributes: attrs)
-        NSString(string: avgText + String(avg) + " ml").drawAtPoint(avgPoint, withAttributes: attrs)
-        CGContextRestoreGState(context)
+        NSString(string: barDescription).draw(at: descriptionPoint, withAttributes: attrs)
+        NSString(string: avgText + String(avg) + " ml").draw(at: avgPoint, withAttributes: attrs)
+        context?.restoreGState()
         
         //draw bar data
         if _data.count == 0 {
@@ -185,18 +185,19 @@ class OIBarChartView: UIView, OIViewAnimatorDelegate {
             }
         }
         
-        CGContextSaveGState(context)
-        CGContextTranslateCTM(context, barLineX, barLineY)
+        context?.saveGState()
+        context?.translateBy(x: barLineX, y: barLineY)
         //draw the limitLine
         if drawLimitLine {
             let height = getHeihtForBar(_limitVolume, barHeight: barHegiht)
-            CGContextMoveToPoint(context, 0, -height)
+            context?.move(to: CGPoint(x: 0, y: -height))
             let dashLineLenghts = [CGFloat(6),CGFloat(12)]
-            CGContextSetLineDash(context, 0.0, dashLineLenghts, 1)
-            CGContextSetLineWidth(context, 0.3)
-            UIColor.lightGrayColor().setStroke()
-            CGContextAddLineToPoint(context, barAreaWidth, -height)
-            CGContextStrokePath(context)
+            context?.setLineDash(phase: 0.0, lengths: dashLineLenghts)
+            //CGContextSetLineDash(context, 0.0, dashLineLenghts, 1)
+            context?.setLineWidth(0.3)
+            UIColor.lightGray.setStroke()
+            context?.addLine(to: CGPoint(x: barAreaWidth, y: -height))
+            context?.strokePath()
         }
         
         //draw dataBar
@@ -204,36 +205,36 @@ class OIBarChartView: UIView, OIViewAnimatorDelegate {
             let (volume, _) = _data[index]
             let height = getHeihtForBar(volume, barHeight: barHegiht) * drawRatio
             let width = barWidth - _margin - _margin
-            let barRect = CGRectMake(CGFloat(index) * barWidth + _margin, -height, width, height)
+            let barRect = CGRect(x: CGFloat(index) * barWidth + _margin, y: -height, width: width, height: height)
             fillColor!.setFill()
-            CGContextFillRect(context, barRect)
+            context?.fill(barRect)
             
             attrs[NSFontAttributeName] = barDataValueFont
             attrs[NSForegroundColorAttributeName] = barLabelColor
             let v = String(volume)
             let fontHeight = barDataValueFont.lineHeight
-            let fontWidth = v.sizeWithAttributes(attrs).width
+            let fontWidth = v.size(attributes: attrs).width
             //let dataValueRect = CGRectMake(CGFloat(index) * barWidth + _margin, , width, fontHeight)
             let textPoint = CGPoint(x: (CGFloat(index) + CGFloat(0.5)) * barWidth - fontWidth / 2.0, y: -height - fontHeight - fontHeight / 3.0)
             //NSString(string: v).drawInRect(dataValueRect, withAttributes: attrs)
-            NSString(string: v).drawAtPoint(textPoint, withAttributes: attrs)
+            NSString(string: v).draw(at: textPoint, withAttributes: attrs)
         }
         
-        CGContextRestoreGState(context)
+        context?.restoreGState()
     }
     
-    func setData(data: [(Int, Int)]) {
+    func setData(_ data: [(Int, Int)]) {
         _data = data
         self.setNeedsDisplay()
     }
-    func setDateWithAnimation(data: [(Int, Int)], animationDurtion: NSTimeInterval) {
+    func setDateWithAnimation(_ data: [(Int, Int)], animationDurtion: TimeInterval) {
         _data = data
         animate(animationDurtion)
     }
-    func setBarLabels(barLabels: [String]) {
+    func setBarLabels(_ barLabels: [String]) {
         _barLabels = barLabels
     }
-    func getHeihtForBar(volume: Int, barHeight: CGFloat) -> CGFloat {
+    func getHeihtForBar(_ volume: Int, barHeight: CGFloat) -> CGFloat {
         let phaseHeight = barHeight / CGFloat(_phases)
         if volume > _limitVolume {
             let v = min(volume, _maxVolume)
@@ -243,47 +244,47 @@ class OIBarChartView: UIView, OIViewAnimatorDelegate {
         }
     }
     
-    func viewAnimatorUpdated(viewAnimator: OIViewAnimator) {
+    func viewAnimatorUpdated(_ viewAnimator: OIViewAnimator) {
         self.setNeedsDisplay()
     }
-    func viewAnimatorStopped(viewAnimator: OIViewAnimator) {
+    func viewAnimatorStopped(_ viewAnimator: OIViewAnimator) {
         //
         self._dataReducedPercent = 0.0
     }
-    func animate(xAxisDuration xAxisDuration: NSTimeInterval, yAxisDuration: NSTimeInterval)
+    func animate(xAxisDuration: TimeInterval, yAxisDuration: TimeInterval)
     {
         _animator.isReversal = false
         _animator.animate(xAxisDuration: xAxisDuration, yAxisDuration: yAxisDuration)
     }
-    func animateReversal(duration: NSTimeInterval) {
+    func animateReversal(_ duration: TimeInterval) {
         _animator.isReversal = true
         _animator.animate(yAxisDuration: duration)
     }
-    func animate(duration: NSTimeInterval) {
+    func animate(_ duration: TimeInterval) {
         _animator.isReversal = false
         _animator.animate(yAxisDuration: duration)
     }
-    func animate(duration: NSTimeInterval, delay: NSTimeInterval) {
-        NSTimer.scheduledTimerWithTimeInterval(delay, target: self, selector: "timerFireAnimate:", userInfo: duration, repeats: false)
+    func animate(_ duration: TimeInterval, delay: TimeInterval) {
+        Timer.scheduledTimer(timeInterval: delay, target: self, selector: #selector(OIBarChartView.timerFireAnimate(_:)), userInfo: duration, repeats: false)
     }
-    func animateReversal(duration: NSTimeInterval, delay: NSTimeInterval) {
-        NSTimer.scheduledTimerWithTimeInterval(delay, target: self, selector: "timerFireAnimateReversal:", userInfo: duration, repeats: false)
+    func animateReversal(_ duration: TimeInterval, delay: TimeInterval) {
+        Timer.scheduledTimer(timeInterval: delay, target: self, selector: #selector(OIBarChartView.timerFireAnimateReversal(_:)), userInfo: duration, repeats: false)
     }
-    func setDataWithAnimation(data: [(Int, Int)], animationDurtion: NSTimeInterval, delay: NSTimeInterval) {
+    func setDataWithAnimation(_ data: [(Int, Int)], animationDurtion: TimeInterval, delay: TimeInterval) {
         _lazyData = data
-        NSTimer.scheduledTimerWithTimeInterval(delay, target: self, selector: "timerFireSetDataWithAnimation:", userInfo: delay, repeats: false)
+        Timer.scheduledTimer(timeInterval: delay, target: self, selector: #selector(OIBarChartView.timerFireSetDataWithAnimation(_:)), userInfo: delay, repeats: false)
     }
-    func timerFireAnimate(timer: NSTimer) {
-        let duration = timer.userInfo! as! NSTimeInterval
+    func timerFireAnimate(_ timer: Timer) {
+        let duration = timer.userInfo! as! TimeInterval
         animate(duration)
     }
-    func timerFireAnimateReversal(timer: NSTimer) {
-        let duration = timer.userInfo! as! NSTimeInterval
+    func timerFireAnimateReversal(_ timer: Timer) {
+        let duration = timer.userInfo! as! TimeInterval
         animateReversal(duration)
     }
-    func timerFireSetDataWithAnimation(timer: NSTimer) {
+    func timerFireSetDataWithAnimation(_ timer: Timer) {
         let data = _lazyData
-        let duration = timer.userInfo! as! NSTimeInterval
+        let duration = timer.userInfo! as! TimeInterval
         self.setDateWithAnimation(data, animationDurtion: duration)
     }
 }
