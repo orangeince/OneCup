@@ -272,6 +272,9 @@ class DrinkingViewController: UIViewController, UITableViewDataSource, UITableVi
                 self.transitioningDelegateForSettings = TransitioningDelegateForSettings()
             }
             toVC.transitioningDelegate = self.transitioningDelegateForSettings
+            if let settingVC = toVC.viewControllers.first as? SettingsTableViewController {
+                settingVC.manageRecordsDelegate = self
+            }
         }
         
         if let toVC = segue.destination as? StatisticViewController {
@@ -293,9 +296,9 @@ class DrinkingViewController: UIViewController, UITableViewDataSource, UITableVi
         loadRecords()
     }
     
-    func refreshRecords() {
+    func refreshRecords(force: Bool = false) {
         let calendar = Calendar.current
-        if calendar.isDateInToday(curDay) {
+        guard force || !calendar.isDateInToday(curDay) else {
             return
         }
         curDay = Date()
@@ -425,10 +428,11 @@ class DrinkingViewController: UIViewController, UITableViewDataSource, UITableVi
             fetchRequest = NSFetchRequest(entityName: "RecordDetail")
             deleteRequest = NSBatchDeleteRequest(fetchRequest: fetchRequest)
             try persistentStoreCoordinator.execute(deleteRequest, with: context!)
+            try context?.save()
+            refreshRecords(force: true)
             return true
         } catch {
             return false
-            //fatalError("delete records error: \(error)")
         }
     }
 }

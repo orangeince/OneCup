@@ -166,27 +166,7 @@ class StatisticViewController: UIViewController, UIPageViewControllerDataSource,
         return Int(arc4random())
     }
     func initializeDatas(_ animatied: Bool) {
-        let barDatas = [
-                            (random() % 3000, 1),
-                            (random() % 3000, 1),
-                            (random() % 3000, 1),
-                            (random() % 1000, 1),
-                            (random() % 3000, 1),
-                            (random() % 3000, 1),
-                            (random() % 3000, 1)
-                        ]
-        volumeChart.setData(barDatas)
-        let datas = [
-                        (9, 0, 200),
-                        (12, 40, 300),
-                        (2, 0, 50),
-                        (18, 20, 500),
-                        (1, 0, 250),
-                        (14, 40, 380),
-                        (22, 0, 420),
-                        (17, 20, 530)
-                    ]
-        clockView.setData(datas)
+        guard !dataStore.isEmpty else { return }
         if animatied {
             let datas = self.dataStore[0]
             
@@ -201,8 +181,6 @@ class StatisticViewController: UIViewController, UIPageViewControllerDataSource,
             volumeChart.animateReversal(0.5)
             clockView.animateReversal(0.5)
         }
-        //volumeChart.setData([])
-        //clockView.setData([])
     }
     
     

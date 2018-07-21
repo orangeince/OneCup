@@ -158,9 +158,28 @@ class OIBarChartView: UIView, OIViewAnimatorDelegate {
         context?.restoreGState()
         
         //draw bar data
-        if _data.count == 0 {
+
+        context?.saveGState()
+        context?.translateBy(x: barLineX, y: barLineY)
+        //draw the limitLine
+        if drawLimitLine {
+            let height = getHeihtForBar(_limitVolume, barHeight: barHegiht)
+            context?.move(to: CGPoint(x: 0, y: -height))
+            let dashLineLenghts = [CGFloat(6),CGFloat(12)]
+            context?.setLineDash(phase: 0.0, lengths: dashLineLenghts)
+            //CGContextSetLineDash(context, 0.0, dashLineLenghts, 1)
+            context?.setLineWidth(0.3)
+            UIColor.lightGray.setStroke()
+            context?.addLine(to: CGPoint(x: barAreaWidth, y: -height))
+            context?.strokePath()
+        }
+        
+        guard !_data.isEmpty else {
+            context?.restoreGState()
             return
         }
+
+        //draw dataBar
         //按比例画view，分两段，第一段为压缩后的bar长度，第二段为剩下需要animator画的部分。比如滑动view的时候bar被缩小了30%，当滑动结束后剩下的70%可能需要animator来画。
         let drawRatio: CGFloat
         if !_animator.isReversal {
@@ -184,23 +203,6 @@ class OIBarChartView: UIView, OIViewAnimatorDelegate {
                 }
             }
         }
-        
-        context?.saveGState()
-        context?.translateBy(x: barLineX, y: barLineY)
-        //draw the limitLine
-        if drawLimitLine {
-            let height = getHeihtForBar(_limitVolume, barHeight: barHegiht)
-            context?.move(to: CGPoint(x: 0, y: -height))
-            let dashLineLenghts = [CGFloat(6),CGFloat(12)]
-            context?.setLineDash(phase: 0.0, lengths: dashLineLenghts)
-            //CGContextSetLineDash(context, 0.0, dashLineLenghts, 1)
-            context?.setLineWidth(0.3)
-            UIColor.lightGray.setStroke()
-            context?.addLine(to: CGPoint(x: barAreaWidth, y: -height))
-            context?.strokePath()
-        }
-        
-        //draw dataBar
         for index in 0 ..< _data.count {
             let (volume, _) = _data[index]
             let height = getHeihtForBar(volume, barHeight: barHegiht) * drawRatio

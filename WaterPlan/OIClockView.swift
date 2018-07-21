@@ -115,7 +115,8 @@ class OIClockView: UIView, OIViewAnimatorDelegate  {
         _radius = CGFloat(1 - margin) * radius
         _centreRadius = _radius / 5.0
         
-        var font = UIFont(name: "HelveticaNeue", size: 12.0)
+        let font = UIFont(name: "HelveticaNeue", size: 12.0) ?? UIFont.systemFont(ofSize: 12)
+        let textHeight = font.lineHeight
         
         let aniamteRatio = _animator.isReversal ? 1 - _animator.phaseY : _animator.phaseY
         
@@ -135,7 +136,6 @@ class OIClockView: UIView, OIViewAnimatorDelegate  {
             let lengthFactor = i % 6 == 0 ? 0.01 : 0.01
             let length = _radius *  CGFloat(lengthFactor)
             if _drawScaleLine {
-            //CGContextSetLineWidth(context, 1)
                 context?.addLine(to: CGPoint(x: 0, y: _radius - length))
                 context?.strokePath()
             }
@@ -144,13 +144,9 @@ class OIClockView: UIView, OIViewAnimatorDelegate  {
             } else {
                 context?.move(to: CGPoint(x: 0, y: _centreRadius))
             }
-            context?.addLine(to: CGPoint(x: 0, y: _radius - 3 * length))
+            context?.addLine(to: CGPoint(x: 0, y: _radius - 3 * length - textHeight))
             context?.setLineWidth(0.05)
             context?.strokePath()
-            if (font == nil) {
-                font = UIFont.systemFont(ofSize: UIFont.systemFontSize)
-            }
-            let textHeight = font!.lineHeight
             _dataAreaRadius = _radius - length - textHeight - _centreRadius
             
             if i % 2 == 0 {
@@ -207,8 +203,8 @@ class OIClockView: UIView, OIViewAnimatorDelegate  {
             context?.translateBy(x: orginX, y: orginY)
             context?.rotate(by: phaseAngle)
             context?.move(to: CGPoint(x: 0, y: 0))
-            context?.addLine(to: CGPoint(x: 0, y: _radius))
-            context?.setLineWidth(0.5)
+            context?.addLine(to: CGPoint(x: 0, y: _radius - textHeight))
+            context?.setLineWidth(0.3)
             //UIColor.redColor().setStroke()
             //CGContextSetStrokeColor(context, UIColor.redColor().CGColor)
             context?.strokePath()
