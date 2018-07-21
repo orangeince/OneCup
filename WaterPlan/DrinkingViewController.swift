@@ -211,6 +211,7 @@ class DrinkingViewController: UIViewController, UITableViewDataSource, UITableVi
         self.drinkingCup.alpha = 0.0
         dismiss(animated: true, completion:{() -> Void in self.drinkingCup.alpha = 1.0 } )
         
+        guard drinkedVolume > 0 else { return }
         if drinkedVolume == 10 {
             resetAllTestData()
             refreshRecords()

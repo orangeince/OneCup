@@ -33,13 +33,16 @@ class WaterVolumeViewController: UIViewController, UIPickerViewDelegate, UIPicke
         blurView.frame = self.view.bounds
         
         for index in 0...3 {
-            let btn = VolumeBtn(frame: CGRect(x: 0, y: 0, width: 50, height: 50), volume: (index + 1) * 200)
-            //btn.setBackgroundImage(UIImage(named: "cat"), forState: .Normal)
+            // 初始直径，容量越大直径越大
+            var diameter = 40
+            diameter += index * 6
+            let btn = VolumeBtn(frame: CGRect(x: 0, y: 0, width: diameter, height: diameter), volume: (index + 1) * 200)
+            //btn.setBackgroundImage(UIImage(named: "cat"), for: .normal)
             btn.backgroundColor = UIColor.white
             volumeBtns.append(btn)
             blurView.contentView.addSubview(btn)
-            btn.setTitle(String(btn.volume), for: UIControl.State())
-            btn.setTitleColor(UIColor.black, for: UIControl.State())
+            btn.setTitle(String(btn.volume), for: .normal)
+            btn.setTitleColor(UIColor.black, for: .normal)
             btn.addTarget(self, action: #selector(WaterVolumeViewController.tapVolumeBtn(_:)), for: .touchUpInside)
         }
         
