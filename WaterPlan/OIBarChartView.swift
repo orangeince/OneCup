@@ -106,14 +106,14 @@ class OIBarChartView: UIView, OIViewAnimatorDelegate {
         
         for idx in 0 ..< barCount {
             var attrs = [String: AnyObject]()
-            attrs[NSFontAttributeName] = barLabelFont
-            attrs[NSForegroundColorAttributeName] = barLabelColor
+            attrs[convertFromNSAttributedStringKey(NSAttributedString.Key.font)] = barLabelFont
+            attrs[convertFromNSAttributedStringKey(NSAttributedString.Key.foregroundColor)] = barLabelColor
             let text = _barLabels[idx]
-            let textWidth = text.size(attributes: attrs).width
+            let textWidth = text.size(withAttributes: convertToOptionalNSAttributedStringKeyDictionary(attrs)).width
             //let textRect = CGRectMake(CGFloat(idx) * barWidth + _margin, _barLabelMargin, barWidth, barWidth)
             let textPoint = CGPoint(x: (CGFloat(idx) + CGFloat(0.5)) * barWidth - textWidth / 2.0, y: _barLabelMargin)
             //NSString(string: text).drawInRect(textRect, withAttributes: attrs)
-            NSString(string: text).draw(at: textPoint, withAttributes: attrs)
+            NSString(string: text).draw(at: textPoint, withAttributes: convertToOptionalNSAttributedStringKeyDictionary(attrs))
         }
         context?.restoreGState()
         
@@ -147,14 +147,14 @@ class OIBarChartView: UIView, OIViewAnimatorDelegate {
         context?.fill(legendRect)
         let descriptionPoint = CGPoint(x: _margin + legendHeight + _descriptionMargin, y: _descriptionMargin)
         var attrs = [String: AnyObject]()
-        attrs[NSFontAttributeName] = barLabelFont
-        attrs[NSForegroundColorAttributeName] = barLabelColor
-        let avgWidth = avgText.size(attributes: attrs).width
+        attrs[convertFromNSAttributedStringKey(NSAttributedString.Key.font)] = barLabelFont
+        attrs[convertFromNSAttributedStringKey(NSAttributedString.Key.foregroundColor)] = barLabelColor
+        let avgWidth = avgText.size(withAttributes: convertToOptionalNSAttributedStringKeyDictionary(attrs)).width
         let maxVolumeText = "10000 ml"
-        let maxVolumeTextWidth = maxVolumeText.size(attributes: attrs).width
+        let maxVolumeTextWidth = maxVolumeText.size(withAttributes: convertToOptionalNSAttributedStringKeyDictionary(attrs)).width
         let avgPoint = CGPoint(x: barAreaWidth - avgWidth - maxVolumeTextWidth + _margin , y: _descriptionMargin)
-        NSString(string: barDescription).draw(at: descriptionPoint, withAttributes: attrs)
-        NSString(string: avgText + String(avg) + " ml").draw(at: avgPoint, withAttributes: attrs)
+        NSString(string: barDescription).draw(at: descriptionPoint, withAttributes: convertToOptionalNSAttributedStringKeyDictionary(attrs))
+        NSString(string: avgText + String(avg) + " ml").draw(at: avgPoint, withAttributes: convertToOptionalNSAttributedStringKeyDictionary(attrs))
         context?.restoreGState()
         
         //draw bar data
@@ -209,15 +209,15 @@ class OIBarChartView: UIView, OIViewAnimatorDelegate {
             fillColor!.setFill()
             context?.fill(barRect)
             
-            attrs[NSFontAttributeName] = barDataValueFont
-            attrs[NSForegroundColorAttributeName] = barLabelColor
+            attrs[convertFromNSAttributedStringKey(NSAttributedString.Key.font)] = barDataValueFont
+            attrs[convertFromNSAttributedStringKey(NSAttributedString.Key.foregroundColor)] = barLabelColor
             let v = String(volume)
             let fontHeight = barDataValueFont.lineHeight
-            let fontWidth = v.size(attributes: attrs).width
+            let fontWidth = v.size(withAttributes: convertToOptionalNSAttributedStringKeyDictionary(attrs)).width
             //let dataValueRect = CGRectMake(CGFloat(index) * barWidth + _margin, , width, fontHeight)
             let textPoint = CGPoint(x: (CGFloat(index) + CGFloat(0.5)) * barWidth - fontWidth / 2.0, y: -height - fontHeight - fontHeight / 3.0)
             //NSString(string: v).drawInRect(dataValueRect, withAttributes: attrs)
-            NSString(string: v).draw(at: textPoint, withAttributes: attrs)
+            NSString(string: v).draw(at: textPoint, withAttributes: convertToOptionalNSAttributedStringKeyDictionary(attrs))
         }
         
         context?.restoreGState()
@@ -274,17 +274,28 @@ class OIBarChartView: UIView, OIViewAnimatorDelegate {
         _lazyData = data
         Timer.scheduledTimer(timeInterval: delay, target: self, selector: #selector(OIBarChartView.timerFireSetDataWithAnimation(_:)), userInfo: delay, repeats: false)
     }
-    func timerFireAnimate(_ timer: Timer) {
+    @objc func timerFireAnimate(_ timer: Timer) {
         let duration = timer.userInfo! as! TimeInterval
         animate(duration)
     }
-    func timerFireAnimateReversal(_ timer: Timer) {
+    @objc func timerFireAnimateReversal(_ timer: Timer) {
         let duration = timer.userInfo! as! TimeInterval
         animateReversal(duration)
     }
-    func timerFireSetDataWithAnimation(_ timer: Timer) {
+    @objc func timerFireSetDataWithAnimation(_ timer: Timer) {
         let data = _lazyData
         let duration = timer.userInfo! as! TimeInterval
         self.setDateWithAnimation(data, animationDurtion: duration)
     }
+}
+
+// Helper function inserted by Swift 4.2 migrator.
+fileprivate func convertFromNSAttributedStringKey(_ input: NSAttributedString.Key) -> String {
+	return input.rawValue
+}
+
+// Helper function inserted by Swift 4.2 migrator.
+fileprivate func convertToOptionalNSAttributedStringKeyDictionary(_ input: [String: Any]?) -> [NSAttributedString.Key: Any]? {
+	guard let input = input else { return nil }
+	return Dictionary(uniqueKeysWithValues: input.map { key, value in (NSAttributedString.Key(rawValue: key), value)})
 }

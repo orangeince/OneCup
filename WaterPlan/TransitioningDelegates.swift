@@ -92,7 +92,7 @@ class AnimationTransitioningForDrinkingAndWaterVolume: NSObject, UIViewControlle
                     cupWaterView.frame = CGRect(x: 0, y: (bounds?.height)!, width: (bounds?.width)!, height: 0)
                     picker.frame = CGRect(x: 0, y: 0, width: (bounds?.width)!, height: (bounds?.height)! / 2.0)
                     submitBtn.frame = CGRect(x: (bounds?.width)! / 2.0 - 20.0, y: (bounds?.height)! / 2.0, width: 40.0, height: 40.0)
-                    submitBtn.setTitle("喝", for: UIControlState())
+                    submitBtn.setTitle("喝", for: UIControl.State())
                     submitBtn.layer.cornerRadius = 20.0
                     //picker.alpha = 0.0
                     //submitBtn.alpha = 0.0
@@ -341,11 +341,11 @@ class AnimationTransitioningForDrinkingAndSettings: NSObject, UIViewControllerAn
         containerView.layer.sublayerTransform = transform
         
         if presenting {
-            toView.layer.transform = CATransform3DMakeRotation(CGFloat(M_PI_2), 0, 1, 0)
-            transform = CATransform3DRotate(CATransform3DIdentity, -CGFloat(M_PI_2), 0, 1, 0)
+            toView.layer.transform = CATransform3DMakeRotation(CGFloat(Double.pi / 2), 0, 1, 0)
+            transform = CATransform3DRotate(CATransform3DIdentity, -CGFloat(Double.pi / 2), 0, 1, 0)
         } else {
-            toView.layer.transform = CATransform3DMakeRotation(CGFloat(-M_PI / 2.0), 0, 1, 0)
-            transform = CATransform3DRotate(CATransform3DIdentity, CGFloat(M_PI_2), 0, 1, 0)
+            toView.layer.transform = CATransform3DMakeRotation(CGFloat(-Double.pi / 2.0), 0, 1, 0)
+            transform = CATransform3DRotate(CATransform3DIdentity, CGFloat(Double.pi / 2), 0, 1, 0)
         }
         
         let duration = self.transitionDuration(using: transitionContext)
@@ -586,7 +586,7 @@ class PresentationControllerForReminderNew: UIPresentationController {
             self.dimmingView!.removeFromSuperview()
         }
     }
-    func dimmingViewTap(_ gesture: UITapGestureRecognizer) {
+    @objc func dimmingViewTap(_ gesture: UITapGestureRecognizer) {
         if let presented = self.presentedViewController as? ReminderNewViewController {
             presented.alertTitleField.resignFirstResponder()
         }

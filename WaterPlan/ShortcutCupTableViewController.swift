@@ -54,7 +54,7 @@ class ShortcutCupTableViewController: UITableViewController, UIPickerViewDataSou
         for item in settingsDataSource.shortcutCupArray {
             if let cup = item as? NSDictionary,
                 let volume = cup.value(forKey: "Volume") as? NSNumber {
-                let shortcutCup = ShortcutCup(volume: Int(volume))
+                let shortcutCup = ShortcutCup(volume: Int(truncating: volume))
                 self.shortcutCups.append(shortcutCup)
             }
         }
@@ -106,8 +106,8 @@ class ShortcutCupTableViewController: UITableViewController, UIPickerViewDataSou
             leftLebal.frame.origin.y = 30.0
             let lebalHeight = leftLebal.font.lineHeight
             var attrs = [String: AnyObject]()
-            attrs[NSFontAttributeName] = leftLebal.font
-            let lebalWidth = leftLebal.text!.size(attributes: attrs).width
+            attrs[convertFromNSAttributedStringKey(NSAttributedString.Key.font)] = leftLebal.font
+            let lebalWidth = leftLebal.text!.size(withAttributes: convertToOptionalNSAttributedStringKeyDictionary(attrs)).width
             let orginY = 30.0 + (height - lebalHeight) / 2.0
             leftLebal.frame = CGRect(x: 20.0, y: orginY, width: lebalWidth, height: lebalHeight)
             view.addSubview(leftLebal)
@@ -215,7 +215,7 @@ class ShortcutCupTableViewController: UITableViewController, UIPickerViewDataSou
     override func tableView(_ tableView: UITableView, shouldIndentWhileEditingRowAt indexPath: IndexPath) -> Bool {
         return false
     }
-    override func tableView(_ tableView: UITableView, editingStyleForRowAt indexPath: IndexPath) -> UITableViewCellEditingStyle {
+    override func tableView(_ tableView: UITableView, editingStyleForRowAt indexPath: IndexPath) -> UITableViewCell.EditingStyle {
         return .none
     }
 
@@ -281,4 +281,15 @@ class ShortcutCupTableViewController: UITableViewController, UIPickerViewDataSou
     }
     */
 
+}
+
+// Helper function inserted by Swift 4.2 migrator.
+fileprivate func convertFromNSAttributedStringKey(_ input: NSAttributedString.Key) -> String {
+	return input.rawValue
+}
+
+// Helper function inserted by Swift 4.2 migrator.
+fileprivate func convertToOptionalNSAttributedStringKeyDictionary(_ input: [String: Any]?) -> [NSAttributedString.Key: Any]? {
+	guard let input = input else { return nil }
+	return Dictionary(uniqueKeysWithValues: input.map { key, value in (NSAttributedString.Key(rawValue: key), value)})
 }

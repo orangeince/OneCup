@@ -60,14 +60,14 @@ class StatisticViewController: UIViewController, UIPageViewControllerDataSource,
         self.pageViewController!.delegate = self
         self.pageViewController!.dataSource = self
         
-        self.addChildViewController(self.pageViewController!)
+        self.addChild(self.pageViewController!)
         self.view.addSubview(self.pageViewController!.view)
         
         let marginTop = self.separateView.frame.origin.y + self.separateView.frame.height//
         let marginBottom = CGFloat(self.dismissBtn.frame.height + 10.0)
         self.pageViewController!.view.frame = CGRect(x: 0, y: marginTop, width: self.view.bounds.width, height: self.view.bounds.height - marginTop - marginBottom)
         //self.pageViewController!.view.frame = CGRectOffset(CGRectInset(pageViewRect, 0, (marginTop + marginBottom) / 2.0), 0, marginBottom / 2.0)
-        self.pageViewController!.didMove(toParentViewController: self)
+        self.pageViewController!.didMove(toParent: self)
         
         self.view.gestureRecognizers = self.pageViewController!.gestureRecognizers
         self.volumeChart = startViewController.dailyVolumeView
@@ -148,14 +148,14 @@ class StatisticViewController: UIViewController, UIPageViewControllerDataSource,
         do {
             let recordDailys = try self.managedObjectContext.fetch(dailyRequest) as! [RecordDaily]
             for daily in recordDailys {
-                let day = Int(daily.weekDay!)
-                let volume = Int(daily.totalVolume!)
+                let day = Int(truncating: daily.weekDay!)
+                let volume = Int(truncating: daily.totalVolume!)
                 let details = daily.details!.allObjects as! [RecordDetail]
                 for index in 0 ..< details.count {
                     let detail = details[index]
-                    let detailVolume = Int(detail.volume!)
-                    let theHour = Int(detail.theHour!)
-                    let theMinute = Int(detail.theMinute!)
+                    let detailVolume = Int(truncating: detail.volume!)
+                    let theHour = Int(truncating: detail.theHour!)
+                    let theMinute = Int(truncating: detail.theMinute!)
                     detailDatas.append((theHour, theMinute, detailVolume))
                 }
                 dailyDatas[day - 1] = (volume, day)
@@ -319,7 +319,7 @@ class StatisticViewController: UIViewController, UIPageViewControllerDataSource,
     func turnTheChartTo(_ to: TurnDirection) {
         if let curChart = self.pageViewController!.viewControllers![0] as? ChartViewController {
             var index = curChart.dataIndex
-            let direction: UIPageViewControllerNavigationDirection
+            let direction: UIPageViewController.NavigationDirection
             switch to {
             case .previous:
                 index += 1

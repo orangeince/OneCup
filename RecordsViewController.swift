@@ -32,7 +32,7 @@ class RecordsViewController: UIViewController, UIPageViewControllerDelegate {
         self.pageViewController!.setViewControllers(viewControllers, direction: .forward, animated: false, completion: nil)
         self.pageViewController!.dataSource = self.modelController
         
-        self.addChildViewController(self.pageViewController!)
+        self.addChild(self.pageViewController!)
         self.view.addSubview(self.pageViewController!.view)
         
         let pageViewRect = self.view.bounds
@@ -40,7 +40,7 @@ class RecordsViewController: UIViewController, UIPageViewControllerDelegate {
         self.pageViewController!.view.frame = pageViewRect.insetBy(dx: 0, dy: 30.0).offsetBy(dx: 0.0, dy: 30.0)
         //self.pageViewController!.view.frame = pageViewRect
         
-        self.pageViewController!.didMove(toParentViewController: self)
+        self.pageViewController!.didMove(toParent: self)
         
         self.view.gestureRecognizers = self.pageViewController!.gestureRecognizers
         

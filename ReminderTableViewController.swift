@@ -72,10 +72,10 @@ class ReminderTableViewController: UITableViewController {
                     //let theReminder = (time, alertTitle, repeatDate, Int(repeatDateMask), Int(theHour), Int(theMinute), enable)
                     let theReminder = Reminder(
                         alertTitle: alertTitle,
-                        theHour: Int(theHour),
-                        theMinute: Int(theMinute),
+                        theHour: Int(truncating: theHour),
+                        theMinute: Int(truncating: theMinute),
                         fireDate: fireDate,
-                        repeatMask: Int(repeatMask),
+                        repeatMask: Int(truncating: repeatMask),
                         identifier: identifier,
                         enable: enable
                     )
@@ -382,7 +382,7 @@ class ReminderTableViewController: UITableViewController {
         }
         return false
     }
-    override func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCellEditingStyle, forRowAt indexPath: IndexPath) {
+    override func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle, forRowAt indexPath: IndexPath) {
         if editingStyle == .delete {
             let reminder = self.reminders[indexPath.row]
             if reminder.enable {
@@ -392,7 +392,7 @@ class ReminderTableViewController: UITableViewController {
             self.tableView.deleteRows(at: [indexPath], with: .none)
         }
     }
-    override func tableView(_ tableView: UITableView, editingStyleForRowAt indexPath: IndexPath) -> UITableViewCellEditingStyle {
+    override func tableView(_ tableView: UITableView, editingStyleForRowAt indexPath: IndexPath) -> UITableViewCell.EditingStyle {
         return .delete
     }
     
@@ -439,7 +439,7 @@ class ReminderTableViewController: UITableViewController {
         //saveReminderSetting()
         //segue.
     }
-    func reminderEnableSwitchChange(_ sender: UISwitch) {
+    @objc func reminderEnableSwitchChange(_ sender: UISwitch) {
         let curNoificationSettings = UIApplication.shared.currentUserNotificationSettings!
         if curNoificationSettings.types == UIUserNotificationType() {
             let alert = UIAlertController(title: "提醒", message: "如果需要使用定时提醒功能，请先允许此应用发送通知。在设置中找到本应用并更改允许发送通知的设置", preferredStyle: .alert)
@@ -529,7 +529,7 @@ class ReminderTableViewController: UITableViewController {
         saveReminderSetting()
         modifyReminderSchedule(reminder)
     }
-    func cellEnableSwitchChange(_ sender: UISwitch) {
+    @objc func cellEnableSwitchChange(_ sender: UISwitch) {
         if let view = sender.superview?.superview?.superview {
             if let cell = view as? ReminderTableViewCell {
                 if sender.isOn {
@@ -630,7 +630,7 @@ class ReminderTableViewController: UITableViewController {
             notification.alertAction = "好的"
             notification.soundName = UILocalNotificationDefaultSoundName
             let dict = NSDictionary(object: identifier, forKey: "identifier" as NSCopying)
-            notification.userInfo = dict as! [AnyHashable: Any]
+            notification.userInfo = dict as? [AnyHashable: Any]
             notification.applicationIconBadgeNumber = 1
             if repeatMask == 127 {
                 notification.repeatInterval = .day
@@ -656,7 +656,7 @@ class ReminderTableViewController: UITableViewController {
                 notification.alertAction = "好的"
                 notification.soundName = UILocalNotificationDefaultSoundName
                 let dict = NSDictionary(object: identifier, forKey: "identifier" as NSCopying)
-                notification.userInfo = dict as! [AnyHashable: Any]
+                notification.userInfo = dict as? [AnyHashable: Any]
                 notification.applicationIconBadgeNumber = 1
                 notification.repeatInterval = .weekday
                 notifications.append(notification)

@@ -38,8 +38,8 @@ class WaterVolumeViewController: UIViewController, UIPickerViewDelegate, UIPicke
             btn.backgroundColor = UIColor.white
             volumeBtns.append(btn)
             blurView.contentView.addSubview(btn)
-            btn.setTitle(String(btn.volume), for: UIControlState())
-            btn.setTitleColor(UIColor.black, for: UIControlState())
+            btn.setTitle(String(btn.volume), for: UIControl.State())
+            btn.setTitleColor(UIColor.black, for: UIControl.State())
             btn.addTarget(self, action: #selector(WaterVolumeViewController.tapVolumeBtn(_:)), for: .touchUpInside)
         }
         
@@ -51,8 +51,8 @@ class WaterVolumeViewController: UIViewController, UIPickerViewDelegate, UIPicke
         submitBtn.layer.cornerRadius = 8
         submitBtn.layer.masksToBounds = true
         submitBtn.layer.borderWidth = 1.0
-        submitBtn.setTitle("确定", for: UIControlState())
-        submitBtn.setTitleColor(UIColor.black, for: UIControlState())
+        submitBtn.setTitle("确定", for: UIControl.State())
+        submitBtn.setTitleColor(UIColor.black, for: UIControl.State())
         submitBtn.setTitleColor(UIColor.lightGray, for: .highlighted)
         submitBtn.addTarget(self, action: #selector(WaterVolumeViewController.tapSubmitBtn(_:)), for: .touchUpInside)
         //submitBtn.setImage(UIImage(named: "cat"), forState: .Normal)
@@ -86,12 +86,12 @@ class WaterVolumeViewController: UIViewController, UIPickerViewDelegate, UIPicke
     }
     */
     
-    func dismissGestureRecognizer(_ gesture: UITapGestureRecognizer) {
+    @objc func dismissGestureRecognizer(_ gesture: UITapGestureRecognizer) {
         if let presented = self.presentingViewController {
             presented.dismiss(animated: true, completion: nil)
         }
     }
-    func tapVolumeBtn(_ sender: VolumeBtn) {
+    @objc func tapVolumeBtn(_ sender: VolumeBtn) {
         if let presented = self.presentingViewController as? DrinkingViewController {
             let volume = sender.volume
             presented.dismissWaterVolumeViewController(volume)
@@ -161,7 +161,7 @@ class WaterVolumeViewController: UIViewController, UIPickerViewDelegate, UIPicke
         pickedVolume = volume
         pickVolume(true)
     }
-    func tapSubmitBtn(_ button: UIButton) {
+    @objc func tapSubmitBtn(_ button: UIButton) {
         if let presented = self.presentingViewController as? DrinkingViewController {
             presented.pickedVolume = pickedVolume
             presented.dismissWaterVolumeViewController(pickedVolume)

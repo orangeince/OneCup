@@ -317,7 +317,7 @@ class SettingsTableViewController: UITableViewController {
             break
         }
     }
-    override func unwind(for unwindSegue: UIStoryboardSegue, towardsViewController subsequentVC: UIViewController) {
+    override func unwind(for unwindSegue: UIStoryboardSegue, towards subsequentVC: UIViewController) {
         //
     }
     @IBAction func unwindToSettings(_ unwindSegue: UIStoryboardSegue ) {

@@ -65,12 +65,12 @@ class ReminderNewViewController: UIViewController, UIPickerViewDelegate, UIPicke
         self.cancelBtn.layer.cornerRadius = 8.0
         self.cancelBtn.layer.masksToBounds = true
         self.cancelBtn.layer.borderWidth = 1.0
-        self.cancelBtn.layer.borderColor = self.cancelBtn.titleColor(for: UIControlState())?.cgColor
+        self.cancelBtn.layer.borderColor = self.cancelBtn.titleColor(for: UIControl.State())?.cgColor
         
         self.saveBtn.layer.cornerRadius = 8.0
         self.saveBtn.layer.masksToBounds = true
         self.saveBtn.layer.borderWidth = 1.0
-        self.saveBtn.layer.borderColor = self.saveBtn.titleColor(for: UIControlState())?.cgColor
+        self.saveBtn.layer.borderColor = self.saveBtn.titleColor(for: UIControl.State())?.cgColor
         
         
         self.cancelBtn.addTarget(self, action: #selector(ReminderNewViewController.btnSwapBackgroudColorWithTitleColor(_:)), for: .touchDown)
@@ -82,8 +82,8 @@ class ReminderNewViewController: UIViewController, UIPickerViewDelegate, UIPicke
         for index in 0 ... btnsCount-1 {
             if let btn = self.weekBtnStack.arrangedSubviews[index] as? UIButton {
                 let weekBtn = WeekButton()
-                weekBtn.setTitle(btn.title(for: UIControlState()), for: UIControlState())
-                weekBtn.setTitleColor(btn.titleColor(for: UIControlState()), for: UIControlState())
+                weekBtn.setTitle(btn.title(for: UIControl.State()), for: UIControl.State())
+                weekBtn.setTitleColor(btn.titleColor(for: UIControl.State()), for: UIControl.State())
                 weekBtn.backgroundColor = btn.tintColor
                 weekBtn.bounds = btn.bounds
                 weekBtn.day = index + 1
@@ -109,12 +109,12 @@ class ReminderNewViewController: UIViewController, UIPickerViewDelegate, UIPicke
     }
     
     func registerForKeyboardNotification() {
-        NotificationCenter.default.addObserver(self, selector: #selector(ReminderNewViewController.keyboardWillShow(_:)), name: NSNotification.Name.UIKeyboardWillShow, object: nil)
-        NotificationCenter.default.addObserver(self, selector: #selector(ReminderNewViewController.keyboardWillHide(_:)), name: NSNotification.Name.UIKeyboardWillHide, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(ReminderNewViewController.keyboardWillShow(_:)), name: UIResponder.keyboardWillShowNotification, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(ReminderNewViewController.keyboardWillHide(_:)), name: UIResponder.keyboardWillHideNotification, object: nil)
     }
-    func keyboardWillShow(_ notification: Notification) {
+    @objc func keyboardWillShow(_ notification: Notification) {
         let userInfo = notification.userInfo!
-        let kbRect = (userInfo[UIKeyboardFrameEndUserInfoKey]! as AnyObject).cgRectValue
+        let kbRect = (userInfo[UIResponder.keyboardFrameEndUserInfoKey]! as AnyObject).cgRectValue
         let windowHeight = self.view.window!.bounds.height
         if (kbRect?.origin.y)! >= windowHeight {
             return
@@ -124,9 +124,9 @@ class ReminderNewViewController: UIViewController, UIPickerViewDelegate, UIPicke
             self.view.frame.origin.y = y
         }) 
     }
-    func keyboardWillHide(_ notification: Notification) {
+    @objc func keyboardWillHide(_ notification: Notification) {
         let userInfo = notification.userInfo!
-        let kbRect = (userInfo[UIKeyboardFrameBeginUserInfoKey]! as AnyObject).cgRectValue
+        let kbRect = (userInfo[UIResponder.keyboardFrameBeginUserInfoKey]! as AnyObject).cgRectValue
         if (kbRect?.origin.y)! >= self.view.window!.bounds.height {
             return
         }
@@ -157,7 +157,7 @@ class ReminderNewViewController: UIViewController, UIPickerViewDelegate, UIPicke
         }
         let string = number < 10 ? ("0" + String(number)) : String(number)
         let color = UIColor.black//self.pickerView.tintColor
-        return NSAttributedString(string: string, attributes: [NSForegroundColorAttributeName: color])
+        return NSAttributedString(string: string, attributes: convertToOptionalNSAttributedStringKeyDictionary([convertFromNSAttributedStringKey(NSAttributedString.Key.foregroundColor): color]))
     }
     func pickerView(_ pickerView: UIPickerView, didSelectRow row: Int, inComponent component: Int) {
         if component == 0 {
@@ -183,9 +183,9 @@ class ReminderNewViewController: UIViewController, UIPickerViewDelegate, UIPicke
         // Pass the selected object to the new view controller.
     }
     */
-    func btnSwapBackgroudColorWithTitleColor(_ sender: UIButton) {
-        let color = sender.titleColor(for: UIControlState())
-        sender.setTitleColor(sender.backgroundColor, for: UIControlState())
+    @objc func btnSwapBackgroudColorWithTitleColor(_ sender: UIButton) {
+        let color = sender.titleColor(for: UIControl.State())
+        sender.setTitleColor(sender.backgroundColor, for: UIControl.State())
         sender.backgroundColor = color
         if let btn = sender as? WeekButton {
             btn.checked = !btn.checked
@@ -258,4 +258,15 @@ class ReminderNewViewController: UIViewController, UIPickerViewDelegate, UIPicke
         return String(describing: curComp.year) + String(describing: curComp.month) + String(describing: curComp.day) + String(describing: curComp.hour) + String(describing: curComp.minute) + String(describing: curComp.second) + String(Int(arc4random()) % 100)
     }
 
+}
+
+// Helper function inserted by Swift 4.2 migrator.
+fileprivate func convertToOptionalNSAttributedStringKeyDictionary(_ input: [String: Any]?) -> [NSAttributedString.Key: Any]? {
+	guard let input = input else { return nil }
+	return Dictionary(uniqueKeysWithValues: input.map { key, value in (NSAttributedString.Key(rawValue: key), value)})
+}
+
+// Helper function inserted by Swift 4.2 migrator.
+fileprivate func convertFromNSAttributedStringKey(_ input: NSAttributedString.Key) -> String {
+	return input.rawValue
 }

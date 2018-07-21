@@ -9,8 +9,8 @@
 //import Foundation
 import UIKit
 
-@objc
-public protocol OIViewAnimatorDelegate
+//@objc
+public protocol OIViewAnimatorDelegate: AnyObject
 {
     /// Called when the Animator has stepped.
     func viewAnimatorUpdated(_ viewAnimator: OIViewAnimator)
@@ -69,7 +69,7 @@ open class OIViewAnimator: NSObject {
     {
         if (_displayLink != nil)
         {
-            _displayLink.remove(from: RunLoop.main, forMode: RunLoopMode.commonModes)
+            _displayLink.remove(from: RunLoop.main, forMode: RunLoop.Mode.common)
             _displayLink = nil
             
             _enabledX = false
@@ -173,7 +173,7 @@ open class OIViewAnimator: NSObject {
         if (_enabledX || _enabledY)
         {
             _displayLink = CADisplayLink(target: self, selector: #selector(OIViewAnimator.animationLoop))
-            _displayLink.add(to: RunLoop.main, forMode: RunLoopMode.commonModes)
+            _displayLink.add(to: RunLoop.main, forMode: RunLoop.Mode.common)
         }
     }
     
@@ -197,7 +197,7 @@ open class OIViewAnimator: NSObject {
             if _displayLink === nil
             {
                 _displayLink = CADisplayLink(target: self, selector: #selector(OIViewAnimator.animationLoop))
-                _displayLink.add(to: RunLoop.main, forMode: RunLoopMode.commonModes)
+                _displayLink.add(to: RunLoop.main, forMode: RunLoop.Mode.common)
             }
         }
     }
@@ -222,7 +222,7 @@ open class OIViewAnimator: NSObject {
             if _displayLink === nil
             {
                 _displayLink = CADisplayLink(target: self, selector: #selector(OIViewAnimator.animationLoop))
-                _displayLink.add(to: RunLoop.main, forMode: RunLoopMode.commonModes)
+                _displayLink.add(to: RunLoop.main, forMode: RunLoop.Mode.common)
             }
         }
     }

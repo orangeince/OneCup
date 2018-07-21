@@ -82,7 +82,7 @@ class DrinkingViewController: UIViewController, UITableViewDataSource, UITableVi
         
         initializeFetchedResultsController()
         if recordDaily != nil {
-            drinkedTotalVolume = Int(recordDaily!.totalVolume!)
+            drinkedTotalVolume = Int(truncating: recordDaily!.totalVolume!)
         }
     }
     override func viewWillAppear(_ animated: Bool) {
@@ -159,16 +159,16 @@ class DrinkingViewController: UIViewController, UITableViewDataSource, UITableVi
     func tableView(_ tableView: UITableView, canEditRowAt indexPath: IndexPath) -> Bool {
         return true
     }
-    func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCellEditingStyle, forRowAt indexPath: IndexPath) {
+    func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle, forRowAt indexPath: IndexPath) {
         if editingStyle == .delete {
             //let volume = records[indexPath.row].drinkingVolume
             //records.removeAtIndex(indexPath.row)
             //drinkedTableView.deleteRowsAtIndexPaths([indexPath], withRowAnimation: .Left)
             let record = self.fetchedResultsController.object(at: indexPath) as! RecordDetail
-            let volume = Int(record.volume!)
+            let volume = Int(truncating: record.volume!)
             let context = self.mangedObjectContext
             context?.delete(record)
-            recordDaily!.totalVolume! = (Int(recordDaily!.totalVolume!) - volume) as NSNumber
+            recordDaily!.totalVolume! = (Int(truncating: recordDaily!.totalVolume!) - volume) as NSNumber
             do {
                 try context?.save()
             } catch {
@@ -181,10 +181,10 @@ class DrinkingViewController: UIViewController, UITableViewDataSource, UITableVi
     func tableView(_ tableView: UITableView, editActionsForRowAt indexPath: IndexPath) -> [UITableViewRowAction]? {
         let deleteAction = UITableViewRowAction(style: .normal, title: "delete") { (action: UITableViewRowAction, indexPath: IndexPath) -> Void in
             let record = self.fetchedResultsController.object(at: indexPath) as! RecordDetail
-            let volume = Int(record.volume!)
+            let volume = Int(truncating: record.volume!)
             let context = self.mangedObjectContext
             context?.delete(record)
-            self.recordDaily!.totalVolume! = (Int(self.recordDaily!.totalVolume!) - volume) as NSNumber
+            self.recordDaily!.totalVolume! = (Int(truncating: self.recordDaily!.totalVolume!) - volume) as NSNumber
             do {
                 try context?.save()
             } catch {
@@ -229,7 +229,7 @@ class DrinkingViewController: UIViewController, UITableViewDataSource, UITableVi
         let addingContext = self.mangedObjectContext
         
         if let daily = recordDaily {
-            drinkedTotalVolume = Int(daily.totalVolume!)
+            drinkedTotalVolume = Int(truncating: daily.totalVolume!)
             daily.totalVolume = drinkedTotalVolume + drinkedVolume as NSNumber
         } else {
             recordDaily = NSEntityDescription.insertNewObject(forEntityName: "RecordDaily", into: addingContext!) as? RecordDaily
@@ -302,7 +302,7 @@ class DrinkingViewController: UIViewController, UITableViewDataSource, UITableVi
         loadRecords()
         drinkedTableView.reloadData()
         if recordDaily != nil {
-            drinkedTotalVolume = Int(recordDaily!.totalVolume!)
+            drinkedTotalVolume = Int(truncating: recordDaily!.totalVolume!)
         }
     }
     
@@ -403,7 +403,7 @@ class DrinkingViewController: UIViewController, UITableViewDataSource, UITableVi
                 detail.date = now
                 detail.volume = drinkedVolume as NSNumber
                 detail.theDay = recordDaily
-                recordDaily.totalVolume = (Int(recordDaily.totalVolume!) + Int(drinkedVolume)) as NSNumber
+                recordDaily.totalVolume = (Int(truncating: recordDaily.totalVolume!) + Int(drinkedVolume)) as NSNumber
                 
                 recordDaily.mutableSetValue(forKey: "details").add(detail)
             }

@@ -119,12 +119,12 @@ class OIClockView: UIView, OIViewAnimatorDelegate  {
         
         let aniamteRatio = _animator.isReversal ? 1 - _animator.phaseY : _animator.phaseY
         
-        let phaseAngle = aniamteRatio * CGFloat(M_PI * 2.0) + CGFloat(M_PI)
+        let phaseAngle = aniamteRatio * CGFloat(Double.pi * 2.0) + CGFloat(Double.pi)
         
         //draw the clock
         for idx in 0 ..< 12 {
             let i = 2 * idx
-            let angle = CGFloat(Double(i) * M_PI / 12.0 + M_PI)
+            let angle = CGFloat(Double(i) * Double.pi / 12.0 + Double.pi)
             //if angle > phaseAngle || (_animator.isReversal && phaseAngle == 0.0) {
                 //break
             //}
@@ -158,13 +158,13 @@ class OIClockView: UIView, OIViewAnimatorDelegate  {
                 //CGContextTranslateCTM(context, 0, _radius + textHeight / 2.0)
                 context?.translateBy(x: 0, y: _radius - length - textHeight / 2.0)
                 //CGContextMoveToPoint(context, 0, length + textHeight)
-                context?.rotate(by: -CGFloat(Double(i) * M_PI / 12.0 - M_PI))
+                context?.rotate(by: -CGFloat(Double(i) * Double.pi / 12.0 - Double.pi))
                 let textRect = CGRect(x: 0 - textHeight / offX, y: -textHeight / 2.0, width: textHeight, height: textHeight)
                 var attrs = [String: AnyObject]()
-                attrs[NSFontAttributeName] = font
-                attrs[NSForegroundColorAttributeName] = scaleColor
+                attrs[convertFromNSAttributedStringKey(NSAttributedString.Key.font)] = font
+                attrs[convertFromNSAttributedStringKey(NSAttributedString.Key.foregroundColor)] = scaleColor
                 //NSString(string: String(i)).drawAtPoint(textPoint, withAttributes: attrs)
-                NSString(string: String(i)).draw(in: textRect, withAttributes: attrs)
+                NSString(string: String(i)).draw(in: textRect, withAttributes: convertToOptionalNSAttributedStringKeyDictionary(attrs))
                 //--end
             }
             context?.restoreGState()
@@ -249,9 +249,9 @@ class OIClockView: UIView, OIViewAnimatorDelegate  {
                 }
             }
             var attrs = [String: AnyObject]()
-            attrs[NSFontAttributeName] = descriptionFont
+            attrs[convertFromNSAttributedStringKey(NSAttributedString.Key.font)] = descriptionFont
             //attrs[NSForegroundColorAttributeName] = UIColor.blackColor()
-            attrs[NSForegroundColorAttributeName] = UIColor.white
+            attrs[convertFromNSAttributedStringKey(NSAttributedString.Key.foregroundColor)] = UIColor.white
             /*
             var descriptionText = "   "
             for texts in self.descriptionTexts {
@@ -268,7 +268,7 @@ class OIClockView: UIView, OIViewAnimatorDelegate  {
             NSString(string: descriptionText).drawAtPoint(textPoint, withAttributes: attrs)
             */
             let maxWidthKeyText = "最常时段 "
-            let maxKeyTextwidth = maxWidthKeyText.size(attributes: attrs).width
+            let maxKeyTextwidth = maxWidthKeyText.size(withAttributes: convertToOptionalNSAttributedStringKeyDictionary(attrs)).width
             let textHeight = descriptionFont.lineHeight
             let textMargin = (_descriptionAreaHeight - textHeight * 4.0) / 5.0
             if descriptionLocation == .center {
@@ -280,13 +280,13 @@ class OIClockView: UIView, OIViewAnimatorDelegate  {
                 let key = descriptionTexts[index].0
                 let value = " " + descriptionTexts[index].1
                 let offsetY = CGFloat(index) * (textHeight + textMargin)
-                let keyTextWidth = key.size(attributes: attrs).width
+                let keyTextWidth = key.size(withAttributes: convertToOptionalNSAttributedStringKeyDictionary(attrs)).width
                 let keyTextPoint = CGPoint(x: maxKeyTextwidth - keyTextWidth, y: offsetY)
-                NSString(string: key).draw(at: keyTextPoint, withAttributes: attrs)
+                NSString(string: key).draw(at: keyTextPoint, withAttributes: convertToOptionalNSAttributedStringKeyDictionary(attrs))
                 
                 //let valueTextWidth = value.sizeWithAttributes(attrs).width
                 let valueTextPoint = CGPoint(x: maxKeyTextwidth, y: offsetY)
-                NSString(string: value).draw(at: valueTextPoint, withAttributes: attrs)
+                NSString(string: value).draw(at: valueTextPoint, withAttributes: convertToOptionalNSAttributedStringKeyDictionary(attrs))
             }
             
             /*
@@ -348,9 +348,9 @@ class OIClockView: UIView, OIViewAnimatorDelegate  {
     }
     */
     fileprivate func angleInClock(_ hour: Int, _ minute: Int) -> CGFloat {
-        let hourAngle = CGFloat(M_PI / 12.0)
+        let hourAngle = CGFloat(Double.pi / 12.0)
         let minuteAngle = hourAngle / 60.0
-        return CGFloat(hour) * hourAngle + CGFloat(minute) * minuteAngle + CGFloat(M_PI)
+        return CGFloat(hour) * hourAngle + CGFloat(minute) * minuteAngle + CGFloat(Double.pi)
     }
     fileprivate func distanceToCentre(_ volume: Int) -> CGFloat {
         let v = min(volume, _maxVolume)
@@ -380,4 +380,15 @@ class OIClockView: UIView, OIViewAnimatorDelegate  {
         _animator.animate(yAxisDuration: duration)
     }
     
+}
+
+// Helper function inserted by Swift 4.2 migrator.
+fileprivate func convertFromNSAttributedStringKey(_ input: NSAttributedString.Key) -> String {
+	return input.rawValue
+}
+
+// Helper function inserted by Swift 4.2 migrator.
+fileprivate func convertToOptionalNSAttributedStringKeyDictionary(_ input: [String: Any]?) -> [NSAttributedString.Key: Any]? {
+	guard let input = input else { return nil }
+	return Dictionary(uniqueKeysWithValues: input.map { key, value in (NSAttributedString.Key(rawValue: key), value)})
 }

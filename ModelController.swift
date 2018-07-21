@@ -23,9 +23,9 @@ class ModelController: NSObject, UIPageViewControllerDataSource {
         //let dateFormatter = NSDateFormatter()
         //pageData = dateFormatter.monthSymbols
         let storyboard = UIStoryboard(name: "Main", bundle: nil)
-        self.dataViewController = storyboard.instantiateViewController(withIdentifier: "StatisticViewController") as! StatisticViewController
+        self.dataViewController = storyboard.instantiateViewController(withIdentifier: "StatisticViewController") as? StatisticViewController
         self.dataViewController.referenceIndex = 0
-        self.secondViewController = storyboard.instantiateViewController(withIdentifier: "StatisticViewController") as! StatisticViewController
+        self.secondViewController = storyboard.instantiateViewController(withIdentifier: "StatisticViewController") as? StatisticViewController
         self.secondViewController.referenceIndex = 1
     }
     
