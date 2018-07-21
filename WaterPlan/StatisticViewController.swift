@@ -89,15 +89,8 @@ class StatisticViewController: UIViewController, UIPageViewControllerDataSource,
             self.firstRecord = firstRecord[0]
             let firstRecordDate = self.firstRecord!.date!
             
-            var calendar = Calendar.current
-            calendar.firstWeekday = 2
-            
-            //var beginningOfWeek: Date?
-            //(calendar as NSCalendar).range(of: .weekOfYear, start: beginningOfWeek as! NSDate, interval: nil, for: firstRecordDate)
-            // self.firstRecordDate = beginningOfWeek
-            // FIXME if wrong
-            self.firstRecordDate = firstRecordDate //解决error时新增一行
-            
+            self.firstRecordDate = firstRecordDate.previous(.monday)
+
             var curWeekDatas = self.loadDataForTheWeek(self.curDate)
             curWeekDatas.2 = "本周"
             self.dataStore.append(curWeekDatas)
@@ -134,9 +127,7 @@ class StatisticViewController: UIViewController, UIPageViewControllerDataSource,
         var calendar = Calendar.current
         calendar.firstWeekday = 2
         
-        //(calendar as NSCalendar).range(of: .weekOfYear, start: startDate as! NSDate, interval: nil, for: theDay)
-        // FIXME if wrong
-        startDate = theDay //解决error时新增一行
+        startDate = theDay.previous(.monday)
         let endDate = Date(timeInterval: TimeInterval(7 * 24 * 3600 - 1), since: startDate!)
         let startComp = (calendar as NSCalendar).components([.month, .day], from: startDate!)
         let endComp = (calendar as NSCalendar).components([.month, .day], from: endDate)

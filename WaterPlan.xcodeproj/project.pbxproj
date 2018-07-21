@@ -35,6 +35,7 @@
 		2ABB6BF81BDA2222003F7C9F /* ReminderTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2ABB6BF71BDA2222003F7C9F /* ReminderTableViewController.swift */; };
 		2AEDAABE1BE72565005FF247 /* drinkedCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2AEDAABD1BE72565005FF247 /* drinkedCell.swift */; };
 		2AEDAAC01BE728EC005FF247 /* DrinkingViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2AEDAABF1BE728EC005FF247 /* DrinkingViewController.swift */; };
+		F5F66D7721032F5F0097D092 /* Date+Ex.swift in Sources */ = {isa = PBXBuildFile; fileRef = F5F66D7621032F5F0097D092 /* Date+Ex.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -80,6 +81,7 @@
 		2ABB6BF71BDA2222003F7C9F /* ReminderTableViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = ReminderTableViewController.swift; path = ../ReminderTableViewController.swift; sourceTree = "<group>"; };
 		2AEDAABD1BE72565005FF247 /* drinkedCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = drinkedCell.swift; sourceTree = "<group>"; };
 		2AEDAABF1BE728EC005FF247 /* DrinkingViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DrinkingViewController.swift; sourceTree = "<group>"; };
+		F5F66D7621032F5F0097D092 /* Date+Ex.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Date+Ex.swift"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -169,6 +171,7 @@
 		2A8574BF1BD37467008B55EC /* WaterPlan */ = {
 			isa = PBXGroup;
 			children = (
+				F5F66D7521032F2C0097D092 /* Extensions */,
 				2A8574C01BD37467008B55EC /* AppDelegate.swift */,
 				2A8574C41BD37467008B55EC /* Main.storyboard */,
 				2A2BEBD01C098AF400D74C27 /* TransitioningDelegates.swift */,
@@ -192,6 +195,14 @@
 				2A8574D71BD37467008B55EC /* Info.plist */,
 			);
 			path = WaterPlanTests;
+			sourceTree = "<group>";
+		};
+		F5F66D7521032F2C0097D092 /* Extensions */ = {
+			isa = PBXGroup;
+			children = (
+				F5F66D7621032F5F0097D092 /* Date+Ex.swift */,
+			);
+			name = Extensions;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -305,6 +316,7 @@
 				2A2BEBDF1C0D6FAF00D74C27 /* ShortcutCupTableViewController.swift in Sources */,
 				2A0301861C21A4A600A6B5AA /* RecordModel.swift in Sources */,
 				2A6CF9C21C167392006D5801 /* OIBarChartView.swift in Sources */,
+				F5F66D7721032F5F0097D092 /* Date+Ex.swift in Sources */,
 				2A1747F81C1ED0D100007B31 /* OICupButton.swift in Sources */,
 				2A8574C31BD37467008B55EC /* ViewController.swift in Sources */,
 				2A2B85DF1C1739E30065EA8E /* OIViewAnimator.swift in Sources */,
