@@ -214,7 +214,7 @@ class DrinkingViewController: UIViewController, UITableViewDataSource, UITableVi
         guard drinkedVolume > 0 else { return }
         if drinkedVolume == 10 {
             resetAllTestData()
-            refreshRecords()
+            refreshRecords(force: true)
             return
         }
         refreshRecords()
@@ -302,7 +302,7 @@ class DrinkingViewController: UIViewController, UITableViewDataSource, UITableVi
             return
         }
         curDay = Date()
-        drinkedTotalVolume = 0
+        DrinkingWater(-drinkedTotalVolume)
         loadRecords()
         drinkedTableView.reloadData()
         if recordDaily != nil {
@@ -382,11 +382,12 @@ class DrinkingViewController: UIViewController, UITableViewDataSource, UITableVi
         let calendar = Calendar.current
         
         for dayIdx in 1 ... 30 {
-            let now = Date(timeInterval: -TimeInterval(dayIdx * 24 * 3600), since: Date())
-            let components = (calendar as NSCalendar).components([.hour, .minute, .weekday], from: now)
+            var theDate = Date(timeInterval: -TimeInterval(dayIdx * 24 * 3600), since: Date())
+            theDate = calendar.date(bySettingHour: 0, minute: 0, second: 0, of: theDate) ?? theDate
+            let components = (calendar as NSCalendar).components([.hour, .minute, .weekday], from: theDate)
          
             let recordDaily = NSEntityDescription.insertNewObject(forEntityName: "RecordDaily", into: context!) as! RecordDaily
-            recordDaily.date = now
+            recordDaily.date = theDate
             recordDaily.totalVolume = 0
             var weekDay = components.weekday
             if weekDay == 1 {
@@ -398,13 +399,13 @@ class DrinkingViewController: UIViewController, UITableViewDataSource, UITableVi
             for _ in 0 ... 5 {
                 let detail = NSEntityDescription.insertNewObject(forEntityName: "RecordDetail", into: context!) as! RecordDetail
                 let drinkedVolume = arc4random() % 600
-                let hour = arc4random() % 24
-                let minute = arc4random() % 60
-                let drinkingTime = getTwoDigitNumber(Int(hour)) + ":" + getTwoDigitNumber(Int(minute))
+                let hour = Int(arc4random() % 24)
+                let minute = Int(arc4random() % 60)
+                let drinkingTime = getTwoDigitNumber(hour) + ":" + getTwoDigitNumber(minute)
                 detail.time = drinkingTime as NSString
                 detail.theHour = hour as NSNumber
                 detail.theMinute = minute as NSNumber
-                detail.date = now
+                detail.date = calendar.date(bySettingHour: hour, minute: minute, second: 0, of: theDate) ?? theDate
                 detail.volume = drinkedVolume as NSNumber
                 detail.theDay = recordDaily
                 recordDaily.totalVolume = (Int(truncating: recordDaily.totalVolume!) + Int(drinkedVolume)) as NSNumber
