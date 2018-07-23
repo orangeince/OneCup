@@ -43,6 +43,12 @@ class StatisticViewController: UIViewController, UIPageViewControllerDataSource,
         case previous
         case next
     }
+    override func viewDidLayoutSubviews() {
+        super.viewDidLayoutSubviews()
+        let marginTop = self.separateView.frame.origin.y + self.separateView.frame.height//
+        let marginBottom = CGFloat(self.dismissBtn.frame.height + 10.0)
+        self.pageViewController!.view.frame = CGRect(x: 0, y: marginTop, width: self.view.bounds.width, height: self.view.bounds.height - marginTop - marginBottom)
+    }
     override func viewDidLoad() {
         super.viewDidLoad()
         self.view.layer.cornerRadius = 8

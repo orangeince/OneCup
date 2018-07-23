@@ -361,6 +361,7 @@ class AnimationTransitioningForDrinkingAndSettings: NSObject, UIViewControllerAn
                 }, completion: { (finished: Bool) -> Void in
                     let success = !transitionContext.transitionWasCancelled
                     transitionContext.completeTransition(success)
+                    fromView.layer.transform = CATransform3DIdentity
             })
             }, completion: nil)
     }
